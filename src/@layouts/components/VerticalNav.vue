@@ -56,7 +56,7 @@ const handleNavScroll = evt => {
     <div class="nav-header">
       <slot name="nav-header">
         <RouterLink class="app-logo d-flex align-center gap-x-3 app-title-wrapper" to="/">
-          <h1 class="leading-normal">sneat</h1>
+          <h1 class="leading-normal">HRaccoon</h1>
         </RouterLink>
       </slot>
     </div>

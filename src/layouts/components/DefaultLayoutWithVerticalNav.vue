@@ -12,7 +12,7 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
 
 <template>
   <VerticalNavLayout>
-    <!-- 👉 navbar -->
+    <!-- 👉 horizontal Navbar -->
     <template #navbar="{ toggleVerticalOverlayNavActive }">
       <div class="d-flex h-100 align-center">
         <!-- 👉 Vertical nav toggle in overlay mode -->
@@ -20,29 +20,20 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
           <VIcon icon="bx-menu" />
         </IconBtn>
 
-        <!-- 👉 Search -->
-        <div class="d-flex align-center cursor-pointer" style="user-select: none">
-          <!-- 👉 Search Trigger button -->
-          <IconBtn>
-            <VIcon icon="bx-search" />
-          </IconBtn>
+        <!--        &lt;!&ndash; 👉 Search &ndash;&gt;-->
+        <!--        <div class="d-flex align-center cursor-pointer" style="user-select: none">-->
+        <!--          &lt;!&ndash; 👉 Search Trigger button &ndash;&gt;-->
+        <!--          <IconBtn>-->
+        <!--            <VIcon icon="bx-search" />-->
+        <!--          </IconBtn>-->
 
-          <span class="d-none d-md-flex align-center text-disabled">
-            <span class="me-3">Search</span>
-            <span class="meta-key">&#8984;K</span>
-          </span>
-        </div>
+        <!--          <span class="d-none d-md-flex align-center text-disabled">-->
+        <!--            <span class="me-3">Search</span>-->
+        <!--            <span class="meta-key">&#8984;K</span>-->
+        <!--          </span>-->
+        <!--        </div>-->
 
         <VSpacer />
-
-        <IconBtn
-          class="me-2"
-          href="https://github.com/themeselection/sneat-vuetify-vuejs-admin-template-free"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <VIcon icon="bxl-github" />
-        </IconBtn>
 
         <IconBtn class="me-2">
           <VIcon icon="bx-bell" />
@@ -54,89 +45,102 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
       </div>
     </template>
 
+    <!-- 👉 Vertical Navbar -->
     <template #vertical-nav-content>
-      <VerticalNavLink
+      <VerticalNavSectionTitle
         :item="{
-          title: 'Dashboard',
-          icon: 'bx-home',
-          to: '/dashboard',
+          heading: '내 정보',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'Account Settings',
+          title: '홈',
+          icon: 'bx-home',
+          to: '/',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: '마이 페이지',
           icon: 'mdi-account-cog-outline',
           to: '/account-settings',
         }"
       />
 
-      <!-- 👉 Pages -->
+      <!-- 👉 근태 -->
       <VerticalNavSectionTitle
         :item="{
-          heading: 'Pages',
+          heading: '근태',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'Login',
+          title: '근태 관리',
           icon: 'bx-log-in',
           to: '/login',
         }"
       />
+
+      <!-- 👉 결재 -->
+      <VerticalNavSectionTitle
+        :item="{
+          heading: '결재 관리',
+        }"
+      />
       <VerticalNavLink
         :item="{
-          title: 'Register',
-          icon: 'bx-user-plus',
+          title: '결재 신청',
+          icon: 'bx-barcode',
           to: '/register',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'Error',
-          icon: 'bx-info-circle',
-          to: '/no-existence',
-        }"
-      />
-
-      <!-- 👉 User Interface -->
-      <VerticalNavSectionTitle
-        :item="{
-          heading: 'User Interface',
+          title: '결재 요청 관리',
+          icon: 'bx-add-to-queue',
+          to: '/register',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'Typography',
+          title: '결재 현황 관리',
+          icon: 'bx-user-plus',
+          to: '/register',
+        }"
+      />
+
+      <!-- 👉 좌석 -->
+      <VerticalNavSectionTitle
+        :item="{
+          heading: '좌석 관리',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: '좌석 선택',
           icon: 'mdi-alpha-t-box-outline',
           to: '/typography',
         }"
       />
-      <VerticalNavLink
+
+      <!-- 👉 에러 페이지 -->
+      <VerticalNavSectionTitle
         :item="{
-          title: 'Icons',
-          icon: 'bx-show',
-          to: '/icons',
+          heading: '개발 페이지',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'Cards',
-          icon: 'bx-credit-card',
-          to: '/cards',
+          title: 'Error',
+          icon: 'bx-x',
+          to: '/no-existence',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'Tables',
-          icon: 'bx-table',
-          to: '/tables',
-        }"
-      />
-      <VerticalNavLink
-        :item="{
-          title: 'Form Layouts',
-          icon: 'mdi-form-select',
-          to: '/form-layouts',
+          title: '테스트 페이지',
+          icon: 'bx-x',
+          to: '/test',
         }"
       />
     </template>
