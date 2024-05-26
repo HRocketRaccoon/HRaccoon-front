@@ -1,7 +1,7 @@
 <template>
-  <component :is="$route.meta.layout || 'div'">
+  <VApp>
     <RouterView />
-  </component>
+  </VApp>
 </template>
 
 <script setup>
