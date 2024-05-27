@@ -11,6 +11,10 @@ const router = createRouter({
       // 예시) 레이아웃 적용
       // meta: { layout: IntroLayout },
     },
+    {
+      path: '/login',
+      component: () => import('@/views/LoginView.vue'),
+    },
 
     // 예시) component를 동적으로 불러오는 방법
     // {
