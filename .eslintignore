@@ -1,4 +1,5 @@
 .prettierrc.json
+.eslintrc.cjs
 index.html
 jsconfig.json
 package.json
