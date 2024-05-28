@@ -15,12 +15,20 @@ const router = createRouter({
           path: 'test',
           component: () => import('@/views/dev/TestView.vue'),
         },
+        {
+          path: 'seat',
+          component: () => import('@/views/SeatView.vue'),
+        },
       ],
     },
     {
       path: '/',
       component: () => import('@/layouts/BlankLayout.vue'),
       children: [
+        {
+          path: 'login',
+          component: () => import('@/views/LoginView.vue'),
+        },
         {
           path: '/:pathMatch(.*)*',
           component: () => import('@/views/exception/ErrorView.vue'),
