@@ -22,6 +22,10 @@ const router = createRouter({
       component: () => import('@/layouts/BlankLayout.vue'),
       children: [
         {
+          path: 'login',
+          component: () => import('@/views/auth/LoginView.vue'),
+        },
+        {
           path: '/:pathMatch(.*)*',
           component: () => import('@/views/exception/ErrorView.vue'),
         },
