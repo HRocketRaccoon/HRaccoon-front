@@ -12,6 +12,10 @@ const router = createRouter({
           component: () => import('@/views/home/HomeView.vue'),
         },
         {
+          path: 'sign-up-approval',
+          component: () => import('@/views/approval/SignUpApprovalView.vue'),
+        },
+        {
           path: 'test',
           component: () => import('@/views/dev/TestView.vue'),
         },
