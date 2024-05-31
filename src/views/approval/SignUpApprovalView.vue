@@ -1,5 +1,5 @@
 <template>
-  <h1 class="mb-2">결재 신청</h1>
+  <h1 class="mb-2">| 결재 신청</h1>
   <VCard>
     <VForm @submit.prevent="() => {}">
       <VRow>
@@ -53,8 +53,8 @@
         </VCol>
 
         <VCol class="d-flex gap-4">
-          <VBtn type="submit"> 제출</VBtn>
-          <VBtn color="secondary" type="reset" variant="tonal" @click="resetParams">초기화</VBtn>
+          <VBtn size="large" type="submit"> 제출</VBtn>
+          <VBtn color="secondary" size="large" type="reset" variant="tonal" @click="resetParams">초기화</VBtn>
         </VCol>
       </VRow>
     </VForm>
