@@ -1,17 +1,25 @@
 <template>
-  <v-container>
-    <v-col>
-      <VueDatePicker v-model="selectDate" inline auto-apply :markers="markers" locale="ko" :enable-time-picker="false">
-        <template #action-extra="{ selectCurrentDate }">
-          <span @click="selectCurrentDate()" title="Select current date">
+  <VCard>
+    <VueDatePicker
+      class="mt-10 mb-10"
+      v-model="selectDate"
+      inline
+      auto-apply
+      :markers="markers"
+      locale="ko"
+      :enable-time-picker="false"
+    >
+      <template #action-extra="{ selectCurrentDate }">
+        <span @click="selectCurrentDate()" title="Select current date">
+          <div :class="{ tooltip: isDateSelected(selectDate) }">
             <div v-for="text in getDataBySelectDate(selectDate)" :key="text.id">
               <p>{{ text }}</p>
             </div>
-          </span>
-        </template>
-      </VueDatePicker>
-    </v-col>
-  </v-container>
+          </div>
+        </span>
+      </template>
+    </VueDatePicker>
+  </VCard>
 </template>
 
 <script setup>
@@ -89,6 +97,8 @@ const addMarkers = () => {
         name: user.name,
         approval_type: user.approval_type,
         color: user.approval_type === 'vacation' ? 'blue' : 'green',
+        startDate: dateStr(startDate),
+        endDate: dateStr(endDate),
       })
 
       currentDate.setUTCDate(currentDate.getUTCDate() + 1) // 다음 날짜로 이동
@@ -102,7 +112,12 @@ const addMarkers = () => {
       type: 'dot',
       color: users[0].color,
     })
-    users.map(user => tooltip.value.push({ date: new Date(dateKey), text: `${user.name} - ${user.approval_type}` }))
+    users.map(user =>
+      tooltip.value.push({
+        date: new Date(dateKey),
+        text: `${user.name}님 ${user.approval_type}: ${user.startDate}~${user.endDate}`,
+      }),
+    )
   })
 }
 
@@ -119,11 +134,31 @@ const getDataBySelectDate = date => {
   })
   return res_text
 }
+
+const isDateSelected = date => {
+  return getDataBySelectDate(date).length > 0
+}
 </script>
 
 <style lang="scss">
 .dp__theme_light {
   --dp-primary-color: gray;
   --dp-primary-disabled-color: #6bacea;
+  --dp-menu-border-color: none;
+  --dp-arrow-left: 50%;
+}
+.dp__flex_display {
+  display: flex;
+  justify-content: center;
+}
+
+:root {
+  --dp-menu-min-width: 350px;
+}
+.tooltip {
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  padding: 35px 0;
 }
 </style>

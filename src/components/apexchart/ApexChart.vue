@@ -1,8 +1,22 @@
 <template>
-  <div>
-    <!-- radial chart -->
-    <VueApexCharts type="radialBar" :height="200" :options="chartOptions.radial" :series="[78]" class="mt-6" />
-  </div>
+  <VCard>
+    <VCardTitle>나의 근무시간</VCardTitle>
+    <VCardText>
+      <VCol class="text-h2">
+        <VueApexCharts type="radialBar" :height="280" :options="chartOptions.radial" :series="[78]" class="mt-6" />
+      </VCol>
+    </VCardText>
+    <template v-slot:actions>
+      <v-btn
+        :to="{ path: '/test' }"
+        append-icon="mdi-chevron-right"
+        color="lighten-2"
+        text="근태 관리 바로가기"
+        variant="outlined"
+        block
+      ></v-btn>
+    </template>
+  </VCard>
 </template>
 
 <script setup>
@@ -169,15 +183,15 @@ const chartOptions = computed(() => {
       responsive: [
         {
           breakpoint: 900,
-          options: { chart: { height: 200 } },
+          options: { chart: { height: 280 } },
         },
         {
           breakpoint: 735,
-          options: { chart: { height: 200 } },
+          options: { chart: { height: 280 } },
         },
         {
           breakpoint: 660,
-          options: { chart: { height: 200 } },
+          options: { chart: { height: 280 } },
         },
         {
           breakpoint: 600,
