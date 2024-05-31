@@ -16,6 +16,10 @@ const router = createRouter({
           component: () => import('@/views/approval/SignUpApprovalView.vue'),
         },
         {
+          path: 'approval-detail',
+          component: () => import('@/views/approval/ApprovalDetailView.vue'),
+        },
+        {
           path: 'test',
           component: () => import('@/views/dev/TestView.vue'),
         },
