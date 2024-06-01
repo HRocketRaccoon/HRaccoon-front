@@ -30,22 +30,32 @@
     <VDivider class="mb-4"></VDivider>
 
     <VCard v-if="tasks.length > 0">
-      <VSlideYTransition class="py-0" tag="v-list" group>
+      <VSlideYTransition class="py-0" tag="VList" group>
         <div v-for="(task, i) in tasks" :key="`${i}-${task.text}`">
           <VDivider v-if="i !== 0" :key="`${i}-divider`"></VDivider>
 
           <VListItem @click="task.done = !task.done">
             <template v-slot:prepend>
-              <v-checkbox-btn v-model="task.done" color="grey"></v-checkbox-btn>
+              <VCheckbox v-model="task.done" color="grey"></VCheckbox>
             </template>
 
             <VListItemTitle>
-              <span :class="task.done ? 'text-grey' : 'text-primary'">{{ task.text }}</span>
+              <span :class="task.done ? 'text-grey done' : 'text-primary'">{{ task.text }}</span>
             </VListItemTitle>
 
             <template v-slot:append>
               <VExpandXTransition>
-                <VIcon v-if="task.done" color="success"> mdi-check </VIcon>
+                <!-- <VIcon v-if="task.done" color="success"> mdi-check </VIcon> -->
+                <!-- <v-btn fab ripple small color="red" v-if="task.done" @click="removeTodo(i)">
+                  <v-icon class="white--text">mdi-close</v-icon>
+                </v-btn> -->
+                <img
+                  v-if="task.done"
+                  class="delete-btn"
+                  @click="removeTodo(i)"
+                  style="cursor: pointer"
+                  src="@/assets/circle-substract.png"
+                />
               </VExpandXTransition>
             </template>
           </VListItem>
@@ -57,7 +67,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import { VIcon } from 'vuetify/lib/components/index.mjs'
 
 const tasks = ref([
   {
@@ -88,12 +97,24 @@ const create = () => {
   })
   newTask.value = null
 }
+
+const removeTodo = index => {
+  tasks.value.splice(index, 1)
+}
 </script>
 
 <style lang="scss">
 .v-selection-control__input input {
-  height: 50px;
-  width: 50px;
-  opacity: 0;
+  position: absolute;
+  left: 8px;
+  top: 0;
+  width: 20px;
+  opacity: 1;
+}
+.done {
+  text-decoration: line-through;
+}
+.delete-btn {
+  height: 30px;
 }
 </style>

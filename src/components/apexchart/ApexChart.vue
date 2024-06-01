@@ -3,7 +3,7 @@
     <VCardTitle>나의 근무시간</VCardTitle>
     <VCardText>
       <VCol class="text-h2">
-        <VueApexCharts type="radialBar" :height="280" :options="chartOptions.radial" :series="[78]" class="mt-6" />
+        <VueApexCharts type="radialBar" :height="300" :options="chartOptions.radial" :series="[78]" class="mt-6" />
       </VCol>
     </VCardText>
     <template v-slot:actions>
@@ -27,17 +27,6 @@ import { computed } from 'vue'
 
 const vuetifyTheme = useTheme()
 const display = useDisplay()
-
-// const series = [
-//   {
-//     name: `${new Date().getFullYear() - 1}`,
-//     data: [18, 7, 15, 29, 18, 12, 9],
-//   },
-//   {
-//     name: `${new Date().getFullYear() - 2}`,
-//     data: [-13, -18, -9, -14, -5, -17, -15],
-//   },
-// ]
 
 const chartOptions = computed(() => {
   const currentTheme = vuetifyTheme.current.value.colors
@@ -183,19 +172,19 @@ const chartOptions = computed(() => {
       responsive: [
         {
           breakpoint: 900,
-          options: { chart: { height: 280 } },
+          options: { chart: { height: 250 } },
         },
         {
           breakpoint: 735,
-          options: { chart: { height: 280 } },
+          options: { chart: { height: 200 } },
         },
         {
           breakpoint: 660,
-          options: { chart: { height: 280 } },
+          options: { chart: { height: 200 } },
         },
         {
           breakpoint: 600,
-          options: { chart: { height: 280 } },
+          options: { chart: { height: 380 } },
         },
       ],
     },
