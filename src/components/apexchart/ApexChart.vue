@@ -14,17 +14,6 @@ import { computed } from 'vue'
 const vuetifyTheme = useTheme()
 const display = useDisplay()
 
-// const series = [
-//   {
-//     name: `${new Date().getFullYear() - 1}`,
-//     data: [18, 7, 15, 29, 18, 12, 9],
-//   },
-//   {
-//     name: `${new Date().getFullYear() - 2}`,
-//     data: [-13, -18, -9, -14, -5, -17, -15],
-//   },
-// ]
-
 const chartOptions = computed(() => {
   const currentTheme = vuetifyTheme.current.value.colors
   const variableTheme = vuetifyTheme.current.value.variables
