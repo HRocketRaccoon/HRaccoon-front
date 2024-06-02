@@ -31,7 +31,7 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${token}`
         return api(originalRequest)
       } catch (err) {
-        authStore.logout()
+        await authStore.signOut()
         return Promise.reject(err)
       }
     }
