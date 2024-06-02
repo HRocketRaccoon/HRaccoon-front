@@ -76,8 +76,8 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
       <VerticalNavLink
         :item="{
           title: '근태 관리',
-          icon: 'bx-log-in',
-          to: '/login',
+          icon: 'bx-home',
+          to: '/',
         }"
       />
 
@@ -91,21 +91,21 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
         :item="{
           title: '결재 신청',
           icon: 'bx-barcode',
-          to: '/register',
+          to: '/approval/request',
         }"
       />
       <VerticalNavLink
         :item="{
           title: '결재 요청 관리',
           icon: 'bx-add-to-queue',
-          to: '/register',
+          to: '/approval/request/list',
         }"
       />
       <VerticalNavLink
         :item="{
           title: '결재 현황 관리',
           icon: 'bx-user-plus',
-          to: '/register',
+          to: '/approval/status/list',
         }"
       />
 
@@ -141,6 +141,13 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
           title: '테스트 페이지',
           icon: 'bx-x',
           to: '/test',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: '로그인',
+          icon: 'bx-log-in',
+          to: '/login',
         }"
       />
     </template>

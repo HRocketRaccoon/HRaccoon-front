@@ -14,7 +14,7 @@
 
       <VCardText class="pt-2 d-flex flex-column align-center justify-center">
         <h5 class="text-h5 mb-1">Welcome to HRaccoon! 👋🏻</h5>
-        <p class="mb-0">로그인을 진행해주세요</p>
+        <p class="mb-0">안녕하세요 HRaccoon입니다. 로그인을 진행해주세요</p>
       </VCardText>
 
       <VCardText>
@@ -38,7 +38,7 @@
 
               <!-- remember me checkbox -->
               <div class="d-flex align-center justify-space-between flex-wrap mt-4 mb-4">
-                <RouterLink class="text-primary ms-2 mb-1" to="javascript:void(0)"> Forgot Password?</RouterLink>
+                <RouterLink class="text-primary mb-1 ml-auto" to="javascript:void(0)"> Forgot Password?</RouterLink>
               </div>
 
               <!-- login button -->
