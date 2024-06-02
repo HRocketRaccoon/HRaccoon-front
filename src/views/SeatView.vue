@@ -1,8 +1,8 @@
 <template>
-  <div id="mySeatPicker">
+  <v-container>
     <h2 class="office-title">좌석배치도</h2>
-    <VRow>
-      <VCol>
+    <v-row>
+      <v-col>
         <div v-for="(layout, floor) in seatLayouts[selectedOffice]" :key="floor">
           <div v-if="selectedFloor === floor" class="seat-map">
             <div
@@ -20,7 +20,7 @@
                     none: seat === null,
                     entrance: seat === '입구',
                   }"
-                  @click="seat !== null && seat !== '입구' && doSelect(seat)"
+                  @click="handleSeatClick(seat)"
                 >
                   {{ seat }}
                 </button>
@@ -28,87 +28,98 @@
             </div>
           </div>
         </div>
-      </VCol>
-      <VCol>
-        <div class="office-selector">
-          <label for="office">오피스를 선택해주세요:</label>
-          <select v-model="selectedOffice" id="office" class="custom-select">
-            <option v-for="office in offices" :key="office" :value="office">{{ office }}</option>
-          </select>
-        </div>
-
-        <div class="floor-selector">
-          <button @click="selectFloor('LOBBY')" :class="{ active: selectedFloor === 'LOBBY' }">Lobby</button>
-          <button @click="selectFloor('1F')" :class="{ active: selectedFloor === '1F' }">1F</button>
-          <button @click="selectFloor('2F')" :class="{ active: selectedFloor === '2F' }">2F</button>
-          <button @click="selectFloor('3F')" :class="{ active: selectedFloor === '3F' }">3F</button>
-        </div>
-
-        <div class="legend">
+      </v-col>
+      <v-col>
+        <v-select v-model="selectedOffice" :items="offices" label="오피스를 선택해주세요"></v-select>
+        <v-btn-toggle v-model="selectedFloor" mandatory class="mt-4">
+          <v-btn value="LOBBY">Lobby</v-btn>
+          <v-btn value="1F">1F</v-btn>
+          <v-btn value="2F">2F</v-btn>
+          <v-btn value="3F">3F</v-btn>
+        </v-btn-toggle>
+        <div class="legend mt-4">
           <div class="tips" v-show="showTips">
             <div><span class="checked seat seatTip"></span> : 사용 중인 좌석</div>
             <div><span class="selected seat seatTip"></span> : 본인이 사용 중인 좌석</div>
             <div><span class="available seat seatTip"></span> : 사용 가능한 좌석</div>
           </div>
         </div>
-      </VCol>
-    </VRow>
+      </v-col>
+    </v-row>
 
     <!-- 사원 정보 모달 시작 -->
-    <div v-if="showEmployeeModal" class="modal-overlay" @click.self="closeModal">
-      <div class="modal-content employee-modal">
-        <button class="modal-close" @click="closeModal">×</button>
-        <div class="modal-body">
-          <div class="employee-photo">
-            <v-img src="src/assets/employee.jpg" class="custom-avatar" alt="Avatar"></v-img>
-          </div>
-          <div class="employee-info">
-            <p>이름: {{ employeeInfo.name }}</p>
-            <p>사번: {{ employeeInfo.id }}</p>
-            <p>부서: {{ employeeInfo.department }}</p>
-            <p>직책: {{ employeeInfo.position }}</p>
-            <!-- 추가: 사용 중인 좌석 문구 -->
-            <div v-if="checked.length > 0" class="used-seats">
-              <p>이미 사용 중인 좌석입니다</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <v-dialog v-model="showEmployeeModal" max-width="600px">
+      <v-card>
+        <v-card-title class="d-flex justify-space-between align-center">
+          <span class="headline">사원 정보</span>
+          <v-btn icon @click="closeModal">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="4">
+                <v-img src="src/assets/employee.jpg" class="custom-avatar" alt="Avatar"></v-img>
+              </v-col>
+              <v-col cols="8">
+                <p>이름: {{ employeeInfo.name }}</p>
+                <p>사번: {{ employeeInfo.id }}</p>
+                <p>부서: {{ employeeInfo.department }}</p>
+                <p>직책: {{ employeeInfo.position }}</p>
+                <div v-if="checked.length > 0" class="used-seats">
+                  <p>이미 사용 중인 좌석입니다</p>
+                </div>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
     <!-- 사원 정보 모달 끝 -->
 
     <!-- 확인 모달 시작 -->
-    <div v-if="showConfirmModal" class="modal-overlay" @click.self="closeConfirmModal">
-      <div class="modal-content confirm-modal">
-        <button class="modal-close" @click="closeConfirmModal">×</button>
-        <div class="modal-body">
+    <v-dialog v-model="showConfirmModal" max-width="400px">
+      <v-card>
+        <v-card-title class="d-flex justify-space-between align-center">
+          <span class="headline">좌석 선택</span>
+          <v-btn icon @click="closeConfirmModal">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-card-text>
           <p>{{ confirmMessage }}</p>
-          <div class="modal-footer">
-            <button @click="confirmAction(true)">확인</button>
-          </div>
-        </div>
-      </div>
-    </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="confirmAction(true)">확인</v-btn>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <!-- 확인 모달 끝 -->
 
     <!-- 알림 모달 시작 -->
-    <div v-if="showAlertModal" class="modal-overlay" @click.self="closeAlertModal">
-      <div class="modal-content alert-modal">
-        <button class="modal-close" @click="closeAlertModal">×</button>
-        <div class="modal-body">
+    <v-dialog v-model="showAlertModal" max-width="400px">
+      <v-card>
+        <v-card-title class="d-flex justify-space-between align-center">
+          <span class="headline">좌석 선택</span>
+        </v-card-title>
+        <v-card-text>
           <p>{{ alertMessage }}</p>
-          <div class="modal-footer">
-            <button @click="closeAlertModal">확인</button>
-          </div>
-        </div>
-      </div>
-    </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="closeAlertModal">확인</v-btn>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <!-- 알림 모달 끝 -->
-  </div>
+  </v-container>
 </template>
 
 <script setup>
-import { VRow } from 'vuetify/lib/components/index.mjs'
 import { ref } from 'vue'
 
 const selected = ref([])
@@ -233,13 +244,8 @@ const confirmMessage = ref('')
 const confirmAction = ref(null)
 const alertMessage = ref('')
 
-const selectFloor = floor => {
-  selectedFloor.value = floor
-}
-
-const doSelect = seat => {
-  if (selected.value.length > 0 && !selected.value.includes(seat)) {
-    showAlert('한 번에 하나의 좌석만 선택할 수 있습니다.')
+const handleSeatClick = seat => {
+  if (seat === null || seat === '입구') {
     return
   }
 
@@ -255,7 +261,7 @@ const doSelect = seat => {
     }
     confirmMessage.value = `좌석 번호 ${seat}을(를) 취소하시겠습니까?`
     showConfirmModal.value = true
-  } else {
+  } else if (selected.value.length === 0) {
     confirmAction.value = confirm => {
       if (confirm) {
         selected.value.push(seat)
@@ -266,8 +272,6 @@ const doSelect = seat => {
     confirmMessage.value = `좌석 번호 ${seat}을(를) 선택하시겠습니까?`
     showConfirmModal.value = true
   }
-  console.log(`선택됨 좌석 번호: ${seat}`)
-  console.log('현재 선택된 좌석', selected.value)
 }
 
 const showEmployeeInfo = () => {
@@ -307,17 +311,10 @@ const closeAlertModal = () => {
   font-size: 1em;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* 왼쪽 정렬 */
-  width: 100vw;
-  height: 150vh;
+  align-items: flex-start;
+  width: 100%;
   padding: 50px;
   box-sizing: border-box;
-}
-
-.header {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start; /* 왼쪽 정렬 */
 }
 
 .office-title {
@@ -325,91 +322,11 @@ const closeAlertModal = () => {
   margin-bottom: 20px;
 }
 
-.seat-picker-container {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  width: 100%;
-  height: 100%;
-}
-
-.seat-map-wrapper {
-  border: 2px solid #ccc;
-  padding: 20px;
-  border-radius: 10px;
-  background-color: #f9f9f9;
-  margin-right: 20px; /* 사이드바와의 간격 */
-  flex-grow: 1;
-  max-width: 800px;
-}
-
-.seat-map {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* 왼쪽 정렬 */
-  height: 100%;
-}
-
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  width: 300px; /* 사이드바 너비 설정 */
-  padding: 10px;
-  background-color: #f9f9f9;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  box-sizing: border-box;
-  margin-left: 20px; /* 좌석 배치도와 간격 조절 */
-}
-
-.office-selector {
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* 왼쪽 정렬 */
-}
-
-.floor-selector {
-  display: flex;
-  flex-direction: column; /* 세로 정렬 */
-  align-items: flex-start; /* 왼쪽 정렬 */
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.floor-selector button {
-  padding: 10px 30px; /* 버튼 크기 증가 */
-  font-size: 1em; /* 글자 크기 증가 */
-  cursor: pointer;
-  background-color: #f9f9f9; /* 기본 배경 색상 */
-  border: 2px solid #c0c0c0; /* 차분한 회색 테두리 */
-  border-radius: 8px; /* 모서리 둥글게 */
-  color: #4f4f4f; /* 기본 글자 색상 */
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease,
-    transform 0.3s ease; /* 부드러운 전환 효과 */
-  width: 100%; /* 모든 버튼 너비 동일하게 설정 */
-  box-sizing: border-box; /* 패딩 포함하여 크기 계산 */
-  text-align: center; /* 버튼 텍스트 가운데 정렬 */
-}
-
-.floor-selector button:hover {
-  background-color: #e0e0e0; /* 호버 시 배경 색상 변경 */
-  color: #000000; /* 호버 시 글자 색상 변경 */
-  transform: scale(1.05); /* 호버 시 약간 확대 효과 */
-}
-
-.floor-selector .active {
-  background-color: #d0d0d0; /* 활성 상태 배경 색상 */
-  color: white; /* 활성 상태 글자 색상 */
-  border: 2px solid #d0d0d0; /* 활성 상태 테두리 색상 */
-}
-
 .row {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-start; /* 왼쪽 정렬 */
+  justify-content: flex-start;
   gap: 10px;
   margin-bottom: 10px;
 }
@@ -473,92 +390,15 @@ const closeAlertModal = () => {
   background-color: #fff;
 }
 
-/* 모달 스타일 */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .modal-content {
   background-color: white;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  width: 100%;
-  max-width: 500px;
-  position: relative;
-}
-
-.employee-modal {
-  max-width: 600px;
-}
-
-.confirm-modal {
-  max-width: 400px;
-}
-
-.alert-modal {
-  max-width: 400px;
-}
-
-.modal-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  font-size: 1.5em;
-  cursor: pointer;
-}
-
-.modal-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
-
-.employee-photo {
-  width: 150px;
-  height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.employee-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: left;
-}
-
-.employee-modal .modal-body {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 20px;
 }
 
 .modal-footer {
-  margin-top: 20px;
   text-align: center;
-  background-color: #f0f0f0;
-  padding: 20px;
-  border-radius: 20px;
-}
-
-.custom-select {
-  border: 1px solid #a19c9c;
-  padding: 10px;
-  appearance: none;
-  font-size: 1em;
+  margin-top: 20px;
 }
 </style>

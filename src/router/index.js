@@ -19,6 +19,10 @@ const router = createRouter({
           path: 'seat',
           component: () => import('@/views/SeatView.vue'),
         },
+        {
+          path: 'mypage',
+          component: () => import('@/views/MypageView.vue'),
+        },
       ],
     },
     {
