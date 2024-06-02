@@ -12,12 +12,20 @@ const router = createRouter({
           component: () => import('@/views/home/HomeView.vue'),
         },
         {
-          path: 'sign-up-approval',
-          component: () => import('@/views/approval/SignUpApprovalView.vue'),
+          path: 'approval/request',
+          component: () => import('@/views/approval/RequestApprovalView.vue'),
+        },
+        {
+          path: 'approval/request/list',
+          component: () => import('@/views/approval/RequestApprovalListView.vue'),
         },
         {
           path: 'approval-detail',
           component: () => import('@/views/approval/ApprovalDetailView.vue'),
+        },
+        {
+          path: 'approval/status/list',
+          component: () => import('@/views/approval/ApprovalStatusListView.vue'),
         },
         {
           path: 'test',

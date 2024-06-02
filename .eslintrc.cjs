@@ -12,6 +12,7 @@ module.exports = {
     ecmaVersion: 'latest'
   },
   rules: {
+    "no-unused-vars": "off",
     "vue/no-multiple-template-root": "off",
     "vue/valid-template-root": "off",
     "prettier/prettier": [

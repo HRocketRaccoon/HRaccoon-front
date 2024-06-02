@@ -91,21 +91,21 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
         :item="{
           title: '결재 신청',
           icon: 'bx-barcode',
-          to: '/sign-up-approval',
+          to: '/approval/request',
         }"
       />
       <VerticalNavLink
         :item="{
           title: '결재 요청 관리',
           icon: 'bx-add-to-queue',
-          to: '/register',
+          to: '/approval/request/list',
         }"
       />
       <VerticalNavLink
         :item="{
           title: '결재 현황 관리',
           icon: 'bx-user-plus',
-          to: '/register',
+          to: '/approval/status/list',
         }"
       />
 
