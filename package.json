@@ -37,6 +37,7 @@
     "vite-plugin-vue-devtools": "^7.0.25",
     "vite-plugin-vuetify": "^2.0.3",
     "vitest": "^1.4.0",
+    "vue-cli-plugin-vuetify": "~2.5.8",
     "vuetify": "^3.6.6"
   }
 }
