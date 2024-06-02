@@ -33,6 +33,7 @@ export const theme = {
         'perfect-scrollbar-thumb': '#DBDADE',
         'skin-bordered-background': '#fff',
         'skin-bordered-surface': '#fff',
+        red: '#FF0000',
       },
       variables: {
         'code-color': '#d400ff',
@@ -102,4 +103,3 @@ export const theme = {
     },
   },
 }
-
