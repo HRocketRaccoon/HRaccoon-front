@@ -38,7 +38,7 @@
 import { ref, onMounted, watch } from 'vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
-import axiosInstance from '@/api/confing'
+import axios from '@/api/axios'
 
 const teamList = ref([
   'IT영업팀',
@@ -61,7 +61,7 @@ const teamApprovalInfo = ref([])
 const getTeamApprovalInfo = async () => {
   try {
     resetMarkersAndTooltips()
-    const response = await axiosInstance.get(`/user/team/${userTeam.value}`)
+    const response = await axios.get(`/user/team/${userTeam.value}`)
     console.log('get userTeam success ! ', response)
     teamApprovalInfo.value = response.data.data
     addMarkers()

@@ -36,7 +36,7 @@
 
 <script setup>
 import { onMounted, ref, watch } from 'vue'
-import axiosInstance from '@/api/confing'
+import axios from '@/api/axios'
 
 const seatOffice = ref('잠실오피스') // remainSeat 가져올 때 .. id
 const remainSeat = ref([])
@@ -85,7 +85,7 @@ onMounted(() => {
 
 const getRemainSeat = async () => {
   try {
-    const response = await axiosInstance.get(`/seat/office/${setToOfficeRegion()}`)
+    const response = await axios.get(`/seat/office/${setToOfficeRegion()}`)
     console.log('get remainSeat success ! ', response)
     remainSeat.value = response.data.data
     countSeatNumber()
