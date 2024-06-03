@@ -114,7 +114,6 @@ const addMarkers = () => {
       type: 'dot',
       color: users[0].color,
     })
-    console.log('users: ', users)
     users.map(user =>
       tooltip.value.push({
         date: new Date(dateKey),
