@@ -123,6 +123,20 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
         }"
       />
 
+      <!-- 👉직원 -->
+      <VerticalNavSectionTitle
+        :item="{
+          heading: '직원 관리',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: '직원 정보 조회',
+          icon: 'mdi-alpha-t-box-outline',
+          to: '/search',
+        }"
+      />
+
       <!-- 👉 에러 페이지 -->
       <VerticalNavSectionTitle
         :item="{
