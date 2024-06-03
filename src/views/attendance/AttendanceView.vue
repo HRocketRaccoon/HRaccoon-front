@@ -1,17 +1,17 @@
 <template>
   <h1 class="mb-2">| 근태 관리</h1>
-  <VCard class="card-container">
-    <h2 class="mb-2">근무 시간</h2>
-    <VCardText>
-      <VCol v-for="day in workHours" :key="day.name" class="d-flex flex-col justify-space-between col-class">
-        <span>{{ day.name }}</span>
-        <span>{{ day.hours }}</span>
-      </VCol>
-    </VCardText>
-  </VCard>
+  <VRow>
+    <VCol>
+      <WorkTime :work-hours="workHours" />
+    </VCol>
+    <CardNavigation :arrival-time="arrivalTime" :departure-time="departureTime" :insert-date="insertDate" />
+  </VRow>
 </template>
+
 <script setup>
 import { ref } from 'vue'
+import WorkTime from '@/components/attendance/WorkTime.vue'
+import CardNavigation from '@/components/attendance/CardNavigation.vue'
 
 const workHours = ref([
   { name: '월', hours: '8시간' },
@@ -20,49 +20,8 @@ const workHours = ref([
   { name: '목', hours: '8시간' },
   { name: '금', hours: '8시간' },
 ])
+
+const insertDate = ref('09월 05일')
+const arrivalTime = ref('9시 30분')
+const departureTime = ref('6시 00분')
 </script>
-<style lang="scss" scoped>
-.card-container {
-  padding: 20px;
-}
-
-.col-class {
-  font-size: large;
-  background-color: var(--v-theme-background);
-  color: var(--v-theme-on-background);
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  span:first-child {
-    font-weight: bold;
-  }
-
-  span:last-child {
-    color: #6c757d;
-  }
-}
-
-.v-theme--light .col-class {
-  background-color: var(--v-theme-background);
-  color: var(--v-theme-on-background);
-
-  span:last-child {
-    color: var(--v-theme-secondary);
-  }
-}
-
-.v-theme--dark .col-class {
-  background-color: var(--v-theme-background);
-  color: var(--v-theme-on-background);
-
-  span:last-child {
-    color: var(--v-theme-secondary);
-  }
-}
-
-.col-class span:first-child {
-  font-weight: bold;
-}
-</style>
