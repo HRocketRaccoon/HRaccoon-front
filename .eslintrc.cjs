@@ -8,8 +8,9 @@ module.exports = {
     ecmaVersion: 'latest'
   },
   rules: {
-    'vue/no-multiple-template-root': 'off',
-    'vue/valid-template-root': 'off',
+    "no-unused-vars": "off",
+    "vue/no-multiple-template-root": "off",
+    "vue/valid-template-root": "off",
     "prettier/prettier": [
       "error",
       {

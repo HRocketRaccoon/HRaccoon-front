@@ -8,8 +8,24 @@ const router = createRouter({
       component: () => import('@/layouts/MainLayout.vue'),
       children: [
         {
-          path: 'home',
+          path: '/',
           component: () => import('@/views/home/HomeView.vue'),
+        },
+        {
+          path: 'approval/request',
+          component: () => import('@/views/approval/RequestApprovalView.vue'),
+        },
+        {
+          path: 'approval/request/list',
+          component: () => import('@/views/approval/RequestApprovalListView.vue'),
+        },
+        {
+          path: 'approval-detail',
+          component: () => import('@/views/approval/ApprovalDetailView.vue'),
+        },
+        {
+          path: 'approval/status/list',
+          component: () => import('@/views/approval/ApprovalStatusListView.vue'),
         },
         {
           path: 'test',
@@ -31,7 +47,7 @@ const router = createRouter({
       children: [
         {
           path: 'login',
-          component: () => import('@/views/LoginView.vue'),
+          component: () => import('@/views/auth/LoginView.vue'),
         },
         {
           path: '/:pathMatch(.*)*',
