@@ -63,7 +63,7 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
         :item="{
           title: '마이 페이지',
           icon: 'mdi-account-cog-outline',
-          to: '/account-settings',
+          to: '/mypage',
         }"
       />
 
@@ -119,7 +119,7 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
         :item="{
           title: '좌석 선택',
           icon: 'mdi-alpha-t-box-outline',
-          to: '/typography',
+          to: '/seat',
         }"
       />
 

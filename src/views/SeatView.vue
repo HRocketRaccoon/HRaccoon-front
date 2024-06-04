@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h2 class="office-title">좌석배치도</h2>
+    <h2 class="office-title">| 좌석 배치도</h2>
     <v-row>
       <v-col>
         <div v-for="(layout, floor) in seatLayouts[selectedOffice]" :key="floor">

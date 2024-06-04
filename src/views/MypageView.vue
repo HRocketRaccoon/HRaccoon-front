@@ -1,210 +1,227 @@
 <template>
-  <v-container>
-    <v-card class="mypage">
-      <v-card-title>
-        <h2>마이페이지</h2>
+  <h1 class="">| 마이페이지</h1>
+  <VCard>
+    <v-card-text>
+      <v-row class="header"> </v-row>
+      <v-row>
+        <v-col cols="12" md="4">
+          <v-img :src="'src/assets/employee.jpg'" aspect-ratio="1.0" class="photo"></v-img>
+        </v-col>
+        <v-col cols="12" md="8">
+          <v-form>
+            <v-row>
+              <v-col cols="12" md="6">
+                <v-text-field label="이름" v-model="user.userName" readonly class="custom-text-field"></v-text-field>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field label="사번" v-model="user.userId" readonly class="custom-text-field"></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" md="6">
+                <v-text-field
+                  label="생년월일"
+                  v-model="user.userBirth"
+                  readonly
+                  class="custom-text-field"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field label="성별" v-model="user.userGender" readonly class="custom-text-field"></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" md="6">
+                <v-text-field
+                  label="소속 부서"
+                  v-model="userDepartmentName"
+                  readonly
+                  class="custom-text-field"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field label="소속 팀" v-model="userTeamName" readonly class="custom-text-field"></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" md="6">
+                <v-text-field label="직위" v-model="userPositionName" readonly class="custom-text-field"></v-text-field>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field label="직책" v-model="userRankName" readonly class="custom-text-field"></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" md="6">
+                <v-text-field
+                  label="입사일"
+                  v-model="user.userJoinDate"
+                  readonly
+                  class="custom-text-field"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field
+                  label="잔여 휴가"
+                  v-model="user.userRemainVacation"
+                  readonly
+                  class="custom-text-field"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-btn color="primary" class="ma-2" @click="openPasswordModal">비밀번호 수정하기</v-btn>
+          </v-form>
+        </v-col>
+      </v-row>
+
+      <!-- Tabs for personal information and skills using div -->
+      <div class="tabs">
+        <button @click="selectedTab = 0" :class="{ active: selectedTab === 0 }">개인정보</button>
+        <button @click="selectedTab = 1" :class="{ active: selectedTab === 1 }">개인역량</button>
+      </div>
+      <div v-if="selectedTab === 0" class="tab-content">
+        <!-- 개인정보 Tab -->
+        <v-form>
+          <v-row>
+            <v-col cols="12" md="6">
+              <v-text-field
+                class="custom-text-field"
+                label="연락처"
+                v-model="user.userMobile"
+                :readonly="!isEditable"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                class="custom-text-field"
+                label="주소"
+                v-model="user.userAddress"
+                :readonly="!isEditable"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" md="6">
+              <v-text-field
+                class="custom-text-field"
+                label="이메일"
+                v-model="user.userEmail"
+                :readonly="!isEditable"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-btn color="primary" class="ma-2" @click="toggleEdit">{{ isEditable ? '수정 완료' : '수정하기' }}</v-btn>
+        </v-form>
+      </div>
+      <div v-else class="tab-content">
+        <!-- 개인역량 Tab -->
+        <v-form>
+          <v-row>
+            <v-col cols="12">
+              <v-chip-group>
+                <v-chip
+                  v-for="(skill, index) in user.skills"
+                  :key="index"
+                  @click="isEditableSkills && removeSkill(index)"
+                  close
+                >
+                  {{ skill }}
+                </v-chip>
+              </v-chip-group>
+              <v-select
+                v-if="isEditableSkills"
+                v-model="newSkill"
+                :items="availableSkills"
+                label="개인역량을 선택해주세요"
+              ></v-select>
+              <v-btn v-if="isEditableSkills" color="primary" class="ma-2" @click="addSkill">추가</v-btn>
+            </v-col>
+          </v-row>
+          <v-btn color="primary" class="ma-2" @click="toggleEditSkills">{{
+            isEditableSkills ? '수정 완료' : '수정하기'
+          }}</v-btn>
+        </v-form>
+      </div>
+    </v-card-text>
+  </VCard>
+
+  <!-- Password Modal -->
+  <v-dialog v-model="showPasswordModal" max-width="500px">
+    <v-card>
+      <v-card-title class="d-flex justify-space-between align-center">
+        <span class="headline">비밀번호를 수정하시겠습니까?</span>
+        <v-btn icon @click="closePasswordModal">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
       </v-card-title>
       <v-card-text>
-        <v-row class="header"> </v-row>
-        <v-row>
-          <v-col cols="12" md="4">
-            <v-img :src="'src/assets/employee.jpg'" aspect-ratio="1.0" class="photo"></v-img>
-          </v-col>
-          <v-col cols="12" md="8">
-            <v-form>
-              <v-row>
-                <v-col cols="12" md="6">
-                  <v-text-field label="이름" v-model="name" readonly class="custom-text-field"></v-text-field>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field label="사번" v-model="employeeId" readonly class="custom-text-field"></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="12" md="6">
-                  <v-text-field label="생년월일" v-model="dob" readonly class="custom-text-field"></v-text-field>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field label="성별" v-model="gender" readonly class="custom-text-field"></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="12" md="6">
-                  <v-text-field label="소속" v-model="affiliation" readonly class="custom-text-field"></v-text-field>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field label="부서" v-model="department" readonly class="custom-text-field"></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="12" md="6">
-                  <v-text-field label="직위" v-model="position" readonly class="custom-text-field"></v-text-field>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field label="직책" v-model="role" readonly class="custom-text-field"></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="12" md="6">
-                  <v-text-field label="입사일" v-model="hireDate" readonly class="custom-text-field"></v-text-field>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field label="잔여 휴가" v-model="vacation" readonly class="custom-text-field"></v-text-field>
-                </v-col>
-              </v-row>
-              <v-btn color="primary" class="ma-2" @click="openPasswordModal">비밀번호 수정하기</v-btn>
-            </v-form>
-          </v-col>
-        </v-row>
-
-        <!-- Tabs for personal information and skills using div -->
-        <div class="tabs">
-          <button @click="selectedTab = 0" :class="{ active: selectedTab === 0 }">개인정보</button>
-          <button @click="selectedTab = 1" :class="{ active: selectedTab === 1 }">개인역량</button>
-        </div>
-        <div v-if="selectedTab === 0" class="tab-content">
-          <!-- 개인정보 Tab -->
-          <v-form>
-            <v-row>
-              <v-col cols="12" md="6">
-                <v-text-field
-                  class="custom-text-field"
-                  label="연락처"
-                  v-model="contact"
-                  :readonly="!isEditable"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-text-field
-                  class="custom-text-field"
-                  label="주소"
-                  v-model="address"
-                  :readonly="!isEditable"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" md="6">
-                <v-text-field
-                  class="custom-text-field"
-                  label="이메일"
-                  v-model="email"
-                  :readonly="!isEditable"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-btn color="primary" class="ma-2" @click="toggleEdit">{{ isEditable ? '수정 완료' : '수정하기' }}</v-btn>
-          </v-form>
-        </div>
-        <div v-else class="tab-content">
-          <!-- 개인역량 Tab -->
-          <v-form>
-            <v-row>
-              <v-col cols="12">
-                <v-chip-group>
-                  <v-chip
-                    v-for="(skill, index) in skills"
-                    :key="index"
-                    @click="isEditableSkills && removeSkill(index)"
-                    close
-                  >
-                    {{ skill }}
-                  </v-chip>
-                </v-chip-group>
-                <v-select
-                  v-if="isEditableSkills"
-                  v-model="newSkill"
-                  :items="availableSkills"
-                  label="개인역량을 선택해주세요"
-                ></v-select>
-                <v-btn v-if="isEditableSkills" color="primary" class="ma-2" @click="addSkill">추가</v-btn>
-              </v-col>
-            </v-row>
-            <v-btn color="primary" class="ma-2" @click="toggleEditSkills">{{
-              isEditableSkills ? '수정 완료' : '수정하기'
-            }}</v-btn>
-          </v-form>
-        </div>
+        <v-form>
+          <v-text-field label="기존 비밀번호" v-model="currentPassword" type="password"></v-text-field>
+          <v-text-field label="새 비밀번호" v-model="newPassword" type="password"></v-text-field>
+          <v-text-field label="비밀번호 확인" v-model="confirmPassword" type="password"></v-text-field>
+        </v-form>
       </v-card-text>
+      <v-card-actions>
+        <v-btn color="primary" @click="updatePassword">수정하기</v-btn>
+      </v-card-actions>
     </v-card>
+  </v-dialog>
 
-    <!-- Password Modal -->
-    <v-dialog v-model="showPasswordModal" max-width="500px">
-      <v-card>
-        <v-card-title class="d-flex justify-space-between align-center">
-          <span class="headline">비밀번호를 수정하시겠습니까?</span>
-          <v-btn icon @click="closePasswordModal">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <v-form>
-            <v-text-field label="기존 비밀번호" v-model="currentPassword" type="password"></v-text-field>
-            <v-text-field label="새 비밀번호" v-model="newPassword" type="password"></v-text-field>
-            <v-text-field label="비밀번호 확인" v-model="confirmPassword" type="password"></v-text-field>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn color="primary" @click="updatePassword">수정하기</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+  <!-- Success Modal -->
+  <v-dialog v-model="showSuccessModal" max-width="500px">
+    <VCard>
+      <v-card-title class="d-flex justify-space-between align-center">
+        <span class="headline">성공</span>
+      </v-card-title>
+      <v-card-text>
+        <p>비밀번호가 수정되었습니다.</p>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="primary" @click="closeSuccessModal">확인</v-btn>
+      </v-card-actions>
+    </VCard>
+  </v-dialog>
 
-    <!-- Success Modal -->
-    <v-dialog v-model="showSuccessModal" max-width="500px">
-      <v-card>
-        <v-card-title class="d-flex justify-space-between align-center">
-          <span class="headline">성공</span>
-        </v-card-title>
-        <v-card-text>
-          <p>비밀번호가 수정되었습니다.</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn color="primary" @click="closeSuccessModal">확인</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <!-- Error Modal -->
-    <v-dialog v-model="showErrorModal" max-width="500px">
-      <v-card>
-        <v-card-title class="d-flex justify-space-between align-center">
-          <span class="headline">오류</span>
-        </v-card-title>
-        <v-card-text>
-          <p v-if="errorType === 'mismatch'">비밀번호가 일치하지 않습니다.</p>
-          <p v-else>
-            비밀번호는 8자 이상 16자 이하 문자(a-z), 숫자(0-9), 특수문자 포함 (!,@,#,$,%,^,&,*,_)를 포함해야 합니다.
-          </p>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn color="primary" @click="closeErrorModal">확인</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-container>
+  <!-- Error Modal -->
+  <v-dialog v-model="showErrorModal" max-width="500px">
+    <VCard>
+      <v-card-title class="d-flex justify-space-between align-center">
+        <span class="headline">오류</span>
+      </v-card-title>
+      <v-card-text>
+        <p v-if="errorType === 'mismatch'">비밀번호가 일치하지 않습니다.</p>
+        <p v-else>
+          비밀번호는 8자 이상 16자 이하 문자(a-z), 숫자(0-9), 특수문자 포함 (!,@,#,$,%,^,&,*,_)를 포함해야 합니다.
+        </p>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="primary" @click="closeErrorModal">확인</v-btn>
+      </v-card-actions>
+    </VCard>
+  </v-dialog>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import api from '/src/api/axios.js'
+import { useCodeStore } from '/src/stores/useCodeStore.js'
 
-// Tabs configuration
 const selectedTab = ref(0) // 초기값을 숫자로 설정
 
-const affiliation = ref('IT사업부')
-const employeeId = ref('19-71001621')
-const name = ref('정광수')
-const dob = ref('1998-12-04')
-const gender = ref('남')
-const department = ref('IT개발팀')
-const hireDate = ref('2024-04-12')
-const position = ref('과장')
-const role = ref('팀장')
-const vacation = ref('10')
+const userId = ref('user01')
 
-const contact = ref(localStorage.getItem('contact') || '010-2532-9705')
-const address = ref(localStorage.getItem('address') || '서울시 성북구 아리랑로 75')
-const email = ref(localStorage.getItem('email') || 'ericj1204@naver.com')
+const user = ref({
+  userDepartment: '',
+  userTeam: '',
+  userPosition: '',
+  userRank: '',
+  skills: [],
+})
+
+const userDepartmentName = ref('')
+const userTeamName = ref('')
+const userPositionName = ref('')
+const userRankName = ref('')
 
 const availableSkills = ref([
   'Python',
@@ -245,26 +262,61 @@ const isEditableSkills = ref(false)
 const showPasswordModal = ref(false) // Modal visibility state
 const showErrorModal = ref(false) // Error modal visibility state
 const showSuccessModal = ref(false) // Success modal visibility state
-const currentPassword = ref('jks981204')
+const currentPassword = ref('')
 const newPassword = ref('')
 const confirmPassword = ref('')
 const errorType = ref('')
 
-const skills = ref(JSON.parse(localStorage.getItem('skills')) || [])
+const store = useCodeStore()
+
+const loadUserData = async () => {
+  try {
+    console.log('Fetching user data for userId:', userId.value)
+    const response = await api.get(`/user/info/${userId.value}`)
+    console.log('User data loaded:', response)
+
+    const userData = response.data.data
+    userData.userJoinDate = formatDate(userData.userJoinDate)
+    userData.skills = userData.skills || []
+    user.value = userData
+
+    userDepartmentName.value = getCodeName(user.value.userDepartment)
+    userTeamName.value = getCodeName(user.value.userTeam)
+    userPositionName.value = getCodeName(user.value.userPosition)
+    userRankName.value = getCodeName(user.value.userRank)
+  } catch (error) {
+    console.error('Failed to load user data:', error)
+    if (error.response) {
+      console.error('Error response data:', error.response.data)
+      console.error('Error response status:', error.response.status)
+      console.error('Error response headers:', error.response.headers)
+    }
+  }
+}
+
+const formatDate = dateString => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' }
+  return new Date(dateString).toLocaleDateString('ko-KR', options)
+}
+
+const getCodeName = code => {
+  return store.getCodeName(code)
+}
+
+onMounted(() => {
+  loadUserData()
+})
 
 watch(
-  skills,
-  newSkills => {
-    localStorage.setItem('skills', JSON.stringify(newSkills))
+  user,
+  () => {
+    userDepartmentName.value = getCodeName(user.value.userDepartment)
+    userTeamName.value = getCodeName(user.value.userTeam)
+    userPositionName.value = getCodeName(user.value.userPosition)
+    userRankName.value = getCodeName(user.value.userRank)
   },
   { deep: true },
 )
-
-watch([contact, address, email], ([newContact, newAddress, newEmail]) => {
-  localStorage.setItem('contact', newContact)
-  localStorage.setItem('address', newAddress)
-  localStorage.setItem('email', newEmail)
-})
 
 const validatePassword = password => {
   const regex = /^(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{8,16}$/
@@ -293,12 +345,12 @@ const toggleEditSkills = () => {
 }
 
 const removeSkill = index => {
-  skills.value.splice(index, 1)
+  user.value.skills.splice(index, 1)
 }
 
 const addSkill = () => {
-  if (newSkill.value && !skills.value.includes(newSkill.value)) {
-    skills.value.push(newSkill.value)
+  if (newSkill.value && !user.value.skills.includes(newSkill.value)) {
+    user.value.skills.push(newSkill.value)
     newSkill.value = ''
   }
 }
@@ -327,20 +379,7 @@ const resetPasswordFields = () => {
 }
 </script>
 
-<style>
-.mypage {
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.photo {
-  width: 150px;
-  height: 200px;
-  object-fit: cover;
-}
-
+<style scoped>
 button {
   margin: 0 10px;
   padding: 10px 20px;
@@ -362,65 +401,9 @@ button:hover {
   background-color: #0056b3;
 }
 
-.update-password,
-.update-info {
-  padding: 8px 12px;
-  border: 1px solid #333; /* Dark border for visibility */
-  background-color: #007bff; /* Blue background for visibility */
-  color: #fff; /* White text color for contrast */
-  border-radius: 4px; /* Rounded corners for better visibility */
-  cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Add slight shadow for depth */
-}
-
-.update-password:hover,
-.update-info:hover {
-  background-color: #0056b3; /* Darker blue on hover */
-}
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  text-align: left;
-  margin-left: 10px;
-}
-
-.tag {
-  background-color: #b5c0cc;
-  color: #000; /* Change text color to black */
-  padding: 5px 15px;
-  margin: 3px;
-  border-radius: 10px;
-  display: inline-flex;
-  position: relative;
-}
-
-.remove-tag:hover {
-  color: #ff0000;
-}
-
 /* 추가된 스타일 */
 .custom-text-field {
   margin-bottom: 20px; /* 필드 간 간격 조정 */
-}
-
-.custom-text-field input[readonly],
-.custom-text-field input[disabled] {
-  color: #000 !important; /* 텍스트 색상을 검정색으로 변경 */
-  opacity: 1 !important; /* 입력 필드가 흐리게 보이지 않도록 설정 */
-}
-
-.custom-text-field .v-input__control[readonly],
-.custom-text-field .v-input__control[disabled] {
-  border-color: #000 !important; /* 테두리 색상을 검정색으로 변경 */
-}
-
-.custom-text-field .v-label {
-  color: #000 !important; /* 라벨 색상을 검정색으로 변경 */
-}
-
-.tabs {
-  margin-top: 20px; /* 탭과 내용 사이의 간격 조정 */
 }
 
 .tab-content {
