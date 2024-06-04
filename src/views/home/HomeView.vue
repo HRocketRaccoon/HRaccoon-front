@@ -3,18 +3,18 @@
     <VRow>
       <VCol cols="12" md="7">
         <VRow>
-          <VCol cols="12" md="10" sm="5">
-            <ApexChart class="mb-5" />
+          <VCol cols="12" md="11" sm="5" xs="12">
+            <ApprovalChartCard class="mb-5" />
           </VCol>
-          <VCol cols="12" md="10" sm="7">
-            <RemainSeat class="pa-10" />
+          <VCol cols="12" md="11" sm="7">
+            <RemainSeat style="padding: 32px 50px" />
           </VCol>
         </VRow>
       </VCol>
       <VCol cols="12" md="5">
         <VRow>
           <VCol cols="12">
-            <PickerCalendar class="mb-5" />
+            <CalendarCard class="mb-5" />
           </VCol>
           <VCol cols="12">
             <TodoModal />
@@ -26,10 +26,11 @@
 </template>
 
 <script setup>
-import PickerCalendar from '@/components/calendar/PickerCalendar.vue'
-import ApexChart from '@/components/apexchart/ApexChart.vue'
+import CalendarCard from '@/components/calendar/CalendarCard.vue'
+import ApprovalChartCard from '@/components/apexchart/ApprovalChartCard.vue'
 import RemainSeat from '@/components/remainseat/RemainSeat.vue'
 import TodoModal from '@/components/todo/TodoModal.vue'
+import { ref } from 'vue'
 </script>
 
 <style></style>
