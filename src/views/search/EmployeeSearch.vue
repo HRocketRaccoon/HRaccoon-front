@@ -2,7 +2,7 @@
   <div>
     <h1 class="mb-2">| 직원 정보 조회</h1>
     <VCard>
-      <VCardText>
+      <VCardText class="pa-10">
         <VRow>
           <VCol cols="12" md="6">
             <VRow>

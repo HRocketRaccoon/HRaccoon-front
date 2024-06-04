@@ -2,7 +2,7 @@
   <VCard class="d-flex flex-column mx-auto py-8" elevation="10">
     <div class="d-flex justify-center mt-auto text-h5 mb-15">잔여 좌석 확인</div>
 
-    <div class="d-flex flex-column ml-auto py-8">
+    <div class="d-flex flex-column mr-1 py-8">
       <VCombobox
         label="조회할 오피스를 고르세요."
         :items="['잠실오피스', '마포오피스', '성북오피스']"
