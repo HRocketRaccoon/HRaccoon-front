@@ -1,30 +1,44 @@
 <template>
-  <VCard>
-    <VCardTitle>나의 근무시간</VCardTitle>
-    <VCardText>
-      <VCol class="text-h2">
-        <VueApexCharts type="radialBar" :height="300" :options="chartOptions.radial" :series="[78]" class="mt-6" />
-      </VCol>
-    </VCardText>
-    <template v-slot:actions>
-      <v-btn
-        :to="{ path: '/test' }"
-        append-icon="mdi-chevron-right"
-        color="lighten-2"
-        text="근태 관리 바로가기"
-        variant="outlined"
-        block
-      ></v-btn>
-    </template>
-  </VCard>
+  <div>
+    <VueApexCharts
+      :type="params.type"
+      :height="300"
+      :options="chartOptions.radial"
+      :series="[params.percent]"
+      class="mt-6"
+    />
+    <span v-if="params.totalTime && params.currentTime">
+      <div class="apex">{{ params.currentTime + '/' + params.totalTime }}시</div>
+    </span>
+  </div>
 </template>
 
 <script setup>
 import VueApexCharts from 'vue3-apexcharts'
 import { useDisplay, useTheme } from 'vuetify'
 import { hexToRgb } from '@layouts/utils'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
+const props = defineProps({
+  params: {
+    type: {
+      type: String,
+      required: true,
+    },
+    text: {
+      type: String,
+      required: true,
+    },
+    percent: {
+      type: Number,
+      required: true,
+    },
+    totalTime: Number,
+    currentTime: Number,
+  },
+})
+
+// const params = ref(props)
 const vuetifyTheme = useTheme()
 const display = useDisplay()
 
@@ -34,7 +48,6 @@ const chartOptions = computed(() => {
   const disabledTextColor = `rgba(${hexToRgb(String(currentTheme['on-surface']))},${variableTheme['disabled-opacity']})`
   const primaryTextColor = `rgba(${hexToRgb(String(currentTheme['on-surface']))},${variableTheme['high-emphasis-opacity']})`
   const borderColor = `rgba(${hexToRgb(String(variableTheme['border-color']))},${variableTheme['border-opacity']})`
-
   return {
     bar: {
       chart: {
@@ -126,7 +139,7 @@ const chartOptions = computed(() => {
     },
     radial: {
       chart: { sparkline: { enabled: true } },
-      labels: ['총 근무 시간'],
+      labels: [props.params.text],
       stroke: { dashArray: 5 },
       colors: [`rgba(${hexToRgb(String(currentTheme.primary))}, 1)`],
       states: {
@@ -192,4 +205,10 @@ const chartOptions = computed(() => {
 })
 </script>
 
-<style></style>
+<style lang="scss">
+.apex {
+  font-size: 20px;
+  padding: 20px 0;
+  text-align: center;
+}
+</style>

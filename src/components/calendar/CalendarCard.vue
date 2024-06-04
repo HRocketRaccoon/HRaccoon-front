@@ -12,34 +12,24 @@
       ></VCombobox>
     </div>
 
-    <VueDatePicker
-      class="mt-3 mb-10"
-      v-model="selectDate"
-      inline
-      auto-apply
-      :markers="markers"
-      locale="ko"
-      :enable-time-picker="false"
-    >
-      <template #action-extra="{ selectCurrentDate }">
-        <span @click="selectCurrentDate()" title="Select current date">
-          <div :class="{ tooltip: isDateSelected(selectDate) }">
-            <div v-for="text in getDataBySelectDate(selectDate)" :key="text.id">
-              <p>{{ text }}</p>
-            </div>
-          </div>
-        </span>
-      </template>
-    </VueDatePicker>
+    <VueDatePickerComponent :markers="markers" @handleSelectCurrentDate="selectCurrentDate"></VueDatePickerComponent>
+
+    <span title="Select current date">
+      <div v-if="isDateSelected(selectDate)" class="tooltip">
+        <VDivider class="mb-2"></VDivider>
+        <div v-for="text in getDataBySelectDate(selectDate)" :key="text.id">
+          <p>{{ text }}</p>
+          <VDivider class="mb-2"></VDivider>
+        </div>
+      </div>
+    </span>
   </VCard>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import VueDatePicker from '@vuepic/vue-datepicker'
-import '@vuepic/vue-datepicker/dist/main.css'
 import axios from '@/api/axios'
-
+import VueDatePickerComponent from '@/components/calendar/VueDatePicker.vue'
 const teamList = ref([
   'IT영업팀',
   '해외영업팀',
@@ -114,7 +104,6 @@ const addMarkers = () => {
       type: 'dot',
       color: users[0].color,
     })
-    console.log('users: ', users)
     users.map(user =>
       tooltip.value.push({
         date: new Date(dateKey),
@@ -137,13 +126,17 @@ const getDataBySelectDate = date => {
   })
   return res_text
 }
-
 const isDateSelected = date => {
   return getDataBySelectDate(date).length > 0
 }
 
 const dateStr = date => {
   return date.toISOString().replace(/T.*$/, '') // YYYY-MM-DD
+}
+
+const selectCurrentDate = date => {
+  selectDate.value = date
+  console.log('card selectDate: ', selectDate.value)
 }
 
 const setToApprovalType = approvalType => {
@@ -160,24 +153,10 @@ watch(userTeam, getTeamApprovalInfo)
 </script>
 
 <style lang="scss">
-.dp__theme_light {
-  --dp-primary-color: gray;
-  --dp-primary-disabled-color: #6bacea;
-  --dp-menu-border-color: none;
-  --dp-arrow-left: 50%;
-}
-.dp__flex_display {
-  display: flex;
-  justify-content: center;
-}
-
-:root {
-  --dp-menu-min-width: 350px;
-}
 .tooltip {
-  height: 300px;
   display: flex;
   flex-direction: column;
-  padding: 35px 0;
+  padding-bottom: 35px;
+  text-align: center;
 }
 </style>
