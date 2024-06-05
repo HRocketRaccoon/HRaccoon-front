@@ -76,8 +76,8 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
       <VerticalNavLink
         :item="{
           title: '근태 관리',
-          icon: 'bx-home',
-          to: '/',
+          icon: 'bx-alarm-add',
+          to: '/attendance',
         }"
       />
 
@@ -132,7 +132,7 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
       <VerticalNavLink
         :item="{
           title: '직원 정보 조회',
-          icon: 'mdi-alpha-t-box-outline',
+          icon: 'bx-bar-chart-alt',
           to: '/search',
         }"
       />

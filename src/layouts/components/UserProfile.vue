@@ -14,7 +14,7 @@
               <VListItemAction start>
                 <VBadge color="success" dot location="bottom right" offset-x="3" offset-y="3">
                   <VAvatar color="primary" variant="tonal">
-                    <!--                    Vimg-->
+                    <!-- Vimg -->
                   </VAvatar>
                 </VBadge>
               </VListItemAction>
@@ -31,7 +31,7 @@
               <VIcon class="me-2" icon="bx-user" size="22" />
             </template>
 
-            <VListItemTitle>Profile</VListItemTitle>
+            <VListItemTitle>MyPage</VListItemTitle>
           </VListItem>
 
           <!-- 👉 Settings -->
@@ -41,15 +41,6 @@
             </template>
 
             <VListItemTitle>Settings</VListItemTitle>
-          </VListItem>
-
-          <!-- 👉 Pricing -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon class="me-2" icon="bx-dollar" size="22" />
-            </template>
-
-            <VListItemTitle>Pricing</VListItemTitle>
           </VListItem>
 
           <!-- 👉 FAQ -->

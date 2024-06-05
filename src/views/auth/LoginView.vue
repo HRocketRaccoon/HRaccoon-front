@@ -18,17 +18,17 @@
       </VCardText>
 
       <VCardText>
-        <VForm @submit.prevent="$router.push('/')">
+        <VForm @submit.prevent="onHandleSubmit">
           <VRow>
-            <!-- id -->
+            <!-- userId -->
             <VCol cols="12">
-              <VTextField v-model="form.id" autofocus label="사번" placeholder="사번을 입력하세요." type="id" />
+              <VTextField v-model="form.userId" autofocus label="사번" placeholder="사번을 입력하세요." type="userId" />
             </VCol>
 
-            <!-- password -->
+            <!-- userPassword -->
             <VCol cols="12">
               <VTextField
-                v-model="form.password"
+                v-model="form.userPassword"
                 :append-inner-icon="isPasswordVisible ? 'bx-hide' : 'bx-show'"
                 :type="isPasswordVisible ? 'text' : 'password'"
                 label="비밀번호"
@@ -36,13 +36,12 @@
                 @click:append-inner="isPasswordVisible = !isPasswordVisible"
               />
 
-              <!-- remember me checkbox -->
               <div class="d-flex align-center justify-space-between flex-wrap mt-4 mb-4">
                 <RouterLink class="text-primary mb-1 ml-auto" to="javascript:void(0)"> Forgot Password?</RouterLink>
               </div>
 
               <!-- login button -->
-              <VBtn block type="submit"> Login</VBtn>
+              <VBtn block type="submit">Login</VBtn>
             </VCol>
           </VRow>
         </VForm>
@@ -52,13 +51,55 @@
 </template>
 <script setup>
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/useAuthStore.js'
+import { useToast } from 'vue-toastification'
 
-const form = ref({
-  id: '',
-  password: '',
-})
+const { signIn } = useAuthStore()
+const { router } = useRoute()
+const toast = useToast()
 
 const isPasswordVisible = ref(false)
+const form = ref({
+  userId: '',
+  userPassword: '',
+})
+
+const onHandleSubmit = async () => {
+  const validationError = validateForm()
+  if (validationError) {
+    toast.error(validationError)
+    return
+  }
+  try {
+    //TODO: 실제 로그인 로직 구현
+    // await signIn(form.value).then(() => {
+    //   router.push('/')
+    // })
+    toast.success('로그인 성공')
+  } catch (error) {
+    toast.error('사번과 비밀번호가 일치하지 않습니다.')
+  }
+}
+
+const validateForm = () => {
+  if (!form.value.userId) {
+    return '사번을 입력해주세요.'
+  }
+  const passwordError = validatePassword(form.value.userPassword)
+  if (passwordError) {
+    return passwordError
+  }
+  return null
+}
+
+const validatePassword = password => {
+  const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*_])[A-Za-z\d!@#$%^&*_]{8,16}$/
+  if (!passwordPattern.test(password)) {
+    return '비밀번호는 8자 이상 16자 이하이며, 영문자 대문자 및 소문자, 숫자, 특수문자를 포함해야 합니다.'
+  }
+  return null
+}
 </script>
 <style lang="scss">
 @use '@core/scss/template/pages/page-auth.scss';

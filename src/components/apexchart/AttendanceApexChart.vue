@@ -1,15 +1,12 @@
 <template>
   <div>
     <VueApexCharts
-      :type="params.type"
       :height="300"
       :options="chartOptions.radial"
-      :series="[params.formattedPercent]"
+      :series="[params.percent]"
       class="mt-6"
+      type="radialBar"
     />
-    <div v-if="params.totalWorkHours">
-      <div class="apex">{{ params.totalWorkHours + '/40' }}시</div>
-    </div>
   </div>
 </template>
 
@@ -17,23 +14,20 @@
 import VueApexCharts from 'vue3-apexcharts'
 import { useDisplay, useTheme } from 'vuetify'
 import { hexToRgb } from '@layouts/utils'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({
   params: {
-    type: {
-      type: String,
-      required: true,
-    },
     text: {
       type: String,
       required: true,
     },
-    formattedPercent: {
+    percent: {
       type: Number,
       required: true,
     },
-    totalWorkHours: Number,
+    totalTime: Number,
+    currentTime: Number,
   },
 })
 
@@ -137,7 +131,7 @@ const chartOptions = computed(() => {
     },
     radial: {
       chart: { sparkline: { enabled: true } },
-      labels: [props.params.text],
+      labels: [props.params.currentTime + '시간 / ' + props.params.totalTime + '시간'],
       stroke: { dashArray: 5 },
       colors: [`rgba(${hexToRgb(String(currentTheme.primary))}, 1)`],
       states: {
@@ -166,14 +160,14 @@ const chartOptions = computed(() => {
             name: {
               offsetY: 25,
               fontWeight: 600,
-              fontSize: '16px',
+              fontSize: '20px',
               color: currentTheme.secondary,
               fontFamily: 'Public Sans',
             },
             value: {
               offsetY: -15,
-              fontWeight: 500,
-              fontSize: '24px',
+              fontWeight: 800,
+              fontSize: '30px',
               color: primaryTextColor,
               fontFamily: 'Public Sans',
             },
