@@ -110,7 +110,9 @@
               ></v-text-field>
             </v-col>
           </v-row>
-          <v-btn color="primary" class="ma-2" @click="toggleEdit">{{ isEditable ? '수정 완료' : '수정하기' }}</v-btn>
+          <v-btn color="primary" class="ma-2" @click="updateUserInfo">{{
+            isEditable ? '수정 완료' : '수정하기'
+          }}</v-btn>
         </v-form>
       </div>
       <div v-else class="tab-content">
@@ -293,6 +295,20 @@ const loadUserData = async () => {
     }
   }
 }
+const updateUserInfo = async () => {
+  try {
+    const response = await api.post('/user/update', {
+      userId: user.value.userId,
+      userMobile: user.value.userMobile,
+      userAddress: user.value.userAddress,
+      userEmail: user.value.userEmail,
+    })
+    console.log('User info updated:', response.data.data)
+    isEditable.value = !isEditable.value
+  } catch (error) {
+    console.error('Failed to update user info:', error)
+  }
+}
 
 const formatDate = dateString => {
   const options = { year: 'numeric', month: 'long', day: 'numeric' }
@@ -307,23 +323,12 @@ onMounted(() => {
   loadUserData()
 })
 
-watch(
-  user,
-  () => {
-    userDepartmentName.value = getCodeName(user.value.userDepartment)
-    userTeamName.value = getCodeName(user.value.userTeam)
-    userPositionName.value = getCodeName(user.value.userPosition)
-    userRankName.value = getCodeName(user.value.userRank)
-  },
-  { deep: true },
-)
-
 const validatePassword = password => {
   const regex = /^(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{8,16}$/
   return regex.test(password)
 }
 
-const updatePassword = () => {
+const updatePassword = async () => {
   if (!validatePassword(newPassword.value)) {
     errorType.value = 'invalid'
     showErrorModal.value = true
@@ -331,8 +336,20 @@ const updatePassword = () => {
     errorType.value = 'mismatch'
     showErrorModal.value = true
   } else {
-    showSuccessModal.value = true
-    closePasswordModal()
+    try {
+      // 비밀번호 업데이트 요청
+      const response = await api.post('/user/updatePassword', {
+        currentPassword: currentPassword.value,
+        newPassword: newPassword.value,
+      })
+
+      // 비밀번호가 성공적으로 업데이트되었을 때
+      showSuccessModal.value = true // 성공 모달 표시
+      closePasswordModal() // 비밀번호 모달 닫기
+    } catch (error) {
+      console.error('Failed to update password:', error)
+      // 오류 처리
+    }
   }
 }
 
