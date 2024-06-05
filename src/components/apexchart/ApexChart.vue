@@ -4,12 +4,12 @@
       :type="params.type"
       :height="300"
       :options="chartOptions.radial"
-      :series="[params.percent]"
+      :series="[params.formattedPercent]"
       class="mt-6"
     />
-    <span v-if="params.totalTime && params.currentTime">
-      <div class="apex">{{ params.currentTime + '/' + params.totalTime }}시</div>
-    </span>
+    <div v-if="params.totalWorkHours">
+      <div class="apex">{{ params.totalWorkHours + '/40' }}시</div>
+    </div>
   </div>
 </template>
 
@@ -29,16 +29,14 @@ const props = defineProps({
       type: String,
       required: true,
     },
-    percent: {
+    formattedPercent: {
       type: Number,
       required: true,
     },
-    totalTime: Number,
-    currentTime: Number,
+    totalWorkHours: Number,
   },
 })
 
-// const params = ref(props)
 const vuetifyTheme = useTheme()
 const display = useDisplay()
 
