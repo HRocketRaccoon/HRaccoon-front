@@ -18,7 +18,7 @@
       </VCardText>
 
       <VCardText>
-        <VForm @submit.prevent="$router.push('/')">
+        <VForm @submit.prevent="onHandleSubmit">
           <VRow>
             <!-- userId -->
             <VCol cols="12">
@@ -53,9 +53,11 @@
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/useAuthStore.js'
+import { useToast } from 'vue-toastification'
 
 const { signIn } = useAuthStore()
 const { router } = useRoute()
+const toast = useToast()
 
 const isPasswordVisible = ref(false)
 const form = ref({
@@ -66,15 +68,17 @@ const form = ref({
 const onHandleSubmit = async () => {
   const validationError = validateForm()
   if (validationError) {
-    alert(validationError)
+    toast.error(validationError)
     return
   }
   try {
-    await signIn(form.value).then(() => {
-      router.push('/')
-    })
+    //TODO: 실제 로그인 로직 구현
+    // await signIn(form.value).then(() => {
+    //   router.push('/')
+    // })
+    toast.success('로그인 성공')
   } catch (error) {
-    alert('Login failed. Please check your credentials and try again.')
+    toast.error('사번과 비밀번호가 일치하지 않습니다.')
   }
 }
 
