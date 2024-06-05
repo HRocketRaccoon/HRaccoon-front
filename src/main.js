@@ -14,8 +14,21 @@ import '@styles/styles.scss'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 import { options } from '@/plugins/toastification/toastOption.js'
+import { theme } from '@/plugins/vuetify/theme.js'
 
 const app = createApp(App)
+
+// Set CSS variables
+const setCSSVariables = theme => {
+  const themeColors = theme.themes[theme.defaultTheme].colors
+  const root = document.documentElement
+
+  Object.keys(themeColors).forEach(key => {
+    root.style.setProperty(`--v-theme-${key}`, themeColors[key])
+  })
+}
+
+setCSSVariables(theme)
 
 app.use(vuetify)
 app.use(router)

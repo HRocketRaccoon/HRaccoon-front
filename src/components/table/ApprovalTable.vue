@@ -10,7 +10,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(item, index) in data" :key="item.approvalNo">
+      <tr v-for="(item, index) in data" :key="item.approvalNo" @click="onHandleClick(item.approvalNo)">
         <td>
           {{ index + 1 }}
         </td>
@@ -31,8 +31,21 @@
   </VTable>
 </template>
 <script setup>
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 const props = defineProps({
   data: Array,
   type: String,
 })
+
+const onHandleClick = approvalNo => {
+  let routePath = '/details/' + approvalNo
+  if (props.type === 'request') {
+    routePath += '?type=request'
+  } else {
+    routePath += '?type=approval'
+  }
+  router.push(routePath)
+}
 </script>
