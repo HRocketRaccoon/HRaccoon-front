@@ -74,7 +74,7 @@
         </v-col>
       </v-row>
 
-      <!-- Tabs for personal information and skills using div -->
+      <!-- Tabs for personal information and abilities using div -->
       <div class="tabs">
         <button @click="selectedTab = 0" :class="{ active: selectedTab === 0 }">개인정보</button>
         <button @click="selectedTab = 1" :class="{ active: selectedTab === 1 }">개인역량</button>
@@ -122,25 +122,25 @@
             <v-col cols="12">
               <v-chip-group>
                 <v-chip
-                  v-for="(skill, index) in user.skills"
+                  v-for="(ability, index) in userAbilities"
                   :key="index"
-                  @click="isEditableSkills && removeSkill(index)"
+                  @click="isEditableAbilities && removeAbility(index)"
                   close
                 >
-                  {{ skill }}
+                  {{ ability }}
                 </v-chip>
               </v-chip-group>
               <v-select
-                v-if="isEditableSkills"
-                v-model="newSkill"
-                :items="availableSkills"
+                v-if="isEditableAbilities"
+                v-model="newAbility"
+                :items="availableAbilities"
                 label="개인역량을 선택해주세요"
               ></v-select>
-              <v-btn v-if="isEditableSkills" color="primary" class="ma-2" @click="addSkill">추가</v-btn>
+              <v-btn v-if="isEditableAbilities" color="primary" class="ma-2" @click="addAbility">추가</v-btn>
             </v-col>
           </v-row>
-          <v-btn color="primary" class="ma-2" @click="toggleEditSkills">{{
-            isEditableSkills ? '수정 완료' : '수정하기'
+          <v-btn color="primary" class="ma-2" @click="toggleEditAbilities">{{
+            isEditableAbilities ? '수정 완료' : '수정하기'
           }}</v-btn>
         </v-form>
       </div>
@@ -225,42 +225,10 @@ const userTeamName = ref('')
 const userPositionName = ref('')
 const userRankName = ref('')
 
-const availableSkills = ref([
-  'Python',
-  'Java',
-  'C',
-  'C++',
-  'C#',
-  'JavaScript',
-  'TypeScript',
-  'Ruby',
-  'PHP',
-  'Swift',
-  'Kotlin',
-  'R',
-  'Go',
-  'Rust',
-  'Scala',
-  'Perl',
-  'Haskell',
-  'Objective-C',
-  'MATLAB',
-  'SQL',
-  'English',
-  'Japanese',
-  'Chinese (Mandarin)',
-  'Spanish',
-  'French',
-  'German',
-  'Russian',
-  'Italian',
-  'Portuguese',
-  'Arabic',
-  'Hindi',
-])
-const newSkill = ref('')
+const userAbilities = ref([])
+const newAbility = ref('')
 const isEditable = ref(false)
-const isEditableSkills = ref(false)
+const isEditableAbilities = ref(false)
 const showPasswordModal = ref(false) // Modal visibility state
 const showErrorModal = ref(false) // Error modal visibility state
 const showSuccessModal = ref(false) // Success modal visibility state
@@ -310,6 +278,24 @@ const updateUserInfo = async () => {
   }
 }
 
+const loadUserAbilities = async () => {
+  try {
+    const response = await api.get(`/user/ability/${userId.value}`)
+    const abilities = response.data.data
+
+    console.log('API response:', abilities) // 전체 응답 데이터 출력
+
+    userAbilities.value = abilities.map(ability => {
+      console.log('abilityName:', ability.abilityName) // 필드 이름 수정
+      const codeName = store.getCodeName(ability.abilityName)
+      console.log('Converted Code Name:', codeName) // 변환 결과 확인
+      return codeName
+    }) // abilityName을 코드명으로 변환하여 저장
+  } catch (error) {
+    console.error('Failed to load user abilities:', error)
+  }
+}
+
 const formatDate = dateString => {
   const options = { year: 'numeric', month: 'long', day: 'numeric' }
   return new Date(dateString).toLocaleDateString('ko-KR', options)
@@ -321,6 +307,7 @@ const getCodeName = code => {
 
 onMounted(() => {
   loadUserData()
+  loadUserAbilities()
 })
 
 const validatePassword = password => {
@@ -337,12 +324,6 @@ const updatePassword = async () => {
     showErrorModal.value = true
   } else {
     try {
-      // 비밀번호 업데이트 요청
-      const response = await api.post('/user/updatePassword', {
-        currentPassword: currentPassword.value,
-        newPassword: newPassword.value,
-      })
-
       // 비밀번호가 성공적으로 업데이트되었을 때
       showSuccessModal.value = true // 성공 모달 표시
       closePasswordModal() // 비밀번호 모달 닫기
@@ -357,18 +338,18 @@ const toggleEdit = () => {
   isEditable.value = !isEditable.value
 }
 
-const toggleEditSkills = () => {
-  isEditableSkills.value = !isEditableSkills.value
+const toggleEditAbilities = () => {
+  isEditableAbilities.value = !isEditableAbilities.value
 }
 
-const removeSkill = index => {
-  user.value.skills.splice(index, 1)
+const removeAbility = index => {
+  user.value.abilities.splice(index, 1)
 }
 
-const addSkill = () => {
-  if (newSkill.value && !user.value.skills.includes(newSkill.value)) {
-    user.value.skills.push(newSkill.value)
-    newSkill.value = ''
+const addAbility = () => {
+  if (newAbility.value && !user.value.abilities.includes(newAbility.value)) {
+    user.value.abilities.push(newAbility.value)
+    newAbility.value = ''
   }
 }
 

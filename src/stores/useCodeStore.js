@@ -80,6 +80,7 @@ export const useCodeStore = defineStore('code', {
   }),
   actions: {
     getCodeName(code) {
+      console.log('Getting code name for:', code)
       return this.codeToNameMap[code] || 'Unknown Code'
     },
   },
