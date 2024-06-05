@@ -21,14 +21,34 @@
 
 <script setup>
 import ApexChart from '@/components/apexchart/ApexChart.vue'
-import { ref } from 'vue'
+import axios from '@/api/axios'
+import { onMounted, ref, watch } from 'vue'
+
+const userNo = ref(1)
 
 const params = ref({
   text: '총 근무 시간',
-  percent: 68,
-  // totalTime: 40,
-  // currentTime: 24.42,
   type: 'radialBar',
+  formattedPercent: 0,
+  //totalWorkHours: 0
+})
+
+const getAttendancePercent = async () => {
+  try {
+    const response = await axios.get(`/attendance/weektotalpercent/${userNo.value}`)
+    console.log('get AttendancePercent success ! ', response)
+    params.value.formattedPercent = formatToTwoDecimalPlaces(response.data.data.formattedPercent)
+  } catch (error) {
+    console.log('Error get AttendancePercent:', error)
+  }
+}
+
+const formatToTwoDecimalPlaces = number => {
+  return parseFloat(number).toFixed(2)
+}
+
+onMounted(() => {
+  getAttendancePercent()
 })
 </script>
 
