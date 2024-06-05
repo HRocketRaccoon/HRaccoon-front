@@ -14,15 +14,13 @@
 
     <VueDatePickerComponent :markers="markers" @handleSelectCurrentDate="selectCurrentDate"></VueDatePickerComponent>
 
-    <span title="Select current date">
-      <div v-if="isDateSelected(selectDate)" class="tooltip">
+    <div v-if="isDateSelected(selectDate)" class="tooltip">
+      <VDivider class="mb-2"></VDivider>
+      <div v-for="text in getDataBySelectDate(selectDate)" :key="text.id">
+        <p>{{ text }}</p>
         <VDivider class="mb-2"></VDivider>
-        <div v-for="text in getDataBySelectDate(selectDate)" :key="text.id">
-          <p>{{ text }}</p>
-          <VDivider class="mb-2"></VDivider>
-        </div>
       </div>
-    </span>
+    </div>
   </VCard>
 </template>
 
