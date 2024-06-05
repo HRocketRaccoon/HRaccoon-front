@@ -80,8 +80,10 @@ export const useCodeStore = defineStore('code', {
   }),
   actions: {
     getCodeName(code) {
-      console.log('Getting code name for:', code)
       return this.codeToNameMap[code] || 'Unknown Code'
+    },
+    getAllAbilities() {
+      return Object.keys(this.codeToNameMap).filter(code => code.startsWith('AB'))
     },
   },
 })

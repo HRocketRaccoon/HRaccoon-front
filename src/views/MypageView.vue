@@ -89,6 +89,7 @@
                 label="연락처"
                 v-model="user.userMobile"
                 :readonly="!isEditable"
+                @input="formatPhoneNumber"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
@@ -110,9 +111,9 @@
               ></v-text-field>
             </v-col>
           </v-row>
-          <v-btn color="primary" class="ma-2" @click="updateUserInfo">{{
-            isEditable ? '수정 완료' : '수정하기'
-          }}</v-btn>
+          <v-btn color="primary" class="ma-2" @click="toggleEdit">
+            {{ isEditable ? '수정 완료' : '수정하기' }}
+          </v-btn>
         </v-form>
       </div>
       <div v-else class="tab-content">
@@ -134,6 +135,8 @@
                 v-if="isEditableAbilities"
                 v-model="newAbility"
                 :items="availableAbilities"
+                item-text="name"
+                item-value="code"
                 label="개인역량을 선택해주세요"
               ></v-select>
               <v-btn v-if="isEditableAbilities" color="primary" class="ma-2" @click="addAbility">추가</v-btn>
@@ -183,6 +186,20 @@
       </v-card-actions>
     </VCard>
   </v-dialog>
+  <!-- Success Modal for Personal Information Update -->
+  <v-dialog v-model="showUserInfoSuccessModal" max-width="500px">
+    <VCard>
+      <v-card-title class="d-flex justify-space-between align-center">
+        <span class="headline">성공</span>
+      </v-card-title>
+      <v-card-text>
+        <p>개인정보가 수정되었습니다.</p>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="primary" @click="closeUserInfoSuccessModal">확인</v-btn>
+      </v-card-actions>
+    </VCard>
+  </v-dialog>
 
   <!-- Error Modal -->
   <v-dialog v-model="showErrorModal" max-width="500px">
@@ -191,9 +208,11 @@
         <span class="headline">오류</span>
       </v-card-title>
       <v-card-text>
-        <p v-if="errorType === 'mismatch'">비밀번호가 일치하지 않습니다.</p>
+        <p v-if="errorType === 'phone'">전화번호 형식이 알맞지 않습니다.</p>
+        <p v-else-if="errorType === 'email'">이메일 형식이 알맞지 않습니다.</p>
+        <p v-else-if="errorType === 'mismatch'">비밀번호가 일치하지 않습니다.</p>
         <p v-else>
-          비밀번호는 8자 이상 16자 이하 문자(a-z), 숫자(0-9), 특수문자 포함 (!,@,#,$,%,^,&,*,_)를 포함해야 합니다.
+          비밀번호는 8자 이상 16자 이하 문자(a-z), 숫자(0-9), 특수문자 포함 (!,@,#,$,%,^,&,*)를 포함해야 합니다.
         </p>
       </v-card-text>
       <v-card-actions>
@@ -217,7 +236,7 @@ const user = ref({
   userTeam: '',
   userPosition: '',
   userRank: '',
-  skills: [],
+  abilities: [],
 })
 
 const userDepartmentName = ref('')
@@ -225,8 +244,12 @@ const userTeamName = ref('')
 const userPositionName = ref('')
 const userRankName = ref('')
 
+const store = useCodeStore()
+
+const availableAbilities = ref(store.getAllAbilities())
+
 const userAbilities = ref([])
-const newAbility = ref('')
+const newAbility = ref([])
 const isEditable = ref(false)
 const isEditableAbilities = ref(false)
 const showPasswordModal = ref(false) // Modal visibility state
@@ -237,7 +260,32 @@ const newPassword = ref('')
 const confirmPassword = ref('')
 const errorType = ref('')
 
-const store = useCodeStore()
+const loadAvailableAbilities = () => {
+  // 가져온 코드를 다시 코드 이름으로 변경하여 availableAbilities에 저장합니다.
+  availableAbilities.value = availableAbilities.value.map(code => store.getCodeName(code))
+
+  console.log('ability list: ', availableAbilities)
+}
+
+const convertGender = gender => {
+  if (gender === 'MALE') return '남자'
+  if (gender === 'FEMALE') return '여자'
+  return gender
+}
+
+const formatPhoneNumber = event => {
+  let phoneNumber = event.target.value.replace(/\D/g, '')
+  if (phoneNumber.length > 3 && phoneNumber.length <= 7) {
+    phoneNumber = `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`
+  } else if (phoneNumber.length > 7) {
+    phoneNumber = `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 7)}-${phoneNumber.slice(7, 11)}`
+  }
+  user.value.userMobile = phoneNumber
+}
+const validateEmail = email_address => {
+  let email_regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i
+  return email_regex.test(email_address)
+}
 
 const loadUserData = async () => {
   try {
@@ -247,13 +295,16 @@ const loadUserData = async () => {
 
     const userData = response.data.data
     userData.userJoinDate = formatDate(userData.userJoinDate)
-    userData.skills = userData.skills || []
+    userData.abilities = userData.abilities || []
+    userData.userGender = convertGender(userData.userGender) // 성별 값 변환
     user.value = userData
 
     userDepartmentName.value = getCodeName(user.value.userDepartment)
     userTeamName.value = getCodeName(user.value.userTeam)
     userPositionName.value = getCodeName(user.value.userPosition)
     userRankName.value = getCodeName(user.value.userRank)
+
+    saveUserDataToLocalStorage()
   } catch (error) {
     console.error('Failed to load user data:', error)
     if (error.response) {
@@ -263,7 +314,23 @@ const loadUserData = async () => {
     }
   }
 }
+const validatePhoneNumber = phoneNumber => {
+  const regex = /^\d{3}-\d{4}-\d{4}$/
+  return regex.test(phoneNumber)
+}
 const updateUserInfo = async () => {
+  if (!validatePhoneNumber(user.value.userMobile)) {
+    errorType.value = 'phone'
+    showErrorModal.value = true
+    return
+  }
+
+  if (!validateEmail(user.value.userEmail)) {
+    errorType.value = 'email'
+    showErrorModal.value = true
+    return
+  }
+
   try {
     const response = await api.post('/user/update', {
       userId: user.value.userId,
@@ -272,7 +339,12 @@ const updateUserInfo = async () => {
       userEmail: user.value.userEmail,
     })
     console.log('User info updated:', response.data.data)
-    isEditable.value = !isEditable.value
+    if (isEditable.value) {
+      isEditable.value = false
+      showUserInfoSuccessModal.value = true // 개인정보 수정 성공 모달 표시
+    }
+
+    saveUserDataToLocalStorage()
   } catch (error) {
     console.error('Failed to update user info:', error)
   }
@@ -282,15 +354,9 @@ const loadUserAbilities = async () => {
   try {
     const response = await api.get(`/user/ability/${userId.value}`)
     const abilities = response.data.data
+    userAbilities.value = abilities.map(ability => store.getCodeName(ability.abilityName)) // ABILITYNAME을 코드명으로 변환하여 저장
 
-    console.log('API response:', abilities) // 전체 응답 데이터 출력
-
-    userAbilities.value = abilities.map(ability => {
-      console.log('abilityName:', ability.abilityName) // 필드 이름 수정
-      const codeName = store.getCodeName(ability.abilityName)
-      console.log('Converted Code Name:', codeName) // 변환 결과 확인
-      return codeName
-    }) // abilityName을 코드명으로 변환하여 저장
+    saveUserAbilitiesToLocalStorage()
   } catch (error) {
     console.error('Failed to load user abilities:', error)
   }
@@ -305,9 +371,58 @@ const getCodeName = code => {
   return store.getCodeName(code)
 }
 
+const saveUserDataToLocalStorage = () => {
+  localStorage.setItem('user', JSON.stringify(user.value))
+  localStorage.setItem('userDepartmentName', userDepartmentName.value)
+  localStorage.setItem('userTeamName', userTeamName.value)
+  localStorage.setItem('userPositionName', userPositionName.value)
+  localStorage.setItem('userRankName', userRankName.value)
+}
+
+const saveUserAbilitiesToLocalStorage = () => {
+  localStorage.setItem('userAbilities', JSON.stringify(userAbilities.value))
+}
+
+const loadUserDataFromLocalStorage = () => {
+  const savedUser = localStorage.getItem('user')
+  const savedUserDepartmentName = localStorage.getItem('userDepartmentName')
+  const savedUserTeamName = localStorage.getItem('userTeamName')
+  const savedUserPositionName = localStorage.getItem('userPositionName')
+  const savedUserRankName = localStorage.getItem('userRankName')
+  const savedUserAbilities = localStorage.getItem('userAbilities')
+
+  if (savedUser) {
+    const userData = JSON.parse(savedUser)
+    userData.userGender = convertGender(userData.userGender) // 성별 값 변환
+    user.value = userData
+  }
+  if (savedUserDepartmentName) userDepartmentName.value = savedUserDepartmentName
+  if (savedUserTeamName) userTeamName.value = savedUserTeamName
+  if (savedUserPositionName) userPositionName.value = savedUserPositionName
+  if (savedUserRankName) userRankName.value = savedUserRankName
+  if (savedUserAbilities) userAbilities.value = JSON.parse(savedUserAbilities)
+}
+
+const updateUserAbilities = async () => {
+  try {
+    const response = await api.post(
+      `/user/ability/update/${userId.value}`,
+      userAbilities.value.map(ability => ({
+        abilityName: ability,
+      })),
+    )
+    console.log('User abilities updated:', response.data.data)
+    saveUserAbilitiesToLocalStorage()
+  } catch (error) {
+    console.error('Failed to update user abilities:', error)
+  }
+}
+
 onMounted(() => {
+  loadUserDataFromLocalStorage()
   loadUserData()
   loadUserAbilities()
+  loadAvailableAbilities([]) // 사용 가능한 모든 역량을 로드합니다.
 })
 
 const validatePassword = password => {
@@ -335,7 +450,11 @@ const updatePassword = async () => {
 }
 
 const toggleEdit = () => {
-  isEditable.value = !isEditable.value
+  if (isEditable.value) {
+    updateUserInfo()
+  } else {
+    isEditable.value = true
+  }
 }
 
 const toggleEditAbilities = () => {
@@ -343,13 +462,17 @@ const toggleEditAbilities = () => {
 }
 
 const removeAbility = index => {
-  user.value.abilities.splice(index, 1)
+  userAbilities.value.splice(index, 1)
+  saveUserAbilitiesToLocalStorage()
+  updateUserAbilities() // DB 업데이트 호출
 }
 
 const addAbility = () => {
-  if (newAbility.value && !user.value.abilities.includes(newAbility.value)) {
-    user.value.abilities.push(newAbility.value)
+  if (newAbility.value && !userAbilities.value.includes(newAbility.value)) {
+    userAbilities.value.push(newAbility.value)
     newAbility.value = ''
+    saveUserAbilitiesToLocalStorage()
+    updateUserAbilities() // DB 업데이트 호출
   }
 }
 
@@ -374,6 +497,11 @@ const resetPasswordFields = () => {
   currentPassword.value = ''
   newPassword.value = ''
   confirmPassword.value = ''
+}
+const showUserInfoSuccessModal = ref(false)
+
+const closeUserInfoSuccessModal = () => {
+  showUserInfoSuccessModal.value = false
 }
 </script>
 
