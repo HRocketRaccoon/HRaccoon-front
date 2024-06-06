@@ -1,14 +1,19 @@
 import { defineStore } from 'pinia'
 import api from '@/api/axios'
+import { jwtDecode } from 'jwt-decode'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    accessToken: localStorage.getItem('accessToken') || '',
-    refreshToken: localStorage.getItem('refreshToken') || '',
+    accessToken: sessionStorage.getItem('accessToken') || '',
+    refreshToken: sessionStorage.getItem('refreshToken') || '',
+
+    userNo: sessionStorage.getItem('userNo') || '',
+    userId: sessionStorage.getItem('userId') || '',
+    authority: sessionStorage.getItem('authority') || '',
   }),
   actions: {
     /**
-     * @description Login 시 발급되는 accessToken 과 refreshToken 을 localStorage 에 저장하는 함수.
+     * @description Login 시 발급되는 accessToken 과 refreshToken 을 sessionStorage 에 저장하는 함수.
      * @param credentials
      */
     async fetchSignIn(credentials) {
@@ -20,11 +25,7 @@ export const useAuthStore = defineStore('auth', {
           return
         }
 
-        this.accessToken = response.data.data.accessToken
-        this.refreshToken = response.data.data.refreshToken
-
-        localStorage.setItem('accessToken', this.accessToken)
-        localStorage.setItem('refreshToken', this.refreshToken)
+        this.setAuthData(response.data.data.accessToken, response.data.data.refreshToken)
       } catch (error) {
         console.error('[ERROR] fetchRefreshToken func error: ', error)
       }
@@ -35,45 +36,85 @@ export const useAuthStore = defineStore('auth', {
      */
     async fetchRefreshToken() {
       try {
-        const response = await api.post('/auth/re-issuance', {
-          refreshToken: this.refreshToken,
-        })
+        const response = await api.post(
+          '/auth/re-issuance',
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${this.refreshToken}`,
+            },
+          },
+        )
 
         if (response.data.status === 'error') {
           console.error('[ERROR] fetchRefreshToken func response error message: ', response.data.message)
-          return
         }
 
-        this.accessToken = response.data.data.accessToken
-        this.refreshToken = response.data.data.refreshToken
-
-        localStorage.setItem('accessToken', this.accessToken)
-        localStorage.setItem('refreshToken', this.refreshToken)
+        this.setAuthData(response.data.data.accessToken, response.data.data.refreshToken)
       } catch (error) {
         console.error('[ERROR] fetchRefreshToken func error:', error)
-        //TODO: 로그아웃 처리 추가 고민 필요
+        await this.fetchSignOut()
+        throw new Error('Unable to refresh token, please login again.')
       }
     },
 
     /**
-     * @description 로그아웃 시 localStorage 에 저장된 accessToken 과 refreshToken 을 삭제하는 함수.
+     * @description 로그아웃 시 sessionStorage 에 저장된 accessToken 과 refreshToken 을 삭제하는 함수.
      * @returns {Promise<void>}
      */
     async fetchSignOut() {
       try {
-        api
-          .post('/auth/sign-out', {
-            refreshToken: this.refreshToken,
-          })
-          .then(() => {
-            this.accessToken = ''
-            this.refreshToken = ''
-            localStorage.removeItem('accessToken')
-            localStorage.removeItem('refreshToken')
-          })
+        await api.post(
+          '/auth/sign-out',
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${this.accessToken}`,
+            },
+          },
+        )
+        this.clearAuthData()
       } catch (error) {
         console.error('Sign out error:', error)
       }
+    },
+
+    /**
+     * @description accessToken 과 refreshToken 을 sessionStorage 에 저장하고 상태를 업데이트하는 함수.
+     * @param accessToken
+     * @param refreshToken
+     */
+    setAuthData(accessToken, refreshToken) {
+      this.accessToken = accessToken
+      this.refreshToken = refreshToken
+
+      const decodedToken = jwtDecode(this.accessToken)
+      console.log('=================== decodedToken', decodedToken)
+      this.userNo = decodedToken?.userNo
+      this.userId = decodedToken?.userId
+      this.authority = decodedToken?.authority
+
+      sessionStorage.setItem('accessToken', this.accessToken)
+      sessionStorage.setItem('refreshToken', this.refreshToken)
+      sessionStorage.setItem('userNo', this.userNo)
+      sessionStorage.setItem('userId', this.userId)
+      sessionStorage.setItem('authority', this.authority)
+    },
+
+    /**
+     * @description sessionStorage 에 저장된 모든 인증 데이터를 삭제하는 함수.
+     */
+    clearAuthData() {
+      this.accessToken = ''
+      this.refreshToken = ''
+      this.userNo = null
+      this.userId = null
+      this.authority = null
+      sessionStorage.removeItem('accessToken')
+      sessionStorage.removeItem('refreshToken')
+      sessionStorage.removeItem('userNo')
+      sessionStorage.removeItem('userId')
+      sessionStorage.removeItem('authority')
     },
   },
 })

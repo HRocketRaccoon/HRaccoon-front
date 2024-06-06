@@ -5,13 +5,19 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1',
 })
 
+const noAuthUrls = ['/auth/sign-in', '/auth/re-issuance']
+
 api.interceptors.request.use(
   config => {
     const authStore = useAuthStore()
     const token = authStore.accessToken
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+
+    if (!noAuthUrls.includes(config.url)) {
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
     }
+
     return config
   },
   error => Promise.reject(error),
@@ -24,14 +30,17 @@ api.interceptors.response.use(
     const originalRequest = error.config
 
     if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
-      try {
-        await authStore.fetchRefreshToken()
-        const token = authStore.accessToken
-        originalRequest.headers.Authorization = `Bearer ${token}`
-        return api(originalRequest)
-      } catch (err) {
-        return Promise.reject(err)
+      const errorMessages = error.response.data.message
+      if (errorMessages === '토큰이 만료되었습니다.' || errorMessages === '로그인이 필요합니다.') {
+        originalRequest._retry = true
+        try {
+          await authStore.fetchRefreshToken()
+          const token = authStore.accessToken
+          originalRequest.headers.Authorization = `Bearer ${token}`
+          return api(originalRequest)
+        } catch (err) {
+          return Promise.reject(err)
+        }
       }
     }
 

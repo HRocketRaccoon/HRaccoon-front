@@ -1,8 +1,24 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/useAuthStore.js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/',
+      component: () => import('@/layouts/BlankLayout.vue'),
+      children: [
+        {
+          path: 'sign-in',
+          name: 'SignIn',
+          component: () => import('@/views/auth/LoginView.vue'),
+        },
+        {
+          path: '/:pathMatch(.*)*',
+          component: () => import('@/views/exception/ErrorView.vue'),
+        },
+      ],
+    },
     {
       path: '/',
       redirect: '/home',
@@ -43,21 +59,18 @@ const router = createRouter({
         },
       ],
     },
-    {
-      path: '/',
-      component: () => import('@/layouts/BlankLayout.vue'),
-      children: [
-        {
-          path: 'login',
-          component: () => import('@/views/auth/LoginView.vue'),
-        },
-        {
-          path: '/:pathMatch(.*)*',
-          component: () => import('@/views/exception/ErrorView.vue'),
-        },
-      ],
-    },
   ],
+})
+
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore()
+  const isLoggedIn = !!sessionStorage.getItem('accessToken')
+
+  if (!isLoggedIn && to.name !== 'SignIn') {
+    next({ name: 'SignIn' })
+  } else {
+    next()
+  }
 })
 
 export default router
