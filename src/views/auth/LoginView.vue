@@ -4,7 +4,7 @@
       <VCardItem class="justify-center">
         <template #prepend>
           <div class="d-flex">
-            <!-- logo -->
+            <!-- TODO: logo 삽입 -->
             <!--           <div class="d-flex text-primary" v-html="logo" />-->
           </div>
         </template>
@@ -51,12 +51,19 @@
 </template>
 <script setup>
 import { ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
+
+// store
 import { useAuthStore } from '@/stores/useAuthStore.js'
+
+// components
 import { useToast } from 'vue-toastification'
 
-const { signIn } = useAuthStore()
-const { router } = useRoute()
+// constants
+import { loginConstant } from '@/util/constants/loginConstant.js'
+
+const { fetchSignIn } = useAuthStore()
+const router = useRouter()
 const toast = useToast()
 
 const isPasswordVisible = ref(false)
@@ -65,6 +72,8 @@ const form = ref({
   userPassword: '',
 })
 
+const { AUTH_SUCCESS, AUTH_ID_REGEX, AUTH_PASSWORD_REGEX, AUTH_NOT_MATCH } = loginConstant
+
 const onHandleSubmit = async () => {
   const validationError = validateForm()
   if (validationError) {
@@ -72,23 +81,32 @@ const onHandleSubmit = async () => {
     return
   }
   try {
-    //TODO: 실제 로그인 로직 구현
-    // await signIn(form.value).then(() => {
-    //   router.push('/')
-    // })
-    toast.success('로그인 성공')
+    await fetchSignIn(form.value).then(() => {
+      toast.success(AUTH_SUCCESS)
+      router.push('/home')
+    })
   } catch (error) {
-    toast.error('사번과 비밀번호가 일치하지 않습니다.')
+    console.log(error)
+    toast.error(AUTH_NOT_MATCH)
   }
 }
 
 const validateForm = () => {
-  if (!form.value.userId) {
-    return '사번을 입력해주세요.'
-  }
+  const idError = validationId(form.value.userId)
   const passwordError = validatePassword(form.value.userPassword)
+  if (idError) {
+    return idError
+  }
   if (passwordError) {
     return passwordError
+  }
+  return null
+}
+
+const validationId = password => {
+  const regex = /^A\d{6}$/
+  if (!regex.test(password)) {
+    return AUTH_ID_REGEX
   }
   return null
 }
@@ -96,7 +114,7 @@ const validateForm = () => {
 const validatePassword = password => {
   const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*_])[A-Za-z\d!@#$%^&*_]{8,16}$/
   if (!passwordPattern.test(password)) {
-    return '비밀번호는 8자 이상 16자 이하이며, 영문자 대문자 및 소문자, 숫자, 특수문자를 포함해야 합니다.'
+    return AUTH_PASSWORD_REGEX
   }
   return null
 }

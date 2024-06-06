@@ -4,11 +4,11 @@
 
     <div class="d-flex flex-column ml-auto py-8 pr-10">
       <VCombobox
-        label="조회할 팀을 고르세요."
+        v-model="userTeam"
         :items="teamList"
+        label="조회할 팀을 고르세요."
         variant="outlined"
         width="280px"
-        v-model="userTeam"
       ></VCombobox>
     </div>
 
@@ -25,9 +25,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import axios from '@/api/axios'
 import VueDatePickerComponent from '@/components/calendar/VueDatePicker.vue'
+
 const teamList = ref([
   'IT영업팀',
   '해외영업팀',
@@ -112,7 +113,7 @@ const addMarkers = () => {
 }
 
 onMounted(() => {
-  getTeamApprovalInfo()
+  // getTeamApprovalInfo()
 })
 
 const getDataBySelectDate = date => {
