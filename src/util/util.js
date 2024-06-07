@@ -3,9 +3,18 @@
  * @param object
  * @returns {unknown[]}
  */
-export const deepFreeze = (object) => {
+export const deepFreeze = object => {
   Object.entries(object).forEach(([key, value]) => {
     if (value && typeof value === 'object') deepFreeze(value)
   })
   return Object.freeze(object)
+}
+
+/**
+ * @description 소수점 이하를 제거하는 함수.
+ * @param number
+ * @returns {number}
+ */
+export const removeDecimal = number => {
+  return Math.round(number)
 }
