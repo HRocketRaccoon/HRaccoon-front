@@ -4,7 +4,7 @@
     <VCardText>
       <VCol v-for="day in workHours" :key="day.name" class="d-flex flex-col justify-space-between col-class">
         <span>{{ day.name }}</span>
-        <span>{{ day.hours }}</span>
+        <span>{{ day.status }}</span>
       </VCol>
     </VCardText>
   </VCard>

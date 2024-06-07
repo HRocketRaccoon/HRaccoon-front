@@ -1,10 +1,10 @@
 <template>
   <div>
     <VueApexCharts
-      :type="params.type"
       :height="300"
       :options="chartOptions.radial"
       :series="[params.formattedPercent]"
+      :type="params.type"
       class="mt-6"
     />
     <div v-if="params.totalWorkHours">
@@ -17,7 +17,7 @@
 import VueApexCharts from 'vue3-apexcharts'
 import { useDisplay, useTheme } from 'vuetify'
 import { hexToRgb } from '@layouts/utils'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({
   params: {

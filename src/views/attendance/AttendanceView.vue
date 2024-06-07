@@ -4,8 +4,8 @@
     <VCol>
       <VCard class="date-picker-card">
         <VDatePicker
-          v-model="date"
-          :max="date"
+          v-model="selectedDate"
+          :max="yesterday"
           clearable
           label="날짜"
           min="2010-01-01"
@@ -17,9 +17,9 @@
     </VCol>
     <VCol>
       <CardNavigation
-        :arrival-time="dailyParams.arrivalTime"
-        :departure-time="dailyParams.departureTime"
-        :insert-date="dailyParams.insertDate"
+        :end-time="dailyParams.endTime"
+        :selected-attendance-date="dailyParams.selectedAttendanceDate"
+        :start-time="dailyParams.startTime"
       />
     </VCol>
   </VRow>
@@ -50,21 +50,21 @@ import AttendanceApexChart from '@/components/apexchart/AttendanceApexChart.vue'
 import { useAuthStore } from '@/stores/useAuthStore.js'
 
 // util
-import { removeDecimal } from '@/util/util.js'
+import { formatDate, removeDecimal } from '@/util/util.js'
 import api from '@/api/axios.js'
 
 const authStore = useAuthStore()
 const weekendParams = ref([
-  { name: '월', hours: '8시간' },
-  { name: '화', hours: '8시간' },
-  { name: '수', hours: '8시간' },
-  { name: '목', hours: '8시간' },
-  { name: '금', hours: '8시간' },
+  { name: '월', status: '8시간' },
+  { name: '화', status: '8시간' },
+  { name: '수', status: '8시간' },
+  { name: '목', status: '8시간' },
+  { name: '금', status: '8시간' },
 ])
 const dailyParams = ref({
-  insertDate: '09월 05일',
-  arrivalTime: '9시 30분',
-  departureTime: '6시 00분',
+  selectedAttendanceDate: '2024-01-01',
+  startTime: '2024-06-03T00:45:04',
+  endTime: '2024-06-03T12:45:01',
 })
 const chartParams = ref({
   text: '총 근무 시간',
@@ -72,9 +72,13 @@ const chartParams = ref({
   totalTime: 40,
   currentTime: 20,
 })
-const date = ref(new Date())
-const calendarParams = ref({})
 const userNo = ref(authStore.userNo || null)
+
+// logic variables
+const selectedDate = ref(new Date())
+const yesterday = ref(new Date())
+selectedDate.value.setDate(selectedDate.value.getDate() - 1)
+yesterday.value.setDate(yesterday.value.getDate() - 1)
 
 const fetchAttendanceChartData = async () => {
   try {
@@ -88,6 +92,32 @@ const fetchAttendanceChartData = async () => {
   }
 }
 
+const fetchDailyAttendanceData = async paramDate => {
+  try {
+    const response = await api.get(`/attendance/startend/${userNo.value}/${paramDate}`)
+    console.log('[SUCCESS] fetchDailyAttendanceData response:', response)
+
+    if (response.data.data) {
+      dailyParams.value.selectedAttendanceDate = response.data.data.attendanceDate
+      dailyParams.value.startTime = response.data.data.attendanceStartTime
+      dailyParams.value.endTime = response.data.data.attendanceEndTime
+    }
+  } catch (error) {
+    console.log('[ERROR] fetchDailyAttendanceData error:', error)
+  }
+}
+
+const fetchWeekendWorkTime = async () => {
+  try {
+    const response = await api.get(`/attendance/worktimeperdate/${userNo.value}`)
+    console.log('[SUCCESS] fetchWeekendWorkTime response:', response)
+
+    weekendParams.value = response.data.data
+  } catch (error) {
+    console.log('[ERROR] fetchWeekendWorkTime error:', error)
+  }
+}
+
 watch(
   userNo,
   async newUserNo => {
@@ -97,6 +127,10 @@ watch(
   },
   { immediate: true },
 )
+
+watch(selectedDate, newDate => {
+  fetchDailyAttendanceData(formatDate(newDate))
+})
 </script>
 <style scoped>
 .date-picker-card {
