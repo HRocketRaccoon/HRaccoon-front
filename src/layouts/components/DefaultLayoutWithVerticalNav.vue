@@ -8,6 +8,16 @@ import VerticalNavLink from '@layouts/components/VerticalNavLink.vue'
 import Footer from '@/layouts/components/GlobalFooter.vue'
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
+import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
+
+// store
+import { useAuthStore } from '@/stores/useAuthStore.js'
+
+const { fetchSignOut } = useAuthStore()
+
+const onHandleDialogButton = async () => {
+  await fetchSignOut()
+}
 </script>
 
 <template>
@@ -41,7 +51,16 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
 
         <NavbarThemeSwitcher class="me-2" />
 
-        <UserProfile />
+        <UserProfile class="me-4" />
+
+        <TwoButtonDialog
+          :right-btn-action="onHandleDialogButton"
+          button-name="로그아웃"
+          content="정말로 로그아웃 하시겠습니까?"
+          icon="mdi-logout"
+          right-btn-name="로그아웃"
+          title="로그아웃"
+        />
       </div>
     </template>
 
@@ -56,7 +75,7 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
         :item="{
           title: '홈',
           icon: 'bx-home',
-          to: '/',
+          to: '/home',
         }"
       />
       <VerticalNavLink
