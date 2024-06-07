@@ -82,7 +82,7 @@ const onHandleDialogButton = async () => {
         :item="{
           title: '마이 페이지',
           icon: 'mdi-account-cog-outline',
-          to: '/account-settings',
+          to: '/mypage',
         }"
       />
 
@@ -138,7 +138,7 @@ const onHandleDialogButton = async () => {
         :item="{
           title: '좌석 선택',
           icon: 'mdi-alpha-t-box-outline',
-          to: '/typography',
+          to: '/seat',
         }"
       />
 

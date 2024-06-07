@@ -57,6 +57,14 @@ const router = createRouter({
           path: 'test',
           component: () => import('@/views/dev/TestView.vue'),
         },
+        {
+          path: 'seat',
+          component: () => import('@/views/SeatView.vue'),
+        },
+        {
+          path: 'mypage',
+          component: () => import('@/views/MypageView.vue'),
+        },
       ],
     },
   ],
