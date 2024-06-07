@@ -69,7 +69,7 @@ export const useAuthStore = defineStore('auth', {
           {},
           {
             headers: {
-              Authorization: `Bearer ${this.accessToken}`,
+              Authorization: `Bearer ${this.refreshToken}`,
             },
           },
         )
