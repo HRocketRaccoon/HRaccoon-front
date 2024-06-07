@@ -354,8 +354,9 @@ const loadUserAbilities = async () => {
   try {
     const response = await api.get(`/user/ability/${userId.value}`)
     const abilities = response.data.data
-    userAbilities.value = abilities.map(ability => store.getCodeName(ability.abilityName)) // ABILITYNAME을 코드명으로 변환하여 저장
+    userAbilities.value = abilities.map(ability => ability.abilityName) // ABILITYNAME을 코드명으로 변환하여 저장
 
+    console.log('user ability :', abilities)
     saveUserAbilitiesToLocalStorage()
   } catch (error) {
     console.error('Failed to load user abilities:', error)
@@ -466,13 +467,12 @@ const removeAbility = index => {
   saveUserAbilitiesToLocalStorage()
   updateUserAbilities() // DB 업데이트 호출
 }
-
 const addAbility = () => {
   if (newAbility.value && !userAbilities.value.includes(newAbility.value)) {
-    userAbilities.value.push(newAbility.value)
+    userAbilities.value.push(newAbility.value) // 문자열 값을 추가
     newAbility.value = ''
     saveUserAbilitiesToLocalStorage()
-    updateUserAbilities() // DB 업데이트 호출
+    updateUserAbilities()
   }
 }
 
