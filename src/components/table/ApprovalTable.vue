@@ -40,7 +40,7 @@ const props = defineProps({
 })
 
 const onHandleClick = approvalNo => {
-  let routePath = '/details/' + approvalNo
+  let routePath = '/approval/details/' + approvalNo
   if (props.type === 'request') {
     routePath += '?type=request'
   } else {
