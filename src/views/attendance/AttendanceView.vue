@@ -88,7 +88,7 @@ const fetchAttendanceChartData = async () => {
     chartParams.value.percent = removeDecimal(response.data.data.formattedPercent)
     chartParams.value.currentTime = response.data.data.totalWorkHours
   } catch (error) {
-    console.log('[ERROR] fetchAttendanceChartData error:', error)
+    console.error('[ERROR] fetchAttendanceChartData error:', error)
   }
 }
 
@@ -103,7 +103,7 @@ const fetchDailyAttendanceData = async paramDate => {
       dailyParams.value.endTime = response.data.data.attendanceEndTime
     }
   } catch (error) {
-    console.log('[ERROR] fetchDailyAttendanceData error:', error)
+    console.error('[ERROR] fetchDailyAttendanceData error:', error)
   }
 }
 
@@ -114,7 +114,7 @@ const fetchWeekendWorkTime = async () => {
 
     weekendParams.value = response.data.data
   } catch (error) {
-    console.log('[ERROR] fetchWeekendWorkTime error:', error)
+    console.error('[ERROR] fetchWeekendWorkTime error:', error)
   }
 }
 
