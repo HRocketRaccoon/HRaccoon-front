@@ -59,12 +59,12 @@
         />
       </VCol>
 
-      <VCol v-if="props.type === 'approval'" class="d-flex gap-4">
-        <VBtn size="large" type="submit">승인</VBtn>
+      <VCol v-if="props.type === 'request'" class="d-flex gap-4">
+        <TwoButtonDialog buttonName="승인" content="결재를 승인하시겠습니까?" rightBtnName="승인" title="결재 승인" />
         <VBtn color="secondary" size="large" type="reset" variant="tonal">반려</VBtn>
       </VCol>
 
-      <VCol v-if="props.type === 'request' && params.approvalStatus === 'PENDING'" class="d-flex gap-4">
+      <VCol v-if="props.type === 'status' && params.approvalStatus === 'PENDING'" class="d-flex gap-4">
         <VBtn size="large" type="submit">요청 닫기</VBtn>
         <VBtn color="secondary" size="large" type="reset" variant="tonal">뒤로 가기</VBtn>
       </VCol>
@@ -79,11 +79,13 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
 
 const props = defineProps({
   approvalNo: String,
   type: String,
 })
+
 const params = ref({
   userTeam: '',
   userId: '',

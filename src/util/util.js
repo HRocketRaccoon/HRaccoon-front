@@ -29,3 +29,12 @@ export const removeDecimal = number => {
 export const formatDate = date => {
   return dayjs(date).format('YYYY-MM-DD')
 }
+
+/**
+ * @description 날짜를 받아서 오프셋 정보를 제외한 ISO 8601 형식(Java의 LocalDateTime과 호환)으로 변환하는 함수.
+ * @param {Date | string} date - 변환할 날짜 객체 또는 날짜 문자열.
+ * @returns {string} - 'YYYY-MM-DDTHH:mm:ss' 형식의 문자열.
+ */
+export const formatLocalDateTime = date => {
+  return dayjs(date).format('YYYY-MM-DDTHH:mm:ss')
+}

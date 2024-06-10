@@ -4,7 +4,7 @@
       <tr>
         <th class="text-uppercase">번호</th>
         <th>제목</th>
-        <th>{{ type === 'request' ? '상신자' : '결재' }}</th>
+        <th>{{ type === 'request' ? '상신자' : '결재자' }}</th>
         <th>등록 일자</th>
         <th>결재 상태</th>
       </tr>
@@ -44,7 +44,7 @@ const onHandleClick = approvalNo => {
   if (props.type === 'request') {
     routePath += '?type=request'
   } else {
-    routePath += '?type=approval'
+    routePath += '?type=status'
   }
   router.push(routePath)
 }

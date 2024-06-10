@@ -10,6 +10,8 @@
 <script setup>
 import { ref } from 'vue'
 import ApprovalTable from '@/components/table/ApprovalTable.vue'
+import { useAuthStore } from '@/stores/useAuthStore.js'
+import api from '@/api/axios.js'
 
 const params = ref([
   {
@@ -33,6 +35,17 @@ const params = ref([
 ])
 const currentPage = ref(1)
 const totalPage = ref(10)
+
+const userNo = ref(useAuthStore().userNo || '')
+
+const fetchApprovalStatusList = async () => {
+  try {
+    const response = await api.get(`/approval/submittedapprovallist/${userNo.value}`)
+    params.value = response.data
+  } catch (error) {
+    console.error(error)
+  }
+}
 
 const changePage = page => {
   currentPage.value = page
