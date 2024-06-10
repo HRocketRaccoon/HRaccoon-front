@@ -22,12 +22,13 @@ export const useAuthStore = defineStore('auth', {
 
         if (response.data.status === 'error') {
           console.error('[ERROR] fetchSignIn func response error message : ', response.data.message)
-          return
+          throw new Error(response.data.message)
         }
 
         this.setAuthData(response.data.data.accessToken, response.data.data.refreshToken)
       } catch (error) {
-        console.error('[ERROR] fetchRefreshToken func error: ', error)
+        console.error('[ERROR] fetchSignIn func error: ', error)
+        throw error
       }
     },
 
