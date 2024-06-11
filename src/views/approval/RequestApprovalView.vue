@@ -18,7 +18,7 @@
 
       <!-- 유형 -->
       <VCol cols="12" md="3">
-        <VSelect v-model="params.approvalStatus" :items="Object.keys(typeMapping)" label="유형" />
+        <VSelect v-model="params.approvalType" :items="Object.values(APPROVAL_TYPE)" label="유형" />
       </VCol>
 
       <!-- 기간 시작 -->
@@ -89,22 +89,21 @@ import { useAuthStore } from '@/stores/useAuthStore.js'
 
 // util
 import dayjs from 'dayjs'
-import { formatLocalDateTime } from '@/util/util.js'
+import { formatLocalDateTime, getKeyByValue } from '@/util/util.js'
+
+// constants
+import { APPROVAL_TITLE, APPROVAL_TYPE } from '@/util/constants/approvalConstant.js'
 
 const toast = useToast()
 const router = useRouter()
-const typeMapping = {
-  출장: 'BUSINESS_TRIP',
-  휴가: 'VACATION',
-  외근: 'OUT_ON_BUSINESS',
-}
+
 // TODO: 결재자 리스트 가져오는 함수 필요
 const approvers = ['김철수', '이영희', '박민수']
 
 const params = ref({
   userTeam: '',
   userName: '',
-  approvalStatus: '',
+  approvalType: '',
   approvalDetailStartDate: null,
   approvalDetailEndDate: null,
   approvalAuthority: '',
@@ -126,7 +125,7 @@ const fetchUserInfo = async () => {
 const fetchApprovalInfo = async () => {
   const approvalInfo = {
     userNo: userNo.value,
-    approvalType: typeMapping[params.value.approvalStatus],
+    approvalType: getKeyByValue(APPROVAL_TYPE, params.value.approvalType),
     approvalDetailStartDate: formatLocalDateTime(params.value.approvalDetailStartDate),
     approvalDetailEndDate: formatLocalDateTime(params.value.approvalDetailEndDate),
     selectedApprovalAuthority: params.value.approvalAuthority,
@@ -167,20 +166,13 @@ const resetParams = () => {
 }
 
 watch(
-  () => params.value.approvalStatus,
+  () => params.value.approvalType,
   newStatus => {
-    switch (newStatus) {
-      case '출장':
-        params.value.title = '출장 신청'
-        break
-      case '휴가':
-        params.value.title = '휴가 신청'
-        break
-      case '외근':
-        params.value.title = '외근 신청'
-        break
-      default:
-        params.value.title = '결재 신청'
+    try {
+      const approvalKey = getKeyByValue(APPROVAL_TYPE, newStatus)
+      params.value.title = APPROVAL_TITLE[approvalKey] || APPROVAL_TITLE.DEFAULT
+    } catch (error) {
+      params.value.title = APPROVAL_TITLE.DEFAULT
     }
   },
 )

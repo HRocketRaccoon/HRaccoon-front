@@ -3,52 +3,69 @@
   <VCard>
     <VCard>
       <ApprovalTable :data="params" type="status" />
-      <VPagination v-model="currentPage" :total-visible="totalPage" @change="changePage" />
+      <VPagination
+        v-model="currentPage"
+        :length="totalPage"
+        :total-visible="totalPage"
+        @update:modelValue="onHandlePage"
+      />
     </VCard>
   </VCard>
 </template>
 <script setup>
-import { ref } from 'vue'
-import ApprovalTable from '@/components/table/ApprovalTable.vue'
-import { useAuthStore } from '@/stores/useAuthStore.js'
-import api from '@/api/axios.js'
+import { ref, watch } from 'vue'
 
-const params = ref([
-  {
-    approvalNo: '1',
-    approvalTitle: '출장 신청',
-    approvalAuthority: '방채원',
-    approvalSubmitDate: '2024.05.23',
-    approvalStatus: '결재 중',
-    approvalDetailStartDate: '',
-    approvalDetailEndDate: '',
-  },
-  {
-    approvalNo: '2',
-    approvalTitle: '휴가 신청',
-    approvalAuthority: '방채원',
-    approvalSubmitDate: '2024.05.31',
-    approvalStatus: '결재 중',
-    approvalDetailStartDate: '',
-    approvalDetailEndDate: '',
-  },
-])
+// components
+import ApprovalTable from '@/components/table/ApprovalTable.vue'
+
+// api
+import api from '@/api/axios.js'
+import { useAuthStore } from '@/stores/useAuthStore.js'
+import { formatDate } from '@/util/util.js'
+import { APPROVAL_STATUS, APPROVAL_TITLE } from '@/util/constants/approvalConstant.js'
+
+const params = ref([])
 const currentPage = ref(1)
-const totalPage = ref(10)
+const totalPage = ref(1)
 
 const userNo = ref(useAuthStore().userNo || '')
 
 const fetchApprovalStatusList = async () => {
   try {
-    const response = await api.get(`/approval/submittedapprovallist/${userNo.value}`)
-    params.value = response.data
+    const response = await api.get(`/approval/submittedapprovallist/${userNo.value}`, {
+      params: {
+        pageNumber: currentPage.value,
+      },
+    })
+
+    params.value = response.data.data.content.map(item => {
+      return {
+        ...item,
+        approvalTitle: APPROVAL_TITLE[item.approvalType] || APPROVAL_TITLE.DEFAULT,
+        approvalSubmitDate: formatDate(item.approvalSubmitDate),
+        approvalStatus: APPROVAL_STATUS[item.approvalStatus],
+      }
+    })
+    totalPage.value = response.data.data.totalPages
+    currentPage.value = response.data.data.pageable.pageNumber + 1
   } catch (error) {
     console.error(error)
   }
 }
 
-const changePage = page => {
+const onHandlePage = page => {
   currentPage.value = page
+  fetchApprovalStatusList()
 }
+
+watch(
+  userNo,
+  async newUserNo => {
+    if (newUserNo) {
+      await fetchApprovalStatusList()
+    }
+  },
+  { immediate: true },
+)
 </script>
 <style scoped></style>

@@ -38,3 +38,17 @@ export const formatDate = date => {
 export const formatLocalDateTime = date => {
   return dayjs(date).format('YYYY-MM-DDTHH:mm:ss')
 }
+
+/**
+ * 주어진 객체에서 값을 통해 키를 찾습니다.
+ * @param {Object} obj - 검색할 객체.
+ * @param {any} value - 해당하는 키를 찾을 값.
+ * @returns {string} - 값에 해당하는 키.
+ */
+export const getKeyByValue = (obj, value) => {
+  for (const [key, val] of Object.entries(obj)) {
+    if (val === value) {
+      return key
+    }
+  }
+}

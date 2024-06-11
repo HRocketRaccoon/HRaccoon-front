@@ -47,11 +47,11 @@ import CardNavigation from '@/components/attendance/CardNavigation.vue'
 import AttendanceApexChart from '@/components/apexchart/AttendanceApexChart.vue'
 
 // api
+import api from '@/api/axios.js'
 import { useAuthStore } from '@/stores/useAuthStore.js'
 
 // util
 import { formatDate, removeDecimal } from '@/util/util.js'
-import api from '@/api/axios.js'
 
 const authStore = useAuthStore()
 const weekendParams = ref([
