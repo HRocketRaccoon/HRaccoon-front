@@ -113,7 +113,7 @@ const addMarkers = () => {
 }
 
 onMounted(() => {
-  // getTeamApprovalInfo()
+  getTeamApprovalInfo()
 })
 
 const getDataBySelectDate = date => {

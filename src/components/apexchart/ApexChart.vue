@@ -1,16 +1,11 @@
 <template>
   <div>
-    <VueApexCharts
-      :type="params.type"
-      :height="350"
-      :options="chartOptions.radial"
-      :series="[params.formattedPercent]"
-      class="mt-6"
-    />
+    <VueApexCharts :type="params.type" :height="350" :options="chartOptions.radial" :series="[68]" class="mt-6" />
     <div v-if="params.totalWorkHours">
       <div class="apex">{{ params.totalWorkHours }}/40시</div>
     </div>
   </div>
+  <!-- :series="[params.formattedPercent]" -->
 </template>
 
 <script setup>
