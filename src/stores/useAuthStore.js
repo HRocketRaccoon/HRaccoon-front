@@ -61,7 +61,7 @@ export const useAuthStore = defineStore('auth', {
 
     /**
      * @description 로그아웃 시 sessionStorage 에 저장된 accessToken 과 refreshToken 을 삭제하는 함수.
-     * @returns {Promise<void>}
+     * @returns {Promise<boolean>}
      */
     async fetchSignOut() {
       try {
@@ -75,8 +75,10 @@ export const useAuthStore = defineStore('auth', {
           },
         )
         this.clearAuthData()
+        return true
       } catch (error) {
         console.error('Sign out error:', error)
+        return false
       }
     },
 
