@@ -38,7 +38,12 @@
       </VCardText>
       <div v-if="params.length > 0">
         <EmployeeTable :data="params" :page="currentPage" />
-        <VPagination v-model="currentPage" :length="totalPage" @update:modelValue="goToPage"></VPagination>
+        <VPagination
+          v-model="currentPage"
+          :length="totalPage"
+          :total-visible="5"
+          @update:modelValue="goToPage"
+        ></VPagination>
       </div>
       <div v-else class="text-center pb-10">no result</div>
     </VCard>
