@@ -30,7 +30,7 @@
     <VDivider class="mb-4"></VDivider>
 
     <VCard v-if="todos.length > 0">
-      <VSlideYTransition class="py-0" tag="VList" group>
+      <VSlideYTransition class="py-0" group tag="VList">
         <div v-for="(todo, i) in todos" :key="`${i}-${todo.todoContent}`">
           <VDivider v-if="i !== 0" :key="`${i}-divider`"></VDivider>
 
@@ -52,9 +52,9 @@
                 <img
                   v-if="todo.todoCompleteYn"
                   class="delete-btn"
-                  @click="toggleDelete(todo.todoNo)"
+                  src="../../assets/images/circle-substract.png"
                   style="cursor: pointer"
-                  src="@/assets/circle-substract.png"
+                  @click="toggleDelete(todo.todoNo)"
                 />
               </VExpandXTransition>
             </template>
