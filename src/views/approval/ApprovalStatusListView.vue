@@ -1,5 +1,5 @@
 <template>
-  <h1 class="mb-2">| 결재 현황 확인</h1>
+  <h1 class="mb-2">| 결재 현황 관리</h1>
   <VCard>
     <VCard>
       <ApprovalTable :data="params" type="status" />

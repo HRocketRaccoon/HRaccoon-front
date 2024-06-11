@@ -1,5 +1,5 @@
 <template>
-  <h1 class="mb-2">| 결재 요청 확인</h1>
+  <h1 class="mb-2">| 결재 요청 관리</h1>
   <VCard>
     <ApprovalTable :data="params" type="request" />
     <VPagination
@@ -41,7 +41,7 @@ const fetchApprovalRequestList = async () => {
       return {
         ...item,
         approvalTitle: APPROVAL_TITLE[item.approvalType] || APPROVAL_TITLE.DEFAULT,
-        approvalSubmitDate: formatDate(item.approvalSubmitDate),
+        approvalSubmitDate: formatDate(item.리),
         approvalStatus: APPROVAL_STATUS[item.approvalStatus],
       }
     })
