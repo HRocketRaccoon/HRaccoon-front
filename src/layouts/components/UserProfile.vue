@@ -14,7 +14,7 @@
               <VListItemAction start>
                 <VBadge color="success" dot location="bottom right" offset-x="3" offset-y="3">
                   <VAvatar color="primary" variant="tonal">
-                    <!--                    Vimg-->
+                    <!-- Vimg -->
                   </VAvatar>
                 </VBadge>
               </VListItemAction>
@@ -31,7 +31,7 @@
               <VIcon class="me-2" icon="bx-user" size="22" />
             </template>
 
-            <VListItemTitle>Profile</VListItemTitle>
+            <VListItemTitle>MyPage</VListItemTitle>
           </VListItem>
 
           <!-- 👉 Settings -->
@@ -43,15 +43,6 @@
             <VListItemTitle>Settings</VListItemTitle>
           </VListItem>
 
-          <!-- 👉 Pricing -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon class="me-2" icon="bx-dollar" size="22" />
-            </template>
-
-            <VListItemTitle>Pricing</VListItemTitle>
-          </VListItem>
-
           <!-- 👉 FAQ -->
           <VListItem link>
             <template #prepend>
@@ -60,21 +51,8 @@
 
             <VListItemTitle>FAQ</VListItemTitle>
           </VListItem>
-
-          <!-- Divider -->
-          <VDivider class="my-2" />
-
-          <!-- 👉 Logout -->
-          <VListItem to="/login">
-            <template #prepend>
-              <VIcon class="me-2" icon="bx-log-out" size="22" />
-            </template>
-
-            <VListItemTitle>Logout</VListItemTitle>
-          </VListItem>
         </VList>
       </VMenu>
-      <!-- !SECTION -->
     </VAvatar>
   </VBadge>
 </template>

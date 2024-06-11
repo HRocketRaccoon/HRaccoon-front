@@ -8,6 +8,16 @@ import VerticalNavLink from '@layouts/components/VerticalNavLink.vue'
 import Footer from '@/layouts/components/GlobalFooter.vue'
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
+import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
+
+// store
+import { useAuthStore } from '@/stores/useAuthStore.js'
+
+const { fetchSignOut } = useAuthStore()
+
+const onHandleDialogButton = async () => {
+  await fetchSignOut()
+}
 </script>
 
 <template>
@@ -41,7 +51,16 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
 
         <NavbarThemeSwitcher class="me-2" />
 
-        <UserProfile />
+        <UserProfile class="me-4" />
+
+        <TwoButtonDialog
+          :right-btn-action="onHandleDialogButton"
+          button-name="로그아웃"
+          content="정말로 로그아웃 하시겠습니까?"
+          icon="mdi-logout"
+          right-btn-name="로그아웃"
+          title="로그아웃"
+        />
       </div>
     </template>
 
@@ -56,14 +75,14 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
         :item="{
           title: '홈',
           icon: 'bx-home',
-          to: '/',
+          to: '/home',
         }"
       />
       <VerticalNavLink
         :item="{
           title: '마이 페이지',
           icon: 'mdi-account-cog-outline',
-          to: '/account-settings',
+          to: '/mypage',
         }"
       />
 
@@ -76,8 +95,8 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
       <VerticalNavLink
         :item="{
           title: '근태 관리',
-          icon: 'bx-home',
-          to: '/',
+          icon: 'bx-alarm-add',
+          to: '/attendance',
         }"
       />
 
@@ -119,7 +138,7 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
         :item="{
           title: '좌석 선택',
           icon: 'mdi-alpha-t-box-outline',
-          to: '/typography',
+          to: '/seat',
         }"
       />
 
@@ -132,7 +151,7 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
       <VerticalNavLink
         :item="{
           title: '직원 정보 조회',
-          icon: 'mdi-alpha-t-box-outline',
+          icon: 'bx-bar-chart-alt',
           to: '/search',
         }"
       />

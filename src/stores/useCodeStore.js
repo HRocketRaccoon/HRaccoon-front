@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-
 export const useCodeStore = defineStore('code', {
   state: () => ({
     codeToNameMap: {
@@ -52,11 +51,39 @@ export const useCodeStore = defineStore('code', {
       ABP018: 'Objective-C',
       ABP019: 'MATLAB',
       ABP020: 'SQL',
+      PS001: '팀장',
+      PS002: '부서장',
+      PS000: '직책없음',
+      RK001: '사원',
+      RK002: '대리',
+      RK003: '과장',
+      RK004: '차장',
+      RK005: '부장',
+      RK006: '이사',
+      RK007: '사장',
+      DP001: 'IT사업부',
+      DP002: 'IOT사업부',
+      DP003: '경영기획부',
+      DP004: '인사총무지원부',
+      TM001: 'IT영업팀',
+      TM002: '해외영업팀',
+      TM003: 'IT개발팀',
+      TM004: '개발지원팀',
+      TM005: 'IOT영업팀',
+      TM006: 'IOTPass영업팀',
+      TM007: 'IOT개발팀',
+      TM008: '경영관리팀',
+      TM009: '외주관리팀',
+      TM010: '인사지원팀',
+      TM011: '총무팀',
     },
   }),
   actions: {
     getCodeName(code) {
       return this.codeToNameMap[code] || 'Unknown Code'
+    },
+    getAllAbilities() {
+      return Object.keys(this.codeToNameMap).filter(code => code.startsWith('AB'))
     },
   },
 })

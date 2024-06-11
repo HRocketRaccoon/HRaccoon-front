@@ -30,7 +30,6 @@ import CalendarCard from '@/components/calendar/CalendarCard.vue'
 import ApprovalChartCard from '@/components/apexchart/ApprovalChartCard.vue'
 import RemainSeat from '@/components/remainseat/RemainSeat.vue'
 import TodoModal from '@/components/todo/TodoModal.vue'
-import { ref } from 'vue'
 </script>
 
 <style lang="scss">

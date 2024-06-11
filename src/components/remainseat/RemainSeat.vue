@@ -4,11 +4,11 @@
 
     <div class="d-flex flex-column mr-1 py-8">
       <VCombobox
-        label="조회할 오피스를 고르세요."
+        v-model="seatOffice"
         :items="['잠실오피스', '마포오피스', '성북오피스']"
+        label="조회할 오피스를 고르세요."
         variant="outlined"
         width="280px"
-        v-model="seatOffice"
       ></VCombobox>
     </div>
 
@@ -21,7 +21,7 @@
         ></v-progress-linear>
 
         <template v-slot:prepend>
-          <span style="width: 20px" class="mr-10">{{ floor.floor }}</span>
+          <span class="mr-10" style="width: 20px">{{ floor.floor }}</span>
         </template>
 
         <template v-slot:append>
@@ -80,7 +80,7 @@ const countSeatNumber = () => {
 }
 
 onMounted(() => {
-  getRemainSeat()
+  // getRemainSeat()
 })
 
 const getRemainSeat = async () => {
