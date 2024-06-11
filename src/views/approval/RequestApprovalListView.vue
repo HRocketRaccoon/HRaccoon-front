@@ -2,27 +2,70 @@
   <h1 class="mb-2">| 결재 요청 확인</h1>
   <VCard>
     <ApprovalTable :data="params" type="request" />
-    <VPagination v-model="currentPage" :total-visible="totalPage" @change="changePage" />
+    <VPagination
+      v-model="currentPage"
+      :length="totalPage"
+      :total-visible="totalPage"
+      @update:modelValue="onHandlePage"
+    />
   </VCard>
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+// components
 import ApprovalTable from '@/components/table/ApprovalTable.vue'
+// api
+import api from '@/api/axios.js'
+// store
+import { useAuthStore } from '@/stores/useAuthStore.js'
+// util
+import { formatDate } from '@/util/util.js'
+// constants
+import { APPROVAL_STATUS, APPROVAL_TITLE } from '@/util/constants/approvalConstant.js'
 
-const params = ref([
-  {
-    approvalNo: '1',
-    approvalTitle: 'IT개발팀 이윤재 출장 신청',
-    userName: '이윤재',
-    approvalSubmitDate: '2024.05.23',
-    approvalStatus: '결재 중',
-  },
-])
+const params = ref([])
 const currentPage = ref(1)
-const totalPage = ref(10)
+const totalPage = ref(1)
 
-const changePage = page => {
-  currentPage.value = page
+const userNo = ref(useAuthStore().userNo || '')
+
+const fetchApprovalRequestList = async () => {
+  try {
+    const response = await api.get(`/approval/requestedapprovallist/${userNo.value}`, {
+      params: {
+        pageNumber: currentPage.value,
+      },
+    })
+
+    params.value = response.data.data.content.map(item => {
+      return {
+        ...item,
+        approvalTitle: APPROVAL_TITLE[item.approvalType] || APPROVAL_TITLE.DEFAULT,
+        approvalSubmitDate: formatDate(item.approvalSubmitDate),
+        approvalStatus: APPROVAL_STATUS[item.approvalStatus],
+      }
+    })
+    totalPage.value = response.data.data.totalPages
+    currentPage.value = response.data.data.pageable.pageNumber + 1
+  } catch (error) {
+    console.error(error)
+  }
 }
+
+const onHandlePage = page => {
+  currentPage.value = page
+
+  fetchApprovalRequestList()
+}
+
+watch(
+  userNo,
+  async newUserNo => {
+    if (newUserNo) {
+      await fetchApprovalRequestList()
+    }
+  },
+  { immediate: true },
+)
 </script>
 <style scoped></style>

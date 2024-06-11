@@ -12,7 +12,7 @@
       </VCol>
 
       <!-- 결재자 -->
-      <VCol cols="12" md="3">
+      <VCol cols="12" md="4">
         <VTextField v-model="params.approvalAuthority" :label="approvalPerson" readonly />
       </VCol>
 
@@ -38,7 +38,7 @@
 
       <!-- 제목 -->
       <VCol cols="12" md="6">
-        <VTextField v-model="params.title" label="제목" readonly />
+        <VTextField v-model="params.approvalTitle" label="제목" readonly />
       </VCol>
 
       <!-- 등록일자 -->
@@ -59,7 +59,7 @@
         />
       </VCol>
 
-      <VCol v-if="params.approvalStatus === 'REJECTED'">
+      <VCol v-if="getKeyByValue(APPROVAL_STATUS, params.approvalStatus) === 'REJECTED'">
         <VTextarea v-model="params.approvalStatus" auto-grow label="반려 사유" readonly />
       </VCol>
 
@@ -71,79 +71,87 @@
           rightBtnName="승인"
           title="결재 승인"
         />
-        <InputDialog
-          :rightBtnAction="fetchApprovalReject"
-          button-name="반려"
-          content="결재를 반려하시겠습니까?"
-          right-btn-name="반려"
-          title="결재 반려"
+        <InputDialog :rightBtnAction="fetchApprovalReject" button-name="반려" right-btn-name="반려" title="결재 반려" />
+      </VCol>
+
+      <VCol
+        v-if="props.type === 'status' && getKeyByValue(APPROVAL_STATUS, params.approvalStatus) === 'PENDING'"
+        class="d-flex gap-4"
+      >
+        <TwoButtonDialog
+          :right-btn-action="fetchApprovalCancel"
+          button-size="large"
+          buttonName="결재 취소"
+          content="결재를 취소하시겠습니까?"
+          icon="mdi-cancel"
+          left-btn-nane="뒤로가기"
+          rightBtnName="결재 취소"
+          title="결재 취소"
         />
       </VCol>
 
-      <VCol v-if="props.type === 'status' && params.approvalStatus === 'PENDING'" class="d-flex gap-4">
-        <VBtn size="large" type="submit">요청 닫기</VBtn>
-        <VBtn color="secondary" size="large" type="reset" variant="tonal">뒤로 가기</VBtn>
+      <VCol class="v-col-right">
+        <VBtn
+          size="large"
+          variant="tonal"
+          @click="
+            () => {
+              router.go(-1)
+            }
+          "
+          >뒤로 가기
+        </VBtn>
       </VCol>
     </VRow>
   </VCard>
 </template>
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
+
+// components
 import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
-import { useAuthStore } from '@/stores/useAuthStore.js'
-import api from '@/api/axios.js'
-import { formatDate } from '@/util/util.js'
 import InputDialog from '@/components/dialog/InputDialog.vue'
+
+// api
+import api from '@/api/axios.js'
+
+// store
+import { useAuthStore } from '@/stores/useAuthStore.js'
+
+// util
+import { formatDate, getKeyByValue } from '@/util/util.js'
+
+// constants
+import { APPROVAL_STATUS, APPROVAL_TITLE, APPROVAL_TYPE } from '@/util/constants/approvalConstant.js'
 
 const props = defineProps({
   approvalNo: String,
   type: String,
 })
 
-const route = useRoute()
+const router = useRouter()
 
-const params = ref({
-  userTeam: '',
-  userId: '',
-  userName: '',
-  approvalType: '',
-  approvalDetailStartDate: null,
-  approvalDetailEndDate: null,
-  approvalAuthority: '',
-  approvalSubmitDate: '',
-  approvalDetailContent: '',
-  approvalStatus: '',
-  approvalDetailResponseContent: '',
-})
+const params = ref({})
 const userNo = ref(useAuthStore().userNo || '')
-
-// TODO: 결재 반려 사유 적용
-const fetchApprovalReject = async () => {
-  try {
-    const response = await api.post(`approval/requestedapprovallist/${userNo.value}/${props.approvalNo}/cancel`)
-    console.log('[SUCCESS] fetchApprovalReject response:', response)
-  } catch (error) {
-    console.error('[ERROR] fetchApprovalReject error:', error)
-  }
-}
 
 const fetchApprovalRequestDetail = async () => {
   try {
-    const response = await api.get(`approval/submittedapprovallist/${userNo.value}/${props.approvalNo}`)
+    const response = await api.get(`/approval/requestedapprovallist/${userNo.value}/${props.approvalNo}`)
     console.log('[SUCCESS] fetchApprovalRequestDetail response:', response)
 
     params.value = {
       userTeam: response.data.data.userTeam,
       userId: response.data.data.userId,
       userName: response.data.data.userName,
-      approvalType: response.data.data.approvalType,
+      approvalType: APPROVAL_TYPE[response.data.data.approvalType],
+      approvalTitle: getKeyByValue(APPROVAL_TITLE, response.data.data.approvalType) || APPROVAL_TITLE.DEFAULT,
       approvalDetailStartDate: formatDate(response.data.data.approvalDetailStartDate),
       approvalDetailEndDate: formatDate(response.data.data.approvalDetailEndDate),
       approvalAuthority: response.data.data.approvalAuthority,
-      approvalSubmitDate: response.data.data.approvalSubmitDate,
+      approvalSubmitDate: formatDate(response.data.data.approvalSubmitDate),
       approvalDetailContent: response.data.data.approvalDetailContent,
-      approvalStatus: response.data.data.approvalStatus,
+      approvalStatus: APPROVAL_STATUS[response.data.data.approvalStatus],
       approvalDetailResponseContent: response.data.data.approvalDetailResponseContent,
     }
   } catch (error) {
@@ -153,24 +161,52 @@ const fetchApprovalRequestDetail = async () => {
 
 const fetchApprovalStatusDetail = async () => {
   try {
-    const response = await api.get(`approval/requestedapprovallist/${userNo.value}/${props.approvalNo}`)
+    const response = await api.get(`/approval/submittedapprovallist/${userNo.value}/${props.approvalNo}`)
     console.log('[SUCCESS] fetchApprovalStatusDetail response:', response)
 
     params.value = {
       userTeam: response.data.data.userTeam,
       userId: response.data.data.userId,
       userName: response.data.data.userName,
-      approvalType: response.data.data.approvalType,
+      approvalType: APPROVAL_TYPE[response.data.data.approvalType],
+      approvalTitle: getKeyByValue(APPROVAL_TITLE, response.data.data.approvalType) || APPROVAL_TITLE.DEFAULT,
       approvalDetailStartDate: formatDate(response.data.data.approvalDetailStartDate),
       approvalDetailEndDate: formatDate(response.data.data.approvalDetailEndDate),
       approvalAuthority: response.data.data.approvalAuthority,
-      approvalSubmitDate: response.data.data.approvalSubmitDate,
+      approvalSubmitDate: formatDate(response.data.data.approvalSubmitDate),
       approvalDetailContent: response.data.data.approvalDetailContent,
-      approvalStatus: response.data.data.approvalStatus,
+      approvalStatus: APPROVAL_STATUS[response.data.data.approvalStatus],
       approvalDetailResponseContent: response.data.data.approvalDetailResponseContent,
     }
   } catch (error) {
     console.error('[ERROR] fetchApprovalStatusDetail error:', error)
+  }
+}
+
+// TODO
+/**
+ * @description 결재 반려 요청 함수
+ * @returns {Promise<void>}
+ */
+const fetchApprovalReject = async () => {
+  try {
+    const response = await api.post(`/approval/requestedapprovallist/${userNo.value}/${props.approvalNo}/cancel`)
+    console.log('[SUCCESS] fetchApprovalReject response:', response)
+  } catch (error) {
+    console.error('[ERROR] fetchApprovalReject error:', error)
+  }
+}
+
+/**
+ * @description 결재 취소 요청 함수
+ * @returns {Promise<void>}
+ */
+const fetchApprovalCancel = async () => {
+  try {
+    const response = await api.post(`/approval/submittedapprovallist/${userNo.value}/${props.approvalNo}/cancel`)
+    console.log('[SUCCESS] fetchApprovalCancel response:', response)
+  } catch (error) {
+    console.error('[ERROR] fetchApprovalCancel error:', error)
   }
 }
 
@@ -201,5 +237,10 @@ watch(
 <style scoped>
 .v-card {
   padding: 1rem;
+}
+
+.v-col-right {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

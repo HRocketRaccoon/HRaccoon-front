@@ -14,14 +14,15 @@
 </template>
 <script setup>
 import { ref, watch } from 'vue'
-
 // components
 import ApprovalTable from '@/components/table/ApprovalTable.vue'
-
 // api
 import api from '@/api/axios.js'
+// store
 import { useAuthStore } from '@/stores/useAuthStore.js'
+// util
 import { formatDate } from '@/util/util.js'
+// constants
 import { APPROVAL_STATUS, APPROVAL_TITLE } from '@/util/constants/approvalConstant.js'
 
 const params = ref([])
@@ -55,6 +56,7 @@ const fetchApprovalStatusList = async () => {
 
 const onHandlePage = page => {
   currentPage.value = page
+
   fetchApprovalStatusList()
 }
 
