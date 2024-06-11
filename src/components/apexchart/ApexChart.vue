@@ -12,7 +12,7 @@
 import VueApexCharts from 'vue3-apexcharts'
 import { useDisplay, useTheme } from 'vuetify'
 import { hexToRgb } from '@layouts/utils'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({
   params: {

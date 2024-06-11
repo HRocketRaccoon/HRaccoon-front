@@ -37,7 +37,7 @@ const router = createRouter({
           component: () => import('@/views/approval/RequestApprovalListView.vue'),
         },
         {
-          path: 'approval-detail/:approvalNo',
+          path: 'approval/details/:approvalNo',
           component: () => import('@/views/approval/ApprovalDetailView.vue'),
           props: route => ({ approvalNo: route.params.approvalNo, type: route.query.type }),
         },

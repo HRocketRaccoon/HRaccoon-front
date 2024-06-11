@@ -1,4 +1,6 @@
 <script setup>
+import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 import VerticalNavSectionTitle from '@/@layouts/components/VerticalNavSectionTitle.vue'
 
 import VerticalNavLayout from '@layouts/components/VerticalNavLayout.vue'
@@ -14,9 +16,18 @@ import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
 import { useAuthStore } from '@/stores/useAuthStore.js'
 
 const { fetchSignOut } = useAuthStore()
+const router = useRouter()
+const toast = useToast()
 
 const onHandleDialogButton = async () => {
-  await fetchSignOut()
+  const res = await fetchSignOut()
+
+  if (res) {
+    await router.push('/login')
+    toast.success('로그아웃 되었습니다.')
+  } else {
+    toast.error('로그아웃에 실패했습니다.')
+  }
 }
 </script>
 
