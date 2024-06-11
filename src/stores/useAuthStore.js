@@ -92,7 +92,6 @@ export const useAuthStore = defineStore('auth', {
       this.refreshToken = refreshToken
 
       const decodedToken = jwtDecode(this.accessToken)
-      console.log('=================== decodedToken', decodedToken)
       this.userNo = decodedToken?.userNo
       this.userId = decodedToken?.userId
       this.authority = decodedToken?.authority
