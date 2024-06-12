@@ -1,16 +1,11 @@
 <template>
   <div>
-    <VueApexCharts
-      :height="300"
-      :options="chartOptions.radial"
-      :series="[params.formattedPercent]"
-      :type="params.type"
-      class="mt-6"
-    />
+    <VueApexCharts :type="params.type" :height="350" :options="chartOptions.radial" :series="[68]" class="mt-6" />
     <div v-if="params.totalWorkHours">
-      <div class="apex">{{ params.totalWorkHours + '/40' }}시</div>
+      <div class="apex">{{ params.totalWorkHours }}/40시</div>
     </div>
   </div>
+  <!-- :series="[params.formattedPercent]" -->
 </template>
 
 <script setup>
@@ -183,19 +178,19 @@ const chartOptions = computed(() => {
       responsive: [
         {
           breakpoint: 900,
-          options: { chart: { height: 250 } },
+          options: { chart: { height: 350 } },
         },
         {
           breakpoint: 735,
-          options: { chart: { height: 200 } },
+          options: { chart: { height: 350 } },
         },
         {
           breakpoint: 660,
-          options: { chart: { height: 200 } },
+          options: { chart: { height: 350 } },
         },
         {
           breakpoint: 600,
-          options: { chart: { height: 380 } },
+          options: { chart: { height: 250 } },
         },
       ],
     },
