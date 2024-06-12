@@ -3,12 +3,7 @@
   <VCard>
     <VCard>
       <ApprovalTable :data="params" type="status" />
-      <VPagination
-        v-model="currentPage"
-        :length="totalPage"
-        :total-visible="totalPage"
-        @update:modelValue="onHandlePage"
-      />
+      <VPagination v-model="currentPage" :length="totalPage" :total-visible="5" @update:modelValue="onHandlePage" />
     </VCard>
   </VCard>
 </template>
