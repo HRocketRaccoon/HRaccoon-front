@@ -18,7 +18,7 @@
           {{ item.approvalTitle }}
         </td>
         <td class="text-center">
-          {{ type === 'request' ? item.userName : item.approvalAuthority }}
+          {{ type === 'request' ? item.userName : item.approvalAuthorityName }}
         </td>
         <td class="text-center">
           {{ item.approvalSubmitDate }}

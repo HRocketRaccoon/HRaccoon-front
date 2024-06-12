@@ -1,5 +1,5 @@
 <template>
-  <h1 class="mb-2">| 결재 신청</h1>
+  <h1 class="mb-2">| 결재 상신</h1>
   <VCard>
     <VRow>
       <VCol cols="12" md="4">
@@ -33,7 +33,13 @@
 
       <!-- 결재자 -->
       <VCol cols="12" md="3">
-        <VSelect v-model="params.approvalAuthority" :items="approvers" label="결재자" />
+        <VSelect
+          v-model="params.approvalAuthority"
+          :items="mappedApprovers"
+          item-title="title"
+          item-value="value"
+          label="결재자"
+        />
       </VCol>
 
       <!-- 제목 -->
@@ -73,7 +79,7 @@
   </VCard>
 </template>
 <script setup>
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { VDateInput } from 'vuetify/labs/components'
 import { useToast } from 'vue-toastification'
 import { useRouter } from 'vue-router'
@@ -97,9 +103,6 @@ import { APPROVAL_TITLE, APPROVAL_TYPE } from '@/util/constants/approvalConstant
 const toast = useToast()
 const router = useRouter()
 
-// TODO: 결재자 리스트 가져오는 함수 필요
-const approvers = ['김철수', '이영희', '박민수']
-
 const params = ref({
   userTeam: '',
   userName: '',
@@ -111,6 +114,7 @@ const params = ref({
   approvalSubmitDate: dayjs(new Date()).format('YYYY-MM-DD'),
   approvalDetailContent: '',
 })
+const approvers = ref([])
 const userId = ref(useAuthStore().userId || '')
 const userNo = ref(useAuthStore().userNo || '')
 
@@ -143,6 +147,17 @@ const fetchApprovalInfo = async () => {
   }
 }
 
+const fetchApprovalAuthority = async () => {
+  try {
+    const response = await api.get(`/approval/approvalauthority/${userNo.value}`)
+    console.log('[SUCCESS] fetchApprovalAuthority response: ', response.data)
+
+    approvers.value = response.data.data
+  } catch (error) {
+    console.error('[ERROR] fetchApprovalAuthority error: ', error)
+  }
+}
+
 const onHandleSubmit = async () => {
   const values = Object.values(params.value)
   const hasNull = values.some(value => value === null || value === '')
@@ -165,6 +180,13 @@ const resetParams = () => {
   params.value.approvalDetailContent = ''
 }
 
+const mappedApprovers = computed(() =>
+  approvers.value.map(approver => ({
+    title: approver.userName,
+    value: approver.userId,
+  })),
+)
+
 watch(
   () => params.value.approvalType,
   newStatus => {
@@ -182,6 +204,16 @@ watch(
   async newUserId => {
     if (newUserId) {
       await fetchUserInfo()
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  userNo,
+  async newUserNo => {
+    if (newUserNo) {
+      await fetchApprovalAuthority()
     }
   },
   { immediate: true },

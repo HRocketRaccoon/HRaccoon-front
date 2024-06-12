@@ -106,7 +106,7 @@ const onHandleDialogButton = async () => {
       />
       <VerticalNavLink
         :item="{
-          title: '결재 신청',
+          title: '결재 상신',
           icon: 'bx-barcode',
           to: '/approval/request',
         }"
@@ -172,13 +172,6 @@ const onHandleDialogButton = async () => {
           title: '테스트 페이지',
           icon: 'bx-x',
           to: '/test',
-        }"
-      />
-      <VerticalNavLink
-        :item="{
-          title: '로그인',
-          icon: 'bx-log-in',
-          to: '/login',
         }"
       />
     </template>
