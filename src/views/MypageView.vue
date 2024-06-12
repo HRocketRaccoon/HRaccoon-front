@@ -226,10 +226,12 @@
 import { ref, onMounted, watch } from 'vue'
 import api from '/src/api/axios.js'
 import { useCodeStore } from '/src/stores/useCodeStore.js'
+import { useAuthStore } from '/src/stores/useAuthStore.js'
 
 const selectedTab = ref(0) // 초기값을 숫자로 설정
 
-const userId = ref('user01')
+const authStore = useAuthStore() // Initialize the auth store
+const userId = ref(authStore.userId) // Use the user ID from the auth store
 
 const user = ref({
   userDepartment: '',
