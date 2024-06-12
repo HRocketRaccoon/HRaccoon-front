@@ -62,7 +62,7 @@ import { useToast } from 'vue-toastification'
 // constants
 import { loginConstant } from '@/util/constants/loginConstant.js'
 
-const { fetchSignIn } = useAuthStore()
+const { fetchSignIn, fetchUserName } = useAuthStore()
 const router = useRouter()
 const toast = useToast()
 
@@ -81,10 +81,11 @@ const onHandleSubmit = async () => {
     return
   }
   try {
-    await fetchSignIn(form.value).then(() => {
-      toast.success(AUTH_SUCCESS)
-      router.push('/home')
-    })
+    await fetchSignIn(form.value)
+
+    toast.success(AUTH_SUCCESS)
+    await fetchUserName()
+    await router.push('/home')
   } catch (error) {
     console.log(error)
     toast.error(AUTH_NOT_MATCH)

@@ -10,6 +10,8 @@ export const useAuthStore = defineStore('auth', {
     userNo: sessionStorage.getItem('userNo') || '',
     userId: sessionStorage.getItem('userId') || '',
     authority: sessionStorage.getItem('authority') || '',
+
+    userName: sessionStorage.getItem('userName') || '',
   }),
   actions: {
     /**
@@ -22,12 +24,13 @@ export const useAuthStore = defineStore('auth', {
 
         if (response.data.status === 'error') {
           console.error('[ERROR] fetchSignIn func response error message : ', response.data.message)
-          return
+          throw new Error(response.data.message)
         }
 
         this.setAuthData(response.data.data.accessToken, response.data.data.refreshToken)
       } catch (error) {
-        console.error('[ERROR] fetchRefreshToken func error: ', error)
+        console.error('[ERROR] fetchSignIn func error: ', error)
+        throw error
       }
     },
 
@@ -60,7 +63,7 @@ export const useAuthStore = defineStore('auth', {
 
     /**
      * @description 로그아웃 시 sessionStorage 에 저장된 accessToken 과 refreshToken 을 삭제하는 함수.
-     * @returns {Promise<void>}
+     * @returns {Promise<boolean>}
      */
     async fetchSignOut() {
       try {
@@ -69,13 +72,15 @@ export const useAuthStore = defineStore('auth', {
           {},
           {
             headers: {
-              Authorization: `Bearer ${this.accessToken}`,
+              Authorization: `Bearer ${this.refreshToken}`,
             },
           },
         )
         this.clearAuthData()
+        return true
       } catch (error) {
         console.error('Sign out error:', error)
+        return false
       }
     },
 
@@ -89,7 +94,6 @@ export const useAuthStore = defineStore('auth', {
       this.refreshToken = refreshToken
 
       const decodedToken = jwtDecode(this.accessToken)
-      console.log('=================== decodedToken', decodedToken)
       this.userNo = decodedToken?.userNo
       this.userId = decodedToken?.userId
       this.authority = decodedToken?.authority
@@ -115,6 +119,25 @@ export const useAuthStore = defineStore('auth', {
       sessionStorage.removeItem('userNo')
       sessionStorage.removeItem('userId')
       sessionStorage.removeItem('authority')
+      sessionStorage.removeItem('userName')
+    },
+
+    /**
+     * @description 사용자 이름을 가져오는 함수.
+     */
+    async fetchUserName() {
+      try {
+        const response = await api.get(`/user/info/name/${this.userId}`)
+
+        if (response.data.status === 'error') {
+          console.error('[ERROR] fetchUserName func response error message: ', response.data.message)
+        }
+
+        this.userName = response.data.data
+        sessionStorage.setItem('userName', this.userName)
+      } catch (error) {
+        console.error('[ERROR] fetchUserName func error:', error)
+      }
     },
   },
 })

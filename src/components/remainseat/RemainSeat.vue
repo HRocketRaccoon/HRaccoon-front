@@ -80,7 +80,7 @@ const countSeatNumber = () => {
 }
 
 onMounted(() => {
-  // getRemainSeat()
+  getRemainSeat()
 })
 
 const getRemainSeat = async () => {

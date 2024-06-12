@@ -17,6 +17,9 @@
           @right-btn-action="onHandleDialog"
         />
       </VCol>
+      <VCol>
+        <InputDialog />
+      </VCol>
     </VRow>
   </div>
 </template>
@@ -24,6 +27,7 @@
 import { useToast } from 'vue-toastification'
 import OneButtonDialog from '@/components/dialog/OneButtonDialog.vue'
 import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
+import InputDialog from '@/components/dialog/InputDialog.vue'
 
 const toast = useToast()
 

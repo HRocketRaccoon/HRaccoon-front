@@ -2,7 +2,7 @@
   <div>
     <VDialog v-model="dialog" max-width="400" persistent>
       <template v-slot:activator="{ props: activatorProps }">
-        <VBtn v-bind="activatorProps"> {{ buttonName }}</VBtn>
+        <VBtn :size="buttonSize" v-bind="activatorProps"> {{ buttonName }}</VBtn>
       </template>
 
       <VCard :prepend-icon="icon" :title="title">
@@ -12,7 +12,7 @@
 
           <VBtn @click="dialog = false"> {{ leftBtnNane }}</VBtn>
 
-          <VBtn @click="rightBtnAction"> {{ rightBtnName }}</VBtn>
+          <VBtn @click="handleRightBtnClick"> {{ rightBtnName }}</VBtn>
         </template>
       </VCard>
     </VDialog>
@@ -23,6 +23,7 @@ import { ref } from 'vue'
 
 const props = defineProps({
   buttonName: String,
+  buttonSize: String,
   leftBtnNane: {
     type: String,
     default: '취소',
@@ -50,4 +51,9 @@ const props = defineProps({
 })
 
 const dialog = ref(false)
+
+const handleRightBtnClick = () => {
+  props.rightBtnAction()
+  dialog.value = false
+}
 </script>

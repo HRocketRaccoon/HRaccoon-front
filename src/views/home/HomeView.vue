@@ -1,12 +1,12 @@
 <template>
-  <main>
+  <main class="home-main-layout">
     <VRow>
       <VCol cols="12" md="7">
         <VRow>
-          <VCol cols="12" md="11" sm="5" xs="12">
+          <VCol cols="12">
             <ApprovalChartCard class="mb-5" />
           </VCol>
-          <VCol cols="12" md="11" sm="7">
+          <VCol cols="12">
             <RemainSeat style="padding: 32px 50px" />
           </VCol>
         </VRow>
@@ -32,4 +32,14 @@ import RemainSeat from '@/components/remainseat/RemainSeat.vue'
 import TodoModal from '@/components/todo/TodoModal.vue'
 </script>
 
-<style></style>
+<style lang="scss">
+.home-main-layout {
+  padding: 0 30px;
+  @media (max-width: 960px) {
+    padding: 0 60px;
+  }
+  @media (max-width: 600px) {
+    padding: 0;
+  }
+}
+</style>

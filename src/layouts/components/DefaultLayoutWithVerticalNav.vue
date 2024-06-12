@@ -1,4 +1,6 @@
 <script setup>
+import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 import VerticalNavSectionTitle from '@/@layouts/components/VerticalNavSectionTitle.vue'
 
 import VerticalNavLayout from '@layouts/components/VerticalNavLayout.vue'
@@ -14,9 +16,18 @@ import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
 import { useAuthStore } from '@/stores/useAuthStore.js'
 
 const { fetchSignOut } = useAuthStore()
+const router = useRouter()
+const toast = useToast()
 
 const onHandleDialogButton = async () => {
-  await fetchSignOut()
+  const res = await fetchSignOut()
+
+  if (res) {
+    await router.push('/login')
+    toast.success('로그아웃 되었습니다.')
+  } else {
+    toast.error('로그아웃에 실패했습니다.')
+  }
 }
 </script>
 
@@ -29,19 +40,6 @@ const onHandleDialogButton = async () => {
         <IconBtn class="ms-n3 d-lg-none" @click="toggleVerticalOverlayNavActive(true)">
           <VIcon icon="bx-menu" />
         </IconBtn>
-
-        <!--        &lt;!&ndash; 👉 Search &ndash;&gt;-->
-        <!--        <div class="d-flex align-center cursor-pointer" style="user-select: none">-->
-        <!--          &lt;!&ndash; 👉 Search Trigger button &ndash;&gt;-->
-        <!--          <IconBtn>-->
-        <!--            <VIcon icon="bx-search" />-->
-        <!--          </IconBtn>-->
-
-        <!--          <span class="d-none d-md-flex align-center text-disabled">-->
-        <!--            <span class="me-3">Search</span>-->
-        <!--            <span class="meta-key">&#8984;K</span>-->
-        <!--          </span>-->
-        <!--        </div>-->
 
         <VSpacer />
 
@@ -108,7 +106,7 @@ const onHandleDialogButton = async () => {
       />
       <VerticalNavLink
         :item="{
-          title: '결재 신청',
+          title: '결재 상신',
           icon: 'bx-barcode',
           to: '/approval/request',
         }"
@@ -174,13 +172,6 @@ const onHandleDialogButton = async () => {
           title: '테스트 페이지',
           icon: 'bx-x',
           to: '/test',
-        }"
-      />
-      <VerticalNavLink
-        :item="{
-          title: '로그인',
-          icon: 'bx-log-in',
-          to: '/login',
         }"
       />
     </template>

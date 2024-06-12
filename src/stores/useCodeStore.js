@@ -53,6 +53,7 @@ export const useCodeStore = defineStore('code', {
       ABP020: 'SQL',
       PS001: '팀장',
       PS002: '부서장',
+      PS003: '임원',
       PS000: '직책없음',
       RK001: '사원',
       RK002: '대리',
