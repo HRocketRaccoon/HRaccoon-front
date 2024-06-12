@@ -174,11 +174,9 @@ const onHandleSubmit = async () => {
 }
 
 const resetParams = () => {
-  params.value.approvalStatus = ''
   params.value.approvalDetailStartDate = null
   params.value.approvalDetailEndDate = null
   params.value.approvalAuthority = ''
-  params.value.title = ''
   params.value.approvalDetailContent = ''
 }
 

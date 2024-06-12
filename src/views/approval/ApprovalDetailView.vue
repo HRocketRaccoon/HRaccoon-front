@@ -60,7 +60,7 @@
       </VCol>
 
       <VCol v-if="getKeyByValue(APPROVAL_STATUS, params.approvalStatus) === 'REJECTED'" cols="12">
-        <VTextarea v-model="params.approvalStatus" auto-grow label="반려 사유" readonly />
+        <VTextarea v-model="params.approvalDetailResponseContent" auto-grow label="반려 사유" readonly />
       </VCol>
 
       <VCol
@@ -156,6 +156,7 @@ const fetchApprovalRequestDetail = async () => {
       approvalDetailStartDate: formatDate(response.data.data.approvalDetailStartDate),
       approvalDetailEndDate: formatDate(response.data.data.approvalDetailEndDate),
       approvalAuthority: response.data.data.approvalAuthority,
+      approvalAuthorityName: response.data.data.approvalAuthorityName,
       approvalSubmitDate: formatDate(response.data.data.approvalSubmitDate),
       approvalDetailContent: response.data.data.approvalDetailContent,
       approvalStatus: APPROVAL_STATUS[response.data.data.approvalStatus],
@@ -180,6 +181,7 @@ const fetchApprovalStatusDetail = async () => {
       approvalDetailStartDate: formatDate(response.data.data.approvalDetailStartDate),
       approvalDetailEndDate: formatDate(response.data.data.approvalDetailEndDate),
       approvalAuthority: response.data.data.approvalAuthority,
+      approvalAuthorityName: response.data.data.approvalAuthorityName,
       approvalSubmitDate: formatDate(response.data.data.approvalSubmitDate),
       approvalDetailContent: response.data.data.approvalDetailContent,
       approvalStatus: APPROVAL_STATUS[response.data.data.approvalStatus],
@@ -194,9 +196,12 @@ const fetchApprovalStatusDetail = async () => {
  * @description 결재 반려 요청 함수
  * @returns {Promise<void>}
  */
-const fetchApprovalReject = async () => {
+const fetchApprovalReject = async content => {
   try {
-    const response = await api.post(`/approval/requested-approval-list/${userNo.value}/${props.approvalNo}/reject`)
+    const response = await api.post(`/approval/requested-approval-list/${userNo.value}/${props.approvalNo}/reject`, {
+      isApproved: false,
+      rejectionReason: content,
+    })
     console.log('[SUCCESS] fetchApprovalReject response:', response)
 
     toast.success('결재 반려가 완료되었습니다.')
@@ -253,7 +258,7 @@ const approvalPerson = computed(() => {
 })
 
 const approvalPersonType = computed(() => {
-  return props.type === 'request' ? params.value.userName : params.value.approvalAuthority
+  return props.type === 'request' ? params.value.userName : params.value.approvalAuthorityName
 })
 
 watch(
