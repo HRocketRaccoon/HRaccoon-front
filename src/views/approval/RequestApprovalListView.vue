@@ -26,7 +26,7 @@ const userNo = ref(useAuthStore().userNo || '')
 
 const fetchApprovalRequestList = async () => {
   try {
-    const response = await api.get(`/approval/requestedapprovallist/${userNo.value}`, {
+    const response = await api.get(`/approval/requested-approval-list/${userNo.value}`, {
       params: {
         pageNumber: currentPage.value,
       },

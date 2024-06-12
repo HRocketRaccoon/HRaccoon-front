@@ -150,7 +150,7 @@ const fetchApprovalInfo = async () => {
 
 const fetchApprovalAuthority = async () => {
   try {
-    const response = await api.get(`/approval/approvalauthority/${userNo.value}`)
+    const response = await api.get(`/approval/approval-authority/${userNo.value}`)
     console.log('[SUCCESS] fetchApprovalAuthority response: ', response.data)
 
     approvers.value = response.data.data

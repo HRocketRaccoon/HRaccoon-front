@@ -144,7 +144,7 @@ const userNo = ref(useAuthStore().userNo || '')
 
 const fetchApprovalRequestDetail = async () => {
   try {
-    const response = await api.get(`/approval/requestedapprovallist/${userNo.value}/${props.approvalNo}`)
+    const response = await api.get(`/approval/requested-approval-list/${userNo.value}/${props.approvalNo}`)
     console.log('[SUCCESS] fetchApprovalRequestDetail response:', response)
 
     params.value = {
@@ -168,7 +168,7 @@ const fetchApprovalRequestDetail = async () => {
 
 const fetchApprovalStatusDetail = async () => {
   try {
-    const response = await api.get(`/approval/submittedapprovallist/${userNo.value}/${props.approvalNo}`)
+    const response = await api.get(`/approval/submitted-approval-list/${userNo.value}/${props.approvalNo}`)
     console.log('[SUCCESS] fetchApprovalStatusDetail response:', response)
 
     params.value = {
@@ -196,7 +196,7 @@ const fetchApprovalStatusDetail = async () => {
  */
 const fetchApprovalReject = async () => {
   try {
-    const response = await api.post(`/approval/requestedapprovallist/${userNo.value}/${props.approvalNo}/reject`)
+    const response = await api.post(`/approval/requested-approval-list/${userNo.value}/${props.approvalNo}/reject`)
     console.log('[SUCCESS] fetchApprovalReject response:', response)
 
     toast.success('결재 반려가 완료되었습니다.')
@@ -214,7 +214,7 @@ const fetchApprovalReject = async () => {
  */
 const fetchApprovalSuccess = async () => {
   try {
-    const response = await api.post(`/approval/requestedapprovallist/${userNo.value}/${props.approvalNo}/approve`)
+    const response = await api.post(`/approval/requested-approval-list/${userNo.value}/${props.approvalNo}/approve`)
     console.log('[SUCCESS] fetchApprovalSuccess response:', response)
 
     toast.success('결재 승인이 완료되었습니다.')
@@ -232,7 +232,7 @@ const fetchApprovalSuccess = async () => {
  */
 const fetchApprovalCancel = async () => {
   try {
-    const response = await api.post(`/approval/submittedapprovallist/${userNo.value}/${props.approvalNo}/cancel`)
+    const response = await api.post(`/approval/submitted-approval-list/${userNo.value}/${props.approvalNo}/cancel`)
     console.log('[SUCCESS] fetchApprovalCancel response:', response)
 
     toast.success(response.data.message)
