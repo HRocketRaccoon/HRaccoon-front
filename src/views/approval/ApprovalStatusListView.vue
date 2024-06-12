@@ -45,7 +45,7 @@ const fetchApprovalStatusList = async () => {
     totalPage.value = response.data.data.totalPages
     currentPage.value = response.data.data.pageable.pageNumber + 1
   } catch (error) {
-    console.error(error)
+    console.error('[ERROR] fetchApprovalStatusList error:', error)
   }
 }
 

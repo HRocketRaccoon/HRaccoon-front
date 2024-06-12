@@ -141,9 +141,10 @@ const fetchApprovalInfo = async () => {
   try {
     const response = await api.post(`/approval/submit/${userNo.value}`, approvalInfo)
     console.log('[SUCCESS] fetchApprovalInfo response: ', response.data)
-    toast.success('결재 신청이 완료되었습니다.')
+    toast.success(response.data.message)
   } catch (error) {
     console.error('[ERROR] fetchApprovalInfo error: ', error)
+    toast.error(error.response.data.message)
   }
 }
 
@@ -155,6 +156,7 @@ const fetchApprovalAuthority = async () => {
     approvers.value = response.data.data
   } catch (error) {
     console.error('[ERROR] fetchApprovalAuthority error: ', error)
+    toast(error.response.data.message)
   }
 }
 

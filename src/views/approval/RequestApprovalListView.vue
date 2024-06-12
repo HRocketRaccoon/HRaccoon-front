@@ -36,14 +36,14 @@ const fetchApprovalRequestList = async () => {
       return {
         ...item,
         approvalTitle: APPROVAL_TITLE[item.approvalType] || APPROVAL_TITLE.DEFAULT,
-        approvalSubmitDate: formatDate(item.리),
+        approvalSubmitDate: formatDate(item.approvalSubmitDate),
         approvalStatus: APPROVAL_STATUS[item.approvalStatus],
       }
     })
     totalPage.value = response.data.data.totalPages
     currentPage.value = response.data.data.pageable.pageNumber + 1
   } catch (error) {
-    console.error(error)
+    console.error('[ERROR] fetchApprovalRequestList error:', error)
   }
 }
 
