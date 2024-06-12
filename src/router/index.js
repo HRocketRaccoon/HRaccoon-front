@@ -63,6 +63,7 @@ const router = createRouter({
         },
         {
           path: 'mypage',
+          name: 'MyPage',
           component: () => import('@/views/MypageView.vue'),
         },
       ],

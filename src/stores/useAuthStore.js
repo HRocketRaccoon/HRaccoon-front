@@ -10,6 +10,8 @@ export const useAuthStore = defineStore('auth', {
     userNo: sessionStorage.getItem('userNo') || '',
     userId: sessionStorage.getItem('userId') || '',
     authority: sessionStorage.getItem('authority') || '',
+
+    userName: sessionStorage.getItem('userName') || '',
   }),
   actions: {
     /**
@@ -117,6 +119,25 @@ export const useAuthStore = defineStore('auth', {
       sessionStorage.removeItem('userNo')
       sessionStorage.removeItem('userId')
       sessionStorage.removeItem('authority')
+      sessionStorage.removeItem('userName')
+    },
+
+    /**
+     * @description 사용자 이름을 가져오는 함수.
+     */
+    async fetchUserName() {
+      try {
+        const response = await api.get(`/user/info/name/${this.userId}`)
+
+        if (response.data.status === 'error') {
+          console.error('[ERROR] fetchUserName func response error message: ', response.data.message)
+        }
+
+        this.userName = response.data.data
+        sessionStorage.setItem('userName', this.userName)
+      } catch (error) {
+        console.error('[ERROR] fetchUserName func error:', error)
+      }
     },
   },
 })

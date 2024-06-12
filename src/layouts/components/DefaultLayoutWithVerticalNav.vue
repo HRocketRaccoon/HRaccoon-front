@@ -41,19 +41,6 @@ const onHandleDialogButton = async () => {
           <VIcon icon="bx-menu" />
         </IconBtn>
 
-        <!--        &lt;!&ndash; 👉 Search &ndash;&gt;-->
-        <!--        <div class="d-flex align-center cursor-pointer" style="user-select: none">-->
-        <!--          &lt;!&ndash; 👉 Search Trigger button &ndash;&gt;-->
-        <!--          <IconBtn>-->
-        <!--            <VIcon icon="bx-search" />-->
-        <!--          </IconBtn>-->
-
-        <!--          <span class="d-none d-md-flex align-center text-disabled">-->
-        <!--            <span class="me-3">Search</span>-->
-        <!--            <span class="meta-key">&#8984;K</span>-->
-        <!--          </span>-->
-        <!--        </div>-->
-
         <VSpacer />
 
         <IconBtn class="me-2">
