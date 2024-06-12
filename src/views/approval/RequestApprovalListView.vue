@@ -2,12 +2,7 @@
   <h1 class="mb-2">| 결재 요청 관리</h1>
   <VCard>
     <ApprovalTable :data="params" type="request" />
-    <VPagination
-      v-model="currentPage"
-      :length="totalPage"
-      :total-visible="totalPage"
-      @update:modelValue="onHandlePage"
-    />
+    <VPagination v-model="currentPage" :length="totalPage" :total-visible="5" @update:modelValue="onHandlePage" />
   </VCard>
 </template>
 <script setup>

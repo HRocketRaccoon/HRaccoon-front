@@ -11,9 +11,9 @@
         <VTextField v-model="params.userId" label="사번" readonly />
       </VCol>
 
-      <!-- 결재자 -->
+      <!-- 결재자 & 상신자-->
       <VCol cols="12" md="4">
-        <VTextField v-model="params.approvalAuthority" :label="approvalPerson" readonly />
+        <VTextField v-model="approvalPersonType" :label="approvalPerson" readonly />
       </VCol>
 
       <!-- 유형 -->
@@ -59,11 +59,14 @@
         />
       </VCol>
 
-      <VCol v-if="getKeyByValue(APPROVAL_STATUS, params.approvalStatus) === 'REJECTED'">
+      <VCol v-if="getKeyByValue(APPROVAL_STATUS, params.approvalStatus) === 'REJECTED'" cols="12">
         <VTextarea v-model="params.approvalStatus" auto-grow label="반려 사유" readonly />
       </VCol>
 
-      <VCol v-if="props.type === 'request'" class="d-flex gap-4">
+      <VCol
+        v-if="props.type === 'request' && getKeyByValue(APPROVAL_STATUS, params.approvalStatus) === 'PENDING'"
+        class="d-flex gap-4"
+      >
         <TwoButtonDialog
           button-size="large"
           buttonName="승인"
@@ -216,6 +219,10 @@ const headerTitle = computed(() => {
 
 const approvalPerson = computed(() => {
   return props.type === 'request' ? '상신자' : '결재자'
+})
+
+const approvalPersonType = computed(() => {
+  return props.type === 'request' ? params.value.userName : params.value.approvalAuthority
 })
 
 watch(

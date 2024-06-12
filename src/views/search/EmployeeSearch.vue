@@ -8,30 +8,30 @@
             <VRow>
               <VCol>
                 <VCombobox
-                  label="소속 부서"
-                  :items="departmentList"
-                  variant="outlined"
                   v-model="selectedDepartment"
+                  :items="departmentList"
+                  label="소속 부서"
+                  variant="outlined"
                 ></VCombobox>
               </VCol>
               <VCol>
-                <VCombobox label="역량" :items="abilityList" variant="outlined" v-model="selectedAbility"></VCombobox>
+                <VCombobox v-model="selectedAbility" :items="abilityList" label="역량" variant="outlined"></VCombobox>
               </VCol>
             </VRow>
           </VCol>
 
           <VCol cols="12" md="6">
             <v-text-field
+              v-model="searchQuery"
               :loading="loading"
               append-inner-icon="mdi-magnify"
               density="compact"
-              label="조회할 직원의 이름, 사번을 입력하세요."
-              variant="solo"
               hide-details
+              label="조회할 직원의 이름, 사번을 입력하세요."
               single-line
-              @click:append-inner="onSubmit"
-              v-model="searchQuery"
               style="height: 66px"
+              variant="solo"
+              @click:append-inner="onSubmit"
             ></v-text-field>
           </VCol>
         </VRow>
