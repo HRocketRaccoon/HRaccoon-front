@@ -68,6 +68,7 @@
 <script setup>
 import { onMounted, ref, watchEffect } from 'vue'
 import axios from '@/api/axios'
+import { useAuthStore } from '@/stores/useAuthStore'
 
 // const tasks = ref([
 //   {
@@ -85,7 +86,7 @@ const todoInsert = ref('')
 
 const todoChangeTrigger = ref(0)
 
-const userNo = ref(1)
+const userNo = ref(useAuthStore().userNo || '')
 
 const completedTasks = () => {
   return todos.value.filter(todo => todo.todoCompleteYn).length
