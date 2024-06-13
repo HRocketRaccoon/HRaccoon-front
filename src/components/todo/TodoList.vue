@@ -34,7 +34,7 @@
         <div v-for="(todo, i) in todos" :key="`${i}-${todo.todoContent}`">
           <VDivider v-if="i !== 0" :key="`${i}-divider`"></VDivider>
 
-          <VListItem @click="todo.todoCompleteYn = !todo.todoCompleteYn">
+          <VListItem @click="toggleChange(todo.todoNo)">
             <template v-slot:prepend>
               <VCheckbox v-model="todo.todoCompleteYn" color="grey"></VCheckbox>
             </template>
@@ -45,10 +45,6 @@
 
             <template v-slot:append>
               <VExpandXTransition>
-                <!-- <VIcon v-if="task.done" color="success"> mdi-check </VIcon> -->
-                <!-- <v-btn fab ripple small color="red" v-if="task.done" @click="removeTodo(i)">
-                  <v-icon class="white--text">mdi-close</v-icon>
-                </v-btn> -->
                 <img
                   v-if="todo.todoCompleteYn"
                   class="delete-btn"
@@ -68,24 +64,15 @@
 <script setup>
 import { onMounted, ref, watchEffect } from 'vue'
 import axios from '@/api/axios'
+import { useAuthStore } from '@/stores/useAuthStore'
 
-// const tasks = ref([
-//   {
-//     done: false,
-//     text: 'Foobar',
-//   },
-//   {
-//     done: false,
-//     text: 'Fizzbuzz',
-//   },
-// ])
 const todos = ref([])
 
 const todoInsert = ref('')
 
 const todoChangeTrigger = ref(0)
 
-const userNo = ref(1)
+const userNo = ref(useAuthStore().userNo || '')
 
 const completedTasks = () => {
   return todos.value.filter(todo => todo.todoCompleteYn).length
