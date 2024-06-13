@@ -28,7 +28,7 @@ const userNo = ref(useAuthStore().userNo || '')
 
 const fetchApprovalStatusList = async () => {
   try {
-    const response = await api.get(`/approval/submittedapprovallist/${userNo.value}`, {
+    const response = await api.get(`/approval/submitted-approval-list/${userNo.value}`, {
       params: {
         pageNumber: currentPage.value,
       },
@@ -45,7 +45,7 @@ const fetchApprovalStatusList = async () => {
     totalPage.value = response.data.data.totalPages
     currentPage.value = response.data.data.pageable.pageNumber + 1
   } catch (error) {
-    console.error(error)
+    console.error('[ERROR] fetchApprovalStatusList error:', error)
   }
 }
 

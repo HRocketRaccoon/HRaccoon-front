@@ -60,7 +60,7 @@
       </VCol>
 
       <VCol v-if="getKeyByValue(APPROVAL_STATUS, params.approvalStatus) === 'REJECTED'" cols="12">
-        <VTextarea v-model="params.approvalStatus" auto-grow label="반려 사유" readonly />
+        <VTextarea v-model="params.approvalDetailResponseContent" auto-grow label="반려 사유" readonly />
       </VCol>
 
       <VCol
@@ -68,9 +68,11 @@
         class="d-flex gap-4"
       >
         <TwoButtonDialog
+          :rightBtnAction="fetchApprovalSuccess"
           button-size="large"
           buttonName="승인"
           content="결재를 승인하시겠습니까?"
+          icon="mdi-check-all"
           rightBtnName="승인"
           title="결재 승인"
         />
@@ -82,7 +84,7 @@
         class="d-flex gap-4"
       >
         <TwoButtonDialog
-          :right-btn-action="fetchApprovalCancel"
+          :rightBtnAction="fetchApprovalCancel"
           button-size="large"
           buttonName="결재 취소"
           content="결재를 취소하시겠습니까?"
@@ -111,6 +113,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 // components
 import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
@@ -134,13 +137,14 @@ const props = defineProps({
 })
 
 const router = useRouter()
+const toast = useToast()
 
 const params = ref({})
 const userNo = ref(useAuthStore().userNo || '')
 
 const fetchApprovalRequestDetail = async () => {
   try {
-    const response = await api.get(`/approval/requestedapprovallist/${userNo.value}/${props.approvalNo}`)
+    const response = await api.get(`/approval/requested-approval-list/${userNo.value}/${props.approvalNo}`)
     console.log('[SUCCESS] fetchApprovalRequestDetail response:', response)
 
     params.value = {
@@ -152,6 +156,7 @@ const fetchApprovalRequestDetail = async () => {
       approvalDetailStartDate: formatDate(response.data.data.approvalDetailStartDate),
       approvalDetailEndDate: formatDate(response.data.data.approvalDetailEndDate),
       approvalAuthority: response.data.data.approvalAuthority,
+      approvalAuthorityName: response.data.data.approvalAuthorityName,
       approvalSubmitDate: formatDate(response.data.data.approvalSubmitDate),
       approvalDetailContent: response.data.data.approvalDetailContent,
       approvalStatus: APPROVAL_STATUS[response.data.data.approvalStatus],
@@ -164,7 +169,7 @@ const fetchApprovalRequestDetail = async () => {
 
 const fetchApprovalStatusDetail = async () => {
   try {
-    const response = await api.get(`/approval/submittedapprovallist/${userNo.value}/${props.approvalNo}`)
+    const response = await api.get(`/approval/submitted-approval-list/${userNo.value}/${props.approvalNo}`)
     console.log('[SUCCESS] fetchApprovalStatusDetail response:', response)
 
     params.value = {
@@ -176,6 +181,7 @@ const fetchApprovalStatusDetail = async () => {
       approvalDetailStartDate: formatDate(response.data.data.approvalDetailStartDate),
       approvalDetailEndDate: formatDate(response.data.data.approvalDetailEndDate),
       approvalAuthority: response.data.data.approvalAuthority,
+      approvalAuthorityName: response.data.data.approvalAuthorityName,
       approvalSubmitDate: formatDate(response.data.data.approvalSubmitDate),
       approvalDetailContent: response.data.data.approvalDetailContent,
       approvalStatus: APPROVAL_STATUS[response.data.data.approvalStatus],
@@ -186,17 +192,42 @@ const fetchApprovalStatusDetail = async () => {
   }
 }
 
-// TODO
 /**
  * @description 결재 반려 요청 함수
  * @returns {Promise<void>}
  */
-const fetchApprovalReject = async () => {
+const fetchApprovalReject = async content => {
   try {
-    const response = await api.post(`/approval/requestedapprovallist/${userNo.value}/${props.approvalNo}/cancel`)
+    const response = await api.post(`/approval/requested-approval-list/${userNo.value}/${props.approvalNo}/reject`, {
+      isApproved: false,
+      rejectionReason: content,
+    })
     console.log('[SUCCESS] fetchApprovalReject response:', response)
+
+    toast.success('결재 반려가 완료되었습니다.')
+    await fetchApprovalRequestDetail()
   } catch (error) {
     console.error('[ERROR] fetchApprovalReject error:', error)
+
+    toast.error(error.response.data.message)
+  }
+}
+
+/**
+ * @description 결재 승인 요청 함수
+ * @returns {Promise<void>}
+ */
+const fetchApprovalSuccess = async () => {
+  try {
+    const response = await api.post(`/approval/requested-approval-list/${userNo.value}/${props.approvalNo}/approve`)
+    console.log('[SUCCESS] fetchApprovalSuccess response:', response)
+
+    toast.success('결재 승인이 완료되었습니다.')
+    await fetchApprovalRequestDetail()
+  } catch (error) {
+    console.error('[ERROR] fetchApprovalSuccess error:', error)
+
+    toast.error(error.response.data.message)
   }
 }
 
@@ -206,10 +237,15 @@ const fetchApprovalReject = async () => {
  */
 const fetchApprovalCancel = async () => {
   try {
-    const response = await api.post(`/approval/submittedapprovallist/${userNo.value}/${props.approvalNo}/cancel`)
+    const response = await api.post(`/approval/submitted-approval-list/${userNo.value}/${props.approvalNo}/cancel`)
     console.log('[SUCCESS] fetchApprovalCancel response:', response)
+
+    toast.success(response.data.message)
+    await fetchApprovalStatusDetail()
   } catch (error) {
     console.error('[ERROR] fetchApprovalCancel error:', error)
+
+    toast.error(error.response.data.message)
   }
 }
 
@@ -222,7 +258,7 @@ const approvalPerson = computed(() => {
 })
 
 const approvalPersonType = computed(() => {
-  return props.type === 'request' ? params.value.userName : params.value.approvalAuthority
+  return props.type === 'request' ? params.value.userName : params.value.approvalAuthorityName
 })
 
 watch(
