@@ -1,6 +1,6 @@
 <template>
   <div class="text-center">
-    <v-dialog transition="slide-x-transition" content-class="custom-dialog" width="500" persistent>
+    <v-dialog transition="slide-x-transition" content-class="custom-dialog" width="500">
       <template v-slot:activator="{ props: activatorProps }">
         <VHover>
           <template v-slot:default="{ isHovering, props }">
