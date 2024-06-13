@@ -49,7 +49,7 @@
       </v-col>
     </v-row>
 
-    <!-- 사원 정보 모달 시작 -->
+    <!-- 사원 정보 모달 -->
     <v-dialog v-model="showEmployeeModal" max-width="600px">
       <v-card>
         <v-card-title class="d-flex justify-space-between align-center">
@@ -78,9 +78,8 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <!-- 사원 정보 모달 끝 -->
 
-    <!-- 확인 모달 시작 -->
+    <!-- 좌석 선택 확인 모달 -->
     <v-dialog v-model="showConfirmModal" max-width="400px">
       <v-card>
         <v-card-title class="d-flex justify-space-between align-center">
@@ -99,9 +98,8 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- 확인 모달 끝 -->
 
-    <!-- 취소 확인 모달 시작 -->
+    <!-- 좌석 취소 확인 모달 -->
     <v-dialog v-model="showCancelModal" max-width="400px">
       <v-card>
         <v-card-title class="d-flex justify-space-between align-center">
@@ -120,9 +118,8 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- 취소 확인 모달 끝 -->
 
-    <!-- 알림 모달 시작 -->
+    <!-- 알림 모달 -->
     <v-dialog v-model="showAlertModal" max-width="400px">
       <v-card>
         <v-card-title class="d-flex justify-space-between align-center">
@@ -138,33 +135,28 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- 알림 모달 끝 -->
   </v-container>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useCodeStore } from '/src/stores/useCodeStore.js'
-import { onMounted, watch } from 'vue'
-import api from '/src/api/axios.js'
 import { useAuthStore } from '/src/stores/useAuthStore.js'
+import { useSeatStore } from '/src/stores/useSeatStore.js'
+import api from '/src/api/axios.js'
 
+// 스토어 및 상태 변수 초기화
 const codeStore = useCodeStore()
-const authStore = useAuthStore() // Initialize the auth store
+const authStore = useAuthStore()
+const seatStore = useSeatStore()
+
 const userNo = ref(authStore.userNo)
-console.log('userNo', userNo)
-
-const selected = ref([]) // 여기에서 초기 선택된 좌석을 설정
-const seatOffice = ref('OJS01') // 초기 오피스 코드
+const selected = ref([])
+const seatOffice = ref('OJS01')
 const floor = ref('LOBBY')
-const offices = ref(['OJS01', 'OMP02', 'OSB03']) // 오피스 코드 목록
-
+const offices = ref(['OJS01', 'OMP02', 'OSB03'])
 const officeNames = computed(() => offices.value.map(office => codeStore.getCodeName(office)))
 const selectedOfficeName = ref(codeStore.getCodeName(seatOffice.value))
-
-watch(selectedOfficeName, newName => {
-  seatOffice.value = Object.keys(codeStore.codeToNameMap).find(key => codeStore.codeToNameMap[key] === newName)
-})
 
 const seatLayouts = ref({
   OJS01: {
@@ -224,76 +216,34 @@ const seatLayouts = ref({
   },
 })
 
-const checked = ref([]) // 사용 중인 좌석 데이터
+const checked = ref([])
 const showTips = ref(true)
 const showEmployeeModal = ref(false)
 const showConfirmModal = ref(false)
-const showCancelModal = ref(false) // 취소 확인 모달 상태
+const showCancelModal = ref(false)
 const showAlertModal = ref(false)
 const employeeInfo = ref({})
 const confirmMessage = ref('')
-const cancelMessage = ref('') // 취소 확인 메시지
+const cancelMessage = ref('')
 const confirmAction = ref(null)
 const alertMessage = ref('')
 const seatNo = ref(null)
 
-// 좌석 선택 상태 확인 함수
+// 함수 선언
+
+/**
+ * 주어진 좌석 번호가 선택 불가능한지 확인
+ * @param {Number} seatNumber - 좌석 번호
+ * @returns {Boolean} - 선택 불가능 여부
+ */
 const isSeatSelectionDisabled = seatNumber => {
   return (selected.value.length > 0 && !selected.value.includes(seatNumber)) || checked.value.includes(seatNumber)
 }
 
-// API 호출 예시
-const fetchSeatData = async () => {
-  try {
-    const response = await api.get(`/seat/available-seats/${seatOffice.value}`)
-    if (response.data && response.data.status === 'success') {
-      checked.value = response.data.data.filter(seat => seat.seatStatusYn).map(seat => seat.seatNo)
-    } else {
-      checked.value = []
-    }
-  } catch (error) {
-    console.error('Error fetching seat data:', error)
-  }
-}
-
-const showEmployeeInfo = async seatNo => {
-  try {
-    const response = await api.get(`/seat/user/info/{seatStatus}`)
-    if (response.data.data) {
-      employeeInfo.value = response.data.data
-      showEmployeeModal.value = true
-    }
-  } catch (error) {
-    console.error('Error fetching employee info:', error)
-  }
-}
-
-const closeModal = () => {
-  showEmployeeModal.value = false
-  employeeInfo.value = {}
-}
-
-const closeConfirmModal = () => {
-  showConfirmModal.value = false
-  confirmMessage.value = ''
-  confirmAction.value = null
-}
-
-const closeCancelModal = () => {
-  showCancelModal.value = false
-  cancelMessage.value = ''
-}
-
-const showAlert = message => {
-  alertMessage.value = message
-  showAlertModal.value = true
-}
-
-const closeAlertModal = () => {
-  showAlertModal.value = false
-  alertMessage.value = ''
-}
-
+/**
+ * 좌석 클릭 시 호출되는 함수
+ * @param {Number} seatNumber - 클릭한 좌석 번호
+ */
 const handleSeatClick = seatNumber => {
   seatNo.value = seatNumber
   if (checked.value.includes(seatNo.value)) {
@@ -307,87 +257,53 @@ const handleSeatClick = seatNumber => {
   }
 }
 
+/**
+ * 좌석 선택을 확인하는 함수
+ */
 const confirmSelection = async () => {
-  closeConfirmModal() // 좌석 선택 모달을 닫습니다.
+  closeConfirmModal()
   try {
     const response = await api.post(`/seat/available-seats/${seatOffice.value}/select/${seatNo.value}/${userNo.value}`)
     if (response.data && response.data.status === 'success') {
       selected.value.push(seatNo.value)
-      saveSelectedSeatToLocalStorage(seatNo.value) // 선택된 좌석을 localStorage에 저장
-      alertMessage.value = `좌석 ${seatNo.value}이(가) 성공적으로 선택되었습니다.`
-      showAlertModal.value = true
-      // 좌석 데이터 다시 로드하여 UI 동기화
+      seatStore.selectSeat(userNo.value, seatNo.value)
+      showAlert(`좌석 ${seatNo.value}이(가) 성공적으로 선택되었습니다.`)
       fetchSeatData()
     } else {
-      alertMessage.value = response.data.message
-      showAlertModal.value = true
+      showAlert(response.data.message)
     }
   } catch (error) {
     console.error('Error selecting seat:', error)
-    if (error.response) {
-      console.error('Response data:', error.response.data)
-      console.error('Response status:', error.response.status)
-      console.error('Response headers:', error.response.headers)
-    }
-    alertMessage.value = '좌석 선택 중 오류가 발생했습니다. 다시 시도해주세요.'
-    showAlertModal.value = true
+    showAlert('좌석 선택 중 오류가 발생했습니다. 다시 시도해주세요.')
   }
 }
 
+/**
+ * 좌석 선택 취소를 확인하는 함수
+ */
 const cancelSelection = async () => {
-  closeCancelModal() // 좌석 취소 모달을 닫습니다.
+  closeCancelModal()
   try {
     const response = await api.post(`/seat/available-seats/${seatOffice.value}/cancel/${seatNo.value}/${userNo.value}`)
     if (response.data && response.data.status === 'success') {
       selected.value = selected.value.filter(seat => seat !== seatNo.value)
-      removeSelectedSeatFromLocalStorage(seatNo.value) // 선택 취소된 좌석을 localStorage에서 삭제
-      alertMessage.value = `좌석 ${seatNo.value}이(가) 성공적으로 취소되었습니다.`
-      showAlertModal.value = true
-      // 좌석 데이터 다시 로드하여 UI 동기화
+      seatStore.cancelSeat(userNo.value)
+      showAlert(`좌석 ${seatNo.value}이(가) 성공적으로 취소되었습니다.`)
       fetchSeatData()
     } else {
-      alertMessage.value = response.data.message
-      showAlertModal.value = true
+      showAlert(response.data.message)
     }
   } catch (error) {
     console.error('Error canceling seat:', error)
-    if (error.response) {
-      console.error('Response data:', error.response.data)
-      console.error('Response status:', error.response.status)
-      console.error('Response headers:', error.response.headers)
-    }
-    alertMessage.value = '좌석 취소 중 오류가 발생했습니다. 다시 시도해주세요.'
-    showAlertModal.value = true
+    showAlert('좌석 취소 중 오류가 발생했습니다. 다시 시도해주세요.')
   }
 }
 
-const saveSelectedSeatToLocalStorage = seatNumber => {
-  const selectedSeats = JSON.parse(localStorage.getItem('selectedSeats')) || {}
-  selectedSeats[userNo.value] = seatNumber
-  localStorage.setItem('selectedSeats', JSON.stringify(selectedSeats))
-}
-
-const removeSelectedSeatFromLocalStorage = seatNumber => {
-  const selectedSeats = JSON.parse(localStorage.getItem('selectedSeats')) || {}
-  delete selectedSeats[userNo.value]
-  localStorage.setItem('selectedSeats', JSON.stringify(selectedSeats))
-}
-
-const fetchSelectedSeatFromLocalStorage = () => {
-  const selectedSeats = JSON.parse(localStorage.getItem('selectedSeats')) || {}
-  selected.value = selectedSeats[userNo.value] ? [selectedSeats[userNo.value]] : []
-}
-
-const init = () => {
-  fetchSeatData()
-  fetchSelectedSeatFromLocalStorage() // 페이지 로드 시 선택된 좌석 정보를 불러옵니다.
-}
-
-onMounted(init)
-
-watch(seatOffice, fetchSeatData)
-watch(floor, fetchSeatData)
-
+/**
+ * 좌석 레이아웃을 가져오는 함수
+ * @param {Array} layout - 좌석 배열
+ * @returns {Array} - 정리된 좌석 배열
+ */
 const getRowLayout = layout => {
   const maxRow = Math.max(...layout.map(seat => seat.seatRow))
   const maxColumn = Math.max(...layout.map(seat => seat.seatColumn))
@@ -397,6 +313,106 @@ const getRowLayout = layout => {
   })
   return rowLayout
 }
+
+/**
+ * 사원 정보를 모달로 보여주는 함수
+ * @param {Number} seatNo - 좌석 번호
+ */
+const showEmployeeInfo = async seatNo => {
+  try {
+    const response = await api.get(`/seat/user/info/${seatNo}`)
+    if (response.data.data) {
+      employeeInfo.value = response.data.data
+      showEmployeeModal.value = true
+    }
+  } catch (error) {
+    console.error('Error fetching employee info:', error)
+  }
+}
+
+// API 호출 함수
+
+/**
+ * 사용 가능한 좌석 데이터를 가져오는 함수
+ */
+const fetchSeatData = async () => {
+  try {
+    const response = await api.get(`/seat/available-seats/${seatOffice.value}`)
+    if (response.data && response.data.status === 'success') {
+      checked.value = response.data.data.filter(seat => seat.seatStatusYn).map(seat => seat.seatNo)
+    } else {
+      checked.value = []
+    }
+  } catch (error) {
+    console.error('Error fetching seat data:', error)
+  }
+}
+
+// 모달 및 알림 함수
+
+/**
+ * 사원 정보 모달 닫기
+ */
+const closeModal = () => {
+  showEmployeeModal.value = false
+  employeeInfo.value = {}
+}
+
+/**
+ * 좌석 선택 확인 모달 닫기
+ */
+const closeConfirmModal = () => {
+  showConfirmModal.value = false
+  confirmMessage.value = ''
+  confirmAction.value = null
+}
+
+/**
+ * 좌석 취소 확인 모달 닫기
+ */
+const closeCancelModal = () => {
+  showCancelModal.value = false
+  cancelMessage.value = ''
+}
+
+/**
+ * 알림 모달을 보여주는 함수
+ * @param {String} message - 알림 메시지
+ */
+const showAlert = message => {
+  alertMessage.value = message
+  showAlertModal.value = true
+}
+
+/**
+ * 알림 모달 닫기
+ */
+const closeAlertModal = () => {
+  showAlertModal.value = false
+  alertMessage.value = ''
+}
+
+// 라이프사이클 훅 및 워치
+
+// 컴포넌트 마운트 시 초기화
+onMounted(() => {
+  fetchSeatData()
+  const selectedSeat = seatStore.getSelectedSeat(userNo.value)
+  if (selectedSeat) {
+    selected.value = [selectedSeat]
+  }
+})
+
+// 좌석 오피스가 변경될 때마다 좌석 데이터 갱신
+watch(seatOffice, fetchSeatData)
+
+// 층이 변경될 때마다 좌석 데이터 갱신
+watch(floor, fetchSeatData)
+
+// 선택된 오피스 이름이 변경될 때 해당 오피스 코드 갱신
+watch(selectedOfficeName, newName => {
+  seatOffice.value = Object.keys(codeStore.codeToNameMap).find(key => codeStore.codeToNameMap[key] === newName)
+})
 </script>
 
 <style scoped>
