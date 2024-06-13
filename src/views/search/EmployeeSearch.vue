@@ -174,10 +174,6 @@ const onSubmit = () => {
 
   getEmployee()
 
-  searchQuery.value = ''
-  selectedAbility.value = ''
-  selectedDepartment.value = ''
-
   setTimeout(() => {
     loading.value = false
     loaded.value = true
@@ -187,6 +183,7 @@ const onSubmit = () => {
 const onReset = () => {
   selectedAbility.value = ''
   selectedDepartment.value = ''
+  searchQuery.value = ''
 }
 </script>
 <style scoped></style>
