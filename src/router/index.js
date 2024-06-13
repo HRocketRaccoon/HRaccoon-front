@@ -70,11 +70,6 @@ const router = createRouter({
             },
           ],
         },
-        // {
-        //   path: 'search/:userId',
-        //   component: () => import('@/components/search/EmployeeView.vue'),
-        //   props: route => ({ userId: route.params.userId, type: route.query.type }),
-        // },
         {
           path: 'test',
           component: () => import('@/views/dev/TestView.vue'),

@@ -41,8 +41,7 @@
   </div>
 </template>
 <script setup>
-import { onMounted, ref } from 'vue'
-import axios from '@/api/axios'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const searchQuery = ref('')
