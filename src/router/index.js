@@ -52,29 +52,29 @@ const router = createRouter({
         {
           path: 'search',
           component: () => import('@/views/search/EmployeeSearch.vue'),
-          children: [
-            {
-              path: '',
-              component: () => import('@/components/search/EmployeeTable.vue'),
-              props: route => ({
-                searchQuery: route.query.searchQuery,
-                selectedAbility: route.query.selectedAbility,
-                selectedDepartment: route.query.selectedDepartment,
-                currentPage: Number(route.query.currentPage) || 1,
-              }),
-            },
-            {
-              path: ':userId',
-              component: () => import('@/components/search/EmployeeView.vue'),
-              props: route => ({ userId: route.params.userId, type: route.query.type }),
-            },
-          ],
+          // children: [
+          //   {
+          //     path: '',
+          //     component: () => import('@/components/search/EmployeeTable.vue'),
+          //     props: route => ({
+          //       searchQuery: route.query.searchQuery,
+          //       selectedAbility: route.query.selectedAbility,
+          //       selectedDepartment: route.query.selectedDepartment,
+          //       currentPage: Number(route.query.currentPage) || 1,
+          //     }),
+          //   },
+          //   {
+          //     path: ':userId',
+          //     component: () => import('@/components/search/EmployeeView.vue'),
+          //     props: route => ({ userId: route.params.userId, type: route.query.type }),
+          //   },
+          // ],
         },
-        // {
-        //   path: 'search/:userId',
-        //   component: () => import('@/components/search/EmployeeView.vue'),
-        //   props: route => ({ userId: route.params.userId, type: route.query.type }),
-        // },
+        {
+          path: 'search/:userId',
+          component: () => import('@/components/search/EmployeeView.vue'),
+          props: route => ({ userId: route.params.userId, type: route.query.type }),
+        },
         {
           path: 'test',
           component: () => import('@/views/dev/TestView.vue'),
