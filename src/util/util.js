@@ -52,3 +52,33 @@ export const getKeyByValue = (obj, value) => {
     }
   }
 }
+
+/**
+ * @description 이메일 형식을 검증하는 함수.
+ * @param email_address
+ * @returns {boolean}
+ */
+export const validateEmail = email_address => {
+  let email_regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i
+  return email_regex.test(email_address)
+}
+
+/**
+ * @description 비밀번호 형식을 검증하는 함수.
+ * @param password
+ * @returns {boolean}
+ */
+export const validatePassword = password => {
+  const regex = /^(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{8,16}$/
+  return regex.test(password)
+}
+
+/**
+ * @description 전화번호 형식을 검증하는 함수.
+ * @param phoneNumber
+ * @returns {boolean}
+ */
+export const validatePhoneNumber = phoneNumber => {
+  const regex = /^\d{3}-\d{4}-\d{4}$/
+  return regex.test(phoneNumber)
+}
