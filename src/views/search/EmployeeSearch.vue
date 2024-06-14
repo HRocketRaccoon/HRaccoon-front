@@ -37,7 +37,7 @@
           </VCol>
         </VRow>
         <VRow>
-          <VBtn :style="linkStyle" class="ml-auto" size="large" variant="tonal" @click="onReset">초기화</VBtn>
+          <VBtn class="ml-auto" size="large" variant="tonal" @click="onReset">초기화</VBtn>
           <VBtn class="ml-3" size="large" @click="onSubmit">검색</VBtn>
         </VRow>
       </VCardText>
@@ -57,13 +57,18 @@
   </div>
 </template>
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import axios from '@/api/axios'
+import { onMounted, ref } from 'vue'
 import EmployeeTable from '@/components/search/EmployeeTable.vue'
-import { useCodeStore } from '@/stores/useCodeStore'
-import { VRow, VTextField } from 'vuetify/lib/components/index.mjs'
-import { useTheme } from 'vuetify/lib/framework.mjs'
 
+// api
+import axios from '@/api/axios'
+
+// store
+import { useCodeStore } from '@/stores/useCodeStore'
+
+const store = useCodeStore()
+
+// TODO: 변경 예정
 const departmentList = ['IT 사업부', 'IOT사업부', '경영기획부', '인사총무지원부']
 const abilityList = [
   'Python',
@@ -95,25 +100,21 @@ const searchQuery = ref('')
 const selectedAbility = ref('')
 const selectedDepartment = ref('')
 
-const store = useCodeStore()
-const vuetifyTheme = useTheme()
-const linkStyle = computed(() => ({
-  color: vuetifyTheme.current.value.colors.primary,
-  textDecoration: 'underline',
-  cursor: 'pointer',
-}))
-
 const params = ref([])
 const totalPage = ref(1)
 const currentPage = ref(1)
 
-const goToPage = newPage => {
-  currentPage.value = newPage
+const fetchEmployeeAbility = async (userId, index) => {
+  try {
+    const response = await axios.get(`/user/ability/${userId}`)
 
-  getEmployee()
+    params.value[index].ability = response.data.data
+  } catch (error) {
+    console.error('Error get Ability:', error)
+  }
 }
 
-const getEmployee = async () => {
+const fetchEmployeeList = async () => {
   try {
     const response = await axios.get(`/user/search`, {
       params: {
@@ -134,24 +135,10 @@ const getEmployee = async () => {
   }
 }
 
-const getEmployeeAbility = async (userId, index) => {
-  try {
-    const response = await axios.get(`/user/ability/${userId}`)
-
-    params.value[index].ability = response.data.data
-  } catch (error) {
-    console.error('Error get Ability:', error)
-  }
-}
-
-onMounted(() => {
-  getEmployee()
-})
-
 const setEmployeeAbility = async employees => {
   try {
     const promises = employees.map(async (employee, index) => {
-      const ability = await getEmployeeAbility(employee.userId, index)
+      const ability = await fetchEmployeeAbility(employee.userId, index)
     })
     await Promise.all(promises)
   } catch (error) {
@@ -159,11 +146,17 @@ const setEmployeeAbility = async employees => {
   }
 }
 
+const goToPage = newPage => {
+  currentPage.value = newPage
+
+  fetchEmployeeList()
+}
+
 const onSubmit = () => {
   loading.value = true
   currentPage.value = 1
 
-  getEmployee()
+  fetchEmployeeList()
 
   setTimeout(() => {
     loading.value = false
@@ -176,5 +169,9 @@ const onReset = () => {
   selectedDepartment.value = ''
   searchQuery.value = ''
 }
+
+onMounted(() => {
+  fetchEmployeeList()
+})
 </script>
 <style scoped></style>
