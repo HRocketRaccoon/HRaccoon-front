@@ -86,7 +86,7 @@ const router = createRouter({
         {
           path: 'mypage',
           name: 'MyPage',
-          component: () => import('@/views/MypageView.vue'),
+          component: () => import('@/views/user/MypageView.vue'),
         },
       ],
     },

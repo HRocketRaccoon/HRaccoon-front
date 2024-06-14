@@ -1,63 +1,54 @@
 <template>
   <div>
     <h1 class="mb-2">| 직원 정보 조회</h1>
-    <VCard>
+    <VCard class="mb-4">
       <VCardText class="pa-10">
         <VRow>
-          <VCol cols="12">
-            <VRow>
-              <VCol cols="12" md="4" sm="5">
-                <VCombobox
-                  v-model="selectedDepartment"
-                  :items="departmentList"
-                  label="소속 부서"
-                  variant="outlined"
-                  @keydown.enter="onSubmit"
-                ></VCombobox>
-              </VCol>
-              <VCol cols="12" md="4" sm="5">
-                <VCombobox
-                  v-model="selectedAbility"
-                  :items="abilityList"
-                  label="역량"
-                  variant="outlined"
-                  @keydown.enter="onSubmit"
-                ></VCombobox>
-              </VCol>
-              <VCol cols="12" md="2" sm="2" style="display: flex; align-items: center">
-                <VText :style="linkStyle" @click="onReset">초기화</VText>
-              </VCol>
-            </VRow>
+          <VCol cols="12" md="4">
+            <VCombobox
+              v-model="selectedDepartment"
+              :items="departmentList"
+              label="소속 부서"
+              variant="outlined"
+              @keydown.enter="onSubmit"
+            ></VCombobox>
           </VCol>
-
-          <VCol cols="12">
-            <VRow>
-              <VCol cols="9" md="6" sm="8">
-                <VTextField
-                  v-model="searchQuery"
-                  :loading="loading"
-                  density="compact"
-                  hide-details
-                  label="조회할 직원의 이름, 사번을 입력하세요."
-                  single-line
-                  style="height: 66px"
-                  variant="solo"
-                  @keydown.enter="onSubmit"
-                ></VTextField>
-              </VCol>
-              <VCol cols="3">
-                <VBtn size="large" variant="tonal" @click="onSubmit">검색</VBtn>
-              </VCol>
-            </VRow>
+          <VCol cols="12" md="4">
+            <VCombobox
+              v-model="selectedAbility"
+              :items="abilityList"
+              label="역량"
+              variant="outlined"
+              @keydown.enter="onSubmit"
+            ></VCombobox>
+          </VCol>
+          <VCol>
+            <VTextField
+              v-model="searchQuery"
+              :loading="loading"
+              density="compact"
+              hide-details
+              label="조회할 직원의 이름, 사번을 입력하세요."
+              single-line
+              style="height: 66px"
+              variant="solo"
+              @keydown.enter="onSubmit"
+            ></VTextField>
           </VCol>
         </VRow>
+        <VRow>
+          <VBtn :style="linkStyle" class="ml-auto" size="large" variant="tonal" @click="onReset">초기화</VBtn>
+          <VBtn class="ml-3" size="large" @click="onSubmit">검색</VBtn>
+        </VRow>
       </VCardText>
+    </VCard>
+    <VCard>
       <div v-if="params.length > 0">
         <EmployeeTable :data="params" />
         <VPagination
           v-model="currentPage"
           :length="totalPage"
-          :total-visible="5"
+          total-visible="7"
           @update:modelValue="goToPage"
         ></VPagination>
       </div>
