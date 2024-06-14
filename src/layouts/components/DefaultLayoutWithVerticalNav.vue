@@ -14,6 +14,7 @@ import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
 
 // store
 import { useAuthStore } from '@/stores/useAuthStore.js'
+import TodoDialog from '@/components/todo/TodoDialog.vue'
 
 const { fetchSignOut } = useAuthStore()
 const router = useRouter()
@@ -42,6 +43,8 @@ const onHandleDialogButton = async () => {
         </IconBtn>
 
         <VSpacer />
+
+        <TodoDialog class="me-2" />
 
         <IconBtn class="me-2">
           <VIcon icon="bx-bell" />
