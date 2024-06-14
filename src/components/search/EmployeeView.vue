@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <VCard>
     <v-card-text>
       <v-row class="header"> </v-row>
       <v-row>
@@ -73,10 +73,12 @@
         </v-col>
       </v-row>
 
-      <div class="tabs">
-        <button @click="selectedTab = 0" :class="{ active: selectedTab === 0 }">근무현황</button>
-        <button @click="selectedTab = 1" :class="{ active: selectedTab === 1 }">개인역량</button>
-      </div>
+      <VRow class="tabs">
+        <VBtn size="large" variant="tonal" @click="selectedTab = 0">근무현황</VBtn>
+        <VBtn size="large" variant="tonal" @click="selectedTab = 1">개인역량</VBtn>
+        <!-- <button @click="selectedTab = 0" :class="{ active: selectedTab === 0 }">근무현황</button>
+        <button @click="selectedTab = 1" :class="{ active: selectedTab === 1 }">개인역량</button> -->
+      </VRow>
       <div v-if="selectedTab === 0" class="tab-content">
         <!-- 개인정보 Tab -->
         <v-form v-if="userSeat.seatOffice">
@@ -103,7 +105,7 @@
             <v-col cols="12">
               <v-chip-group>
                 <v-chip v-for="(ability, index) in userAbilities" :key="index">
-                  {{ getCodeName(ability) }}
+                  {{ ability }}
                 </v-chip>
               </v-chip-group>
             </v-col>
@@ -111,19 +113,36 @@
         </v-form>
       </div>
     </v-card-text>
-  </div>
+    <VRow>
+      <VCol class="v-col-right">
+        <VBtn
+          size="large"
+          variant="tonal"
+          class="mb-3"
+          @click="
+            () => {
+              router.go(-1)
+            }
+          "
+          >뒤로 가기
+        </VBtn>
+      </VCol>
+    </VRow>
+  </VCard>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from '@/api/axios'
 import { useCodeStore } from '@/stores/useCodeStore'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { VCard } from 'vuetify/lib/components/index.mjs'
 
 const selectedTab = ref(0) // 초기값을 숫자로 설정
 
 const route = useRoute()
 const userId = ref(route.params.userId)
+const router = useRouter()
 
 const user = ref({
   userId: '',
@@ -172,7 +191,6 @@ const loadUserAbilities = async () => {
     const response = await axios.get(`/user/ability/${userId.value}`)
     const abilities = response.data.data
     userAbilities.value = abilities.map(ability => ability.abilityName)
-    console.log('user ability :', userAbilities)
   } catch (error) {
     console.error('Failed to load user abilities:', error)
   }
@@ -228,13 +246,9 @@ onMounted(() => {
 button {
   margin: 0 10px;
   padding: 10px 20px;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
 }
 
-button.active {
+/* button.active {
   background-color: #0056b3;
 }
 
@@ -244,7 +258,7 @@ button:focus {
 
 button:hover {
   background-color: #0056b3;
-}
+} */
 
 .custom-text-field {
   margin-bottom: 20px;
@@ -252,5 +266,9 @@ button:hover {
 
 .tab-content {
   margin-top: 20px;
+}
+.v-col-right {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>
