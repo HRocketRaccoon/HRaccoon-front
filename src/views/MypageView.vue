@@ -96,7 +96,7 @@
               </VCol>
             </VRow>
             <VRow>
-              <VBtn class="ml-auto" color="primary" size="large" @click="onHandleUpdateBtn">
+              <VBtn class="ml-auto" color="primary" size="large" @click="onHandleUserBtn">
                 {{ isEditable ? '수정 완료' : '수정하기' }}
               </VBtn>
             </VRow>
@@ -108,9 +108,9 @@
               <VCol>
                 <VChipGroup>
                   <VChip
-                    v-for="(ability, index) in userAbilities"
+                    v-for="(ability, index) in modifiedAbilities"
                     :key="index"
-                    close
+                    :closable="isEditableAbilities"
                     @click="isEditableAbilities && removeAbility(index)"
                   >
                     {{ ability.abilityName }}
@@ -122,19 +122,20 @@
               <VSelect
                 v-if="isEditableAbilities"
                 v-model="newAbility"
-                :items="availableAbilities"
-                item-text="name"
+                :items="abilities"
+                :return-object="false"
+                item-title="name"
                 item-value="code"
                 label="개인역량을 선택해주세요"
               />
 
-              <VBtn v-if="isEditableAbilities" class="ml-8" color="primary" size="large" @click="addAbility"
-                >추가
+              <VBtn v-if="isEditableAbilities" class="ml-8" color="primary" size="large" @click="addAbility">
+                추가
               </VBtn>
             </VRow>
             <VRow class="mt-5">
-              <VBtn class="ml-auto" color="primary" size="large" @click="onHandleAbilityBtn"
-                >{{ isEditableAbilities ? '수정완료' : '수정하기' }}
+              <VBtn class="ml-auto" color="primary" size="large" @click="onHandleAbilityBtn">
+                {{ isEditableAbilities ? '수정완료' : '수정하기' }}
               </VBtn>
             </VRow>
           </div>
@@ -155,7 +156,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import dayjs from 'dayjs'
 import { useToast } from 'vue-toastification'
 
@@ -169,25 +170,33 @@ import { useAuthStore } from '@/stores/useAuthStore.js'
 // util
 import { validateEmail, validatePhoneNumber } from '@/util/util.js'
 
+//constant
+import { userConstant } from '@/util/constants/userConstant.js'
+
 const useAuth = useAuthStore()
 const store = useCodeStore()
 const toast = useToast()
+const {
+  DUPLICATE_INFO,
+  ABILITY_DUPLICATE,
+  ABILITY_LIMITED,
+  ABILITY_REMAIN,
+  NOT_VALID_PHONE,
+  NOT_VALID_EMAIL,
+  NOT_VALID_ADDRESS,
+} = userConstant
 
-const params = ref({
-  userDepartment: '',
-  userTeam: '',
-  userPosition: '',
-  userRank: '',
-  userDepartmentName: '',
-  abilities: [],
-})
 const userId = ref(useAuth.userId)
-const userAbilities = ref([])
+const params = ref({
+  userAbilities: [],
+})
+
+/* 역량 목록 & 수정 관련 ref*/
+const abilities = ref([])
 const newAbility = ref('')
+const modifiedAbilities = ref([])
 
-//TODO: API 호출로 변경 예정
-const availableAbilities = ref(store.getAllAbilities())
-
+/* 컴포넌트 로직 관련 ref*/
 const tab = ref('tab-1')
 const isEditable = ref(false)
 const isEditableAbilities = ref(false)
@@ -217,9 +226,22 @@ const fetchUserAbilities = async () => {
   try {
     const response = await api.get(`/user/ability/${userId.value}`)
     console.log('[SUCCESS] fetchUserAbilities response:', response.data)
-    userAbilities.value = response.data.data
+
+    params.value.userAbilities = response.data.data
+    modifiedAbilities.value = params.value.userAbilities
   } catch (error) {
     console.error('[ERROR] fetchUserInfo error:', error.response)
+  }
+}
+
+const fetchAbilities = async () => {
+  try {
+    const response = await api.get('/code/ability')
+    console.log('[SUCCESS] fetchAbilities response:', response.data.data)
+
+    abilities.value = [...response.data.data]
+  } catch (error) {
+    console.error('[ERROR] fetchAbilities error:', error.response)
   }
 }
 
@@ -239,6 +261,7 @@ const fetchUpdateUserInfo = async () => {
     }
   } catch (error) {
     console.error('[ERROR] fetchUpdateUserInfo error:', error.response)
+    toast.error(DUPLICATE_INFO)
   }
 }
 
@@ -246,31 +269,38 @@ const fetchUpdateUserAbilities = async () => {
   try {
     const response = await api.post(
       `/user/ability/update/${userId.value}`,
-      userAbilities.value.map(ability => ({
-        abilityName: ability,
+      modifiedAbilities.value.map(ability => ({
+        abilityName: ability.abilityCode,
       })),
     )
-    console.log('User abilities updated:', response.data.data)
+    console.log('[SUCCESS] fetchUpdateUserAbilities response:', response.data)
+
+    if (isEditableAbilities.value) {
+      isEditableAbilities.value = false
+      dialog.value = true
+    }
+
+    await fetchUserAbilities()
   } catch (error) {
-    console.error('Failed to update user abilities:', error)
+    console.error('[ERROR] fetchUpdateUserAbilities error:', error.response)
   }
 }
 
 const validateUserInfo = () => {
   if (!validatePhoneNumber(params.value.userMobile)) {
-    return '휴대폰 번호 형식에 맞지 않습니다. 다시 작성해주세요.'
+    return NOT_VALID_PHONE
   }
 
   if (!validateEmail(params.value.userEmail)) {
-    return '이메일 형식에 맞지 않습니다. 다시 작성해주세요.'
+    return NOT_VALID_EMAIL
   }
 
   if (params.value.userAddress.length < 1) {
-    return '주소를 입력해주세요.'
+    return NOT_VALID_ADDRESS
   }
 }
 
-const onHandleUpdateBtn = () => {
+const onHandleUserBtn = () => {
   if (isEditable.value) {
     if (validateUserInfo()) {
       toast.error(validateUserInfo())
@@ -284,28 +314,38 @@ const onHandleUpdateBtn = () => {
 
 const onHandleAbilityBtn = () => {
   if (isEditableAbilities.value) {
-    console.log('test')
+    fetchUpdateUserAbilities()
   } else {
     isEditableAbilities.value = !isEditableAbilities.value
   }
 }
 
 const removeAbility = index => {
-  userAbilities.value.splice(index, 1)
-  // fetchUpdateUserAbilities()
+  if (modifiedAbilities.value.length > 1) {
+    modifiedAbilities.value.splice(index, 1)
+  } else {
+    toast.error(ABILITY_REMAIN)
+  }
 }
 
 const addAbility = () => {
-  console.log('newAbility.value', newAbility.value)
+  if (newAbility.value && !modifiedAbilities.value.find(a => a.abilityCode === newAbility.value)) {
+    if (modifiedAbilities.value.length < 8) {
+      const ability = abilities.value.find(a => a.code === newAbility.value)
 
-  console.log(!userAbilities.value.includes(newAbility.value))
-
-  console.log(newAbility.value && !userAbilities.value.includes(newAbility.value))
-
-  if (newAbility.value && !userAbilities.value.includes(newAbility.value)) {
-    userAbilities.value.push(newAbility.value)
-    newAbility.value = ''
-    // fetchUpdateUserAbilities()
+      if (ability) {
+        const newAbilityObject = {
+          abilityCode: ability.code,
+          abilityName: ability.name,
+        }
+        modifiedAbilities.value.push(newAbilityObject)
+        newAbility.value = ''
+      }
+    } else {
+      toast.error(ABILITY_LIMITED)
+    }
+  } else {
+    toast.error(ABILITY_DUPLICATE)
   }
 }
 
@@ -319,9 +359,12 @@ const formatPhoneNumber = event => {
   params.value.userMobile = phoneNumber
 }
 
+watch(modifiedAbilities, newVal => {}, { deep: true })
+
 onMounted(() => {
   fetchUserInfo()
   fetchUserAbilities()
+  fetchAbilities()
 })
 </script>
 
