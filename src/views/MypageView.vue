@@ -96,7 +96,7 @@
               </VCol>
             </VRow>
             <VRow>
-              <VBtn class="ml-auto" color="primary" size="large" @click="toggleEdit">
+              <VBtn class="ml-auto" color="primary" size="large" @click="onHandleUpdateBtn">
                 {{ isEditable ? '수정 완료' : '수정하기' }}
               </VBtn>
             </VRow>
@@ -113,7 +113,7 @@
                     close
                     @click="isEditableAbilities && removeAbility(index)"
                   >
-                    {{ ability }}
+                    {{ ability.abilityName }}
                   </VChip>
                 </VChipGroup>
               </VCol>
@@ -128,11 +128,13 @@
                 label="개인역량을 선택해주세요"
               />
 
-              <VBtn v-if="isEditableAbilities" class="ml-8" color="primary" size="large" @click="addAbility">추가</VBtn>
+              <VBtn v-if="isEditableAbilities" class="ml-8" color="primary" size="large" @click="addAbility"
+                >추가
+              </VBtn>
             </VRow>
             <VRow class="mt-5">
-              <VBtn class="ml-auto" color="primary" size="large" @click="toggleEditAbilities"
-                >{{ isEditableAbilities ? '수정 완료' : '수정하기' }}
+              <VBtn class="ml-auto" color="primary" size="large" @click="onHandleAbilityBtn"
+                >{{ isEditableAbilities ? '수정완료' : '수정하기' }}
               </VBtn>
             </VRow>
           </div>
@@ -141,60 +143,21 @@
     </VTabsWindow>
   </VCard>
 
-  <!-- Success Modal -->
-  <v-dialog v-model="showSuccessModal" max-width="500px">
-    <VCard>
-      <v-card-title class="d-flex justify-space-between align-center">
-        <span class="headline">성공</span>
-      </v-card-title>
-      <v-card-text>
-        <p>비밀번호가 수정되었습니다.</p>
-      </v-card-text>
-      <v-card-actions>
-        <v-btn color="primary" @click="closeSuccessModal">확인</v-btn>
-      </v-card-actions>
+  <VDialog v-model="dialog" width="500px">
+    <VCard max-width="400" prepend-icon="mdi-success" title="성공">
+      <VSpacer />
+      <VCardText class="text-center"> 수정에 성공했습니다.</VCardText>
+      <template v-slot:actions>
+        <VBtn class="ms-auto" text="확인" @click="dialog = false" />
+      </template>
     </VCard>
-  </v-dialog>
-
-  <!-- Success Modal for Personal Information Update -->
-  <v-dialog v-model="showUserInfoSuccessModal" max-width="500px">
-    <VCard>
-      <v-card-title class="d-flex justify-space-between align-center">
-        <span class="headline">성공</span>
-      </v-card-title>
-      <v-card-text>
-        <p>개인정보가 수정되었습니다.</p>
-      </v-card-text>
-      <v-card-actions>
-        <v-btn color="primary" @click="closeUserInfoSuccessModal">확인</v-btn>
-      </v-card-actions>
-    </VCard>
-  </v-dialog>
-
-  <!-- Error Modal -->
-  <v-dialog v-model="showErrorModal" max-width="500px">
-    <VCard>
-      <v-card-title class="d-flex justify-space-between align-center">
-        <span class="headline">오류</span>
-      </v-card-title>
-      <v-card-text>
-        <p v-if="errorType === 'phone'">전화번호 형식이 알맞지 않습니다.</p>
-        <p v-else-if="errorType === 'email'">이메일 형식이 알맞지 않습니다.</p>
-        <p v-else-if="errorType === 'mismatch'">비밀번호가 일치하지 않습니다.</p>
-        <p v-else>
-          비밀번호는 8자 이상 16자 이하 문자(a-z), 숫자(0-9), 특수문자 포함 (!,@,#,$,%,^,&,*)를 포함해야 합니다.
-        </p>
-      </v-card-text>
-      <v-card-actions>
-        <v-btn color="primary" @click="closeErrorModal">확인</v-btn>
-      </v-card-actions>
-    </VCard>
-  </v-dialog>
+  </VDialog>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue'
 import dayjs from 'dayjs'
+import { useToast } from 'vue-toastification'
 
 // api
 import api from '/src/api/axios.js'
@@ -208,6 +171,7 @@ import { validateEmail, validatePhoneNumber } from '@/util/util.js'
 
 const useAuth = useAuthStore()
 const store = useCodeStore()
+const toast = useToast()
 
 const params = ref({
   userDepartment: '',
@@ -218,20 +182,16 @@ const params = ref({
   abilities: [],
 })
 const userId = ref(useAuth.userId)
-const tab = ref('tab-1')
+const userAbilities = ref([])
+const newAbility = ref('')
 
+//TODO: API 호출로 변경 예정
 const availableAbilities = ref(store.getAllAbilities())
 
-const userAbilities = ref([])
-const newAbility = ref([])
-
+const tab = ref('tab-1')
 const isEditable = ref(false)
 const isEditableAbilities = ref(false)
-
-const showErrorModal = ref(false) // Error modal visibility state
-const showSuccessModal = ref(false) // Success modal visibility state
-
-const errorType = ref('')
+const dialog = ref(false)
 
 const fetchUserInfo = async () => {
   try {
@@ -242,11 +202,11 @@ const fetchUserInfo = async () => {
       ...response.data.data,
       userBirth: dayjs(response.data.data.userBirth).format('YYYY년 MM월 DD일'),
       userJoinDate: dayjs(response.data.data.userJoinDate).format('YYYY년 MM월 DD일'),
-      userGender: convertGender(response.data.data.userGender),
-      userDepartmentName: getCodeName(response.data.data.userDepartment),
-      userTeamName: getCodeName(response.data.data.userTeam),
-      userPositionName: getCodeName(response.data.data.userPosition),
-      userRankName: getCodeName(response.data.data.userRank),
+      userGender: response.data.data.userGender === 'MALE' ? '남자' : '여자',
+      userDepartmentName: store.getCodeName(response.data.data.userDepartment),
+      userTeamName: store.getCodeName(response.data.data.userTeam),
+      userPositionName: store.getCodeName(response.data.data.userPosition),
+      userRankName: store.getCodeName(response.data.data.userRank),
     }
   } catch (error) {
     console.error('[ERROR] fetchUserInfo error:', error.response)
@@ -257,27 +217,13 @@ const fetchUserAbilities = async () => {
   try {
     const response = await api.get(`/user/ability/${userId.value}`)
     console.log('[SUCCESS] fetchUserAbilities response:', response.data)
-    const abilities = response.data.data
-
-    userAbilities.value = abilities.map(ability => ability.abilityName) // ABILITYNAME을 코드명으로 변환하여 저장
+    userAbilities.value = response.data.data
   } catch (error) {
     console.error('[ERROR] fetchUserInfo error:', error.response)
   }
 }
 
 const fetchUpdateUserInfo = async () => {
-  if (!validatePhoneNumber(params.value.userMobile)) {
-    errorType.value = 'phone'
-    showErrorModal.value = true
-    return
-  }
-
-  if (!validateEmail(params.value.userEmail)) {
-    errorType.value = 'email'
-    showErrorModal.value = true
-    return
-  }
-
   try {
     const response = await api.post('/user/update', {
       userId: params.value.userId,
@@ -289,14 +235,14 @@ const fetchUpdateUserInfo = async () => {
 
     if (isEditable.value) {
       isEditable.value = false
-      showUserInfoSuccessModal.value = true // 개인정보 수정 성공 모달 표시
+      dialog.value = true
     }
   } catch (error) {
     console.error('[ERROR] fetchUpdateUserInfo error:', error.response)
   }
 }
 
-const updateUserAbilities = async () => {
+const fetchUpdateUserAbilities = async () => {
   try {
     const response = await api.post(
       `/user/ability/update/${userId.value}`,
@@ -310,14 +256,57 @@ const updateUserAbilities = async () => {
   }
 }
 
-const changeAbilities = () => {
-  availableAbilities.value = availableAbilities.value.map(code => store.getCodeName(code))
+const validateUserInfo = () => {
+  if (!validatePhoneNumber(params.value.userMobile)) {
+    return '휴대폰 번호 형식에 맞지 않습니다. 다시 작성해주세요.'
+  }
+
+  if (!validateEmail(params.value.userEmail)) {
+    return '이메일 형식에 맞지 않습니다. 다시 작성해주세요.'
+  }
+
+  if (params.value.userAddress.length < 1) {
+    return '주소를 입력해주세요.'
+  }
 }
 
-const convertGender = gender => {
-  if (gender === 'MALE') return '남자'
-  if (gender === 'FEMALE') return '여자'
-  return gender
+const onHandleUpdateBtn = () => {
+  if (isEditable.value) {
+    if (validateUserInfo()) {
+      toast.error(validateUserInfo())
+      return
+    }
+    fetchUpdateUserInfo()
+  } else {
+    isEditable.value = true
+  }
+}
+
+const onHandleAbilityBtn = () => {
+  if (isEditableAbilities.value) {
+    console.log('test')
+  } else {
+    isEditableAbilities.value = !isEditableAbilities.value
+  }
+}
+
+const removeAbility = index => {
+  userAbilities.value.splice(index, 1)
+  // fetchUpdateUserAbilities()
+}
+
+const addAbility = () => {
+  console.log('newAbility.value', newAbility.value)
+
+  console.log(!userAbilities.value.includes(newAbility.value))
+
+  console.log(newAbility.value && !userAbilities.value.includes(newAbility.value))
+
+  if (newAbility.value && !userAbilities.value.includes(newAbility.value)) {
+    userAbilities.value.push(newAbility.value)
+    newAbility.value = ''
+    // fetchUpdateUserAbilities()
+  }
 }
 
 const formatPhoneNumber = event => {
@@ -328,53 +317,6 @@ const formatPhoneNumber = event => {
     phoneNumber = `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 7)}-${phoneNumber.slice(7, 11)}`
   }
   params.value.userMobile = phoneNumber
-}
-
-const formatDate = dateString => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' }
-  return new Date(dateString).toLocaleDateString('ko-KR', options)
-}
-
-const getCodeName = code => {
-  return store.getCodeName(code)
-}
-
-const toggleEdit = () => {
-  if (isEditable.value) {
-    fetchUpdateUserInfo()
-  } else {
-    isEditable.value = true
-  }
-}
-
-const toggleEditAbilities = () => {
-  isEditableAbilities.value = !isEditableAbilities.value
-}
-
-const removeAbility = index => {
-  userAbilities.value.splice(index, 1)
-  updateUserAbilities() // DB 업데이트 호출
-}
-const addAbility = () => {
-  if (newAbility.value && !userAbilities.value.includes(newAbility.value)) {
-    userAbilities.value.push(newAbility.value) // 문자열 값을 추가
-    newAbility.value = ''
-    updateUserAbilities()
-  }
-}
-
-const closeErrorModal = () => {
-  showErrorModal.value = false
-}
-
-const closeSuccessModal = () => {
-  showSuccessModal.value = false
-}
-
-const showUserInfoSuccessModal = ref(false)
-
-const closeUserInfoSuccessModal = () => {
-  showUserInfoSuccessModal.value = false
 }
 
 onMounted(() => {
