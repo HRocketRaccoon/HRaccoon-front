@@ -3,34 +3,33 @@
     <h2 class="office-title">| 좌석 배치도</h2>
     <v-row>
       <v-col>
-        <div v-if="seatLayouts[seatOffice] && seatLayouts[seatOffice][floor]" class="seat-map">
+        <div v-if="seatLayouts[seatOffice] && seatLayouts[seatOffice][convertFloor(floor)]" class="seat-map">
           <div
-            v-for="(row, rowIndex) in getRowLayout(seatLayouts[seatOffice][floor])"
-            :key="`${seatOffice}_${floor}_row_${rowIndex}`"
+            v-for="(row, rowIndex) in getRowLayout(seatLayouts[seatOffice][convertFloor(floor)])"
+            :key="`${seatOffice}_${convertFloor(floor)}_row_${rowIndex}`"
             class="row"
           >
             <div
               v-for="(seat, colIndex) in row"
-              :key="`${seatOffice}_${floor}_seat_${rowIndex}_${colIndex}`"
+              :key="`${seatOffice}_${convertFloor(floor)}_seat_${rowIndex}_${colIndex}`"
               class="col"
             >
               <button
                 v-if="seat"
                 class="seat"
                 :class="{
-                  checked: checked.includes(seat.seatNo),
-                  selected: selected.includes(seat.seatNo),
-                  entrance: seat.seatNo === '입구',
+                  checked: checked.includes(seat.seatLocation),
+                  selected: selected.includes(seat.seatLocation),
                 }"
-                :disabled="isSeatSelectionDisabled(seat.seatNo)"
-                @click="handleSeatClick(seat.seatNo)"
+                @click="handleSeatClick(seat)"
               >
-                {{ seat.seatNo }}
+                {{ seat.seatNum }}
               </button>
             </div>
           </div>
         </div>
       </v-col>
+
       <v-col>
         <v-select v-model="selectedOfficeName" :items="officeNames" label="오피스를 선택해주세요"></v-select>
         <v-btn-toggle v-model="floor" mandatory class="mt-4">
@@ -152,71 +151,16 @@ const seatStore = useSeatStore()
 
 const userNo = ref(authStore.userNo)
 const selected = ref([])
-const seatOffice = ref('OJS01')
-const floor = ref('LOBBY')
+const seatOffice = ref('OJS01') // 기본 오피스를 잠실오피스로 설정
+const floor = ref('1F') // 기본 층을 1F로 설정
 const offices = ref(['OJS01', 'OMP02', 'OSB03'])
 const officeNames = computed(() => offices.value.map(office => codeStore.getCodeName(office)))
 const selectedOfficeName = ref(codeStore.getCodeName(seatOffice.value))
 
-const seatLayouts = ref({
-  OJS01: {
-    LOBBY: [
-      { seatNo: 1, seatRow: 0, seatColumn: 0 },
-      { seatNo: 2, seatRow: 0, seatColumn: 1 },
-      { seatNo: 3, seatRow: 0, seatColumn: 2 },
-      { seatNo: 4, seatRow: 0, seatColumn: 3 },
-      { seatNo: 5, seatRow: 0, seatColumn: 4 },
-      { seatNo: 6, seatRow: 0, seatColumn: 5 },
-      { seatNo: 7, seatRow: 0, seatColumn: 6 },
-    ],
-    '1F': [
-      { seatNo: 8, seatRow: 1, seatColumn: 0 },
-      { seatNo: 9, seatRow: 1, seatColumn: 1 },
-      { seatNo: 10, seatRow: 1, seatColumn: 2 },
-      { seatNo: 11, seatRow: 1, seatColumn: 3 },
-    ],
-    '2F': [
-      { seatNo: 12, seatRow: 2, seatColumn: 0 },
-      { seatNo: 13, seatRow: 2, seatColumn: 1 },
-      { seatNo: 14, seatRow: 2, seatColumn: 2 },
-    ],
-    '3F': [
-      { seatNo: 15, seatRow: 3, seatColumn: 0 },
-      { seatNo: 16, seatRow: 3, seatColumn: 1 },
-      { seatNo: 17, seatRow: 3, seatColumn: 2 },
-      { seatNo: 18, seatRow: 3, seatColumn: 3 },
-      { seatNo: 19, seatRow: 3, seatColumn: 4 },
-      { seatNo: 20, seatRow: 3, seatColumn: 5 },
-    ],
-  },
-  OMP02: {
-    LOBBY: [
-      { seatNo: 21, seatRow: 0, seatColumn: 0 },
-      { seatNo: 22, seatRow: 0, seatColumn: 1 },
-      { seatNo: 23, seatRow: 0, seatColumn: 2 },
-    ],
-    '1F': [
-      { seatNo: 24, seatRow: 1, seatColumn: 0 },
-      { seatNo: 25, seatRow: 1, seatColumn: 1 },
-    ],
-    '2F': [
-      { seatNo: 26, seatRow: 2, seatColumn: 0 },
-      { seatNo: 27, seatRow: 2, seatColumn: 1 },
-      { seatNo: 28, seatRow: 2, seatColumn: 2 },
-    ],
-    '3F': [
-      { seatNo: 29, seatRow: 3, seatColumn: 0 },
-      { seatNo: 30, seatRow: 3, seatColumn: 1 },
-    ],
-  },
-  OSB03: {
-    LOBBY: [{ seatNo: 31, seatRow: 0, seatColumn: 0 }],
-    '1F': [{ seatNo: 32, seatRow: 1, seatColumn: 0 }],
-    '2F': [{ seatNo: 33, seatRow: 2, seatColumn: 0 }],
-  },
-})
+const seatLayouts = ref([])
 
 const checked = ref([])
+const seatUserInfo = ref() // 좌석에 할당된 사용자 정보를 저장
 const showTips = ref(true)
 const showEmployeeModal = ref(false)
 const showConfirmModal = ref(false)
@@ -227,47 +171,75 @@ const confirmMessage = ref('')
 const cancelMessage = ref('')
 const confirmAction = ref(null)
 const alertMessage = ref('')
-const seatNo = ref(null)
+const seatLocation = ref(null)
+
+const seatNo = ref([])
+
+// 변환 함수
+const convertFloor = floor => {
+  switch (floor) {
+    case 'LOBBY':
+      return 'L'
+    case '1F':
+      return '1'
+    case '2F':
+      return '2'
+    case '3F':
+      return '3'
+    default:
+      return floor
+  }
+}
 
 // 함수 선언
 
 /**
  * 주어진 좌석 번호가 선택 불가능한지 확인
- * @param {Number} seatNumber - 좌석 번호
+ * @param {String} seatLocation - 좌석 위치
  * @returns {Boolean} - 선택 불가능 여부
  */
-const isSeatSelectionDisabled = seatNumber => {
-  return (selected.value.length > 0 && !selected.value.includes(seatNumber)) || checked.value.includes(seatNumber)
+const isSeatSelectionDisabled = seatLocation => {
+  return checked.value.includes(seatLocation)
 }
 
 /**
  * 좌석 클릭 시 호출되는 함수
- * @param {Number} seatNumber - 클릭한 좌석 번호
+ * @param {Object} seat - 클릭한 좌석 객체
  */
-const handleSeatClick = seatNumber => {
-  seatNo.value = seatNumber
-  if (checked.value.includes(seatNo.value)) {
-    showEmployeeInfo(seatNo.value)
-  } else if (selected.value.includes(seatNo.value)) {
-    cancelMessage.value = `좌석 ${seatNo.value}을(를) 취소하시겠습니까?`
+const handleSeatClick = async seat => {
+  seatLocation.value = seat.seatLocation
+  seatNo.value = seat.seatStatusNo
+  if (checked.value.includes(seatLocation.value) && !selected.value.includes(seatLocation.value)) {
+    const userInfo = await fetchUserInfo(seatLocation.value)
+    if (userInfo) {
+      employeeInfo.value = userInfo
+      showEmployeeModal.value = true
+    } else {
+      showAlert('직원 정보를 가져올 수 없습니다.')
+    }
+  } else if (selected.value.includes(seatLocation.value)) {
+    cancelMessage.value = `좌석 ${seatLocation.value}을(를) 취소하시겠습니까?`
     showCancelModal.value = true
   } else {
-    confirmMessage.value = `좌석 ${seatNo.value}을(를) 선택하시겠습니까?`
+    confirmMessage.value = `좌석 ${seatLocation.value}을(를) 선택하시겠습니까?`
     showConfirmModal.value = true
   }
 }
-
 /**
  * 좌석 선택을 확인하는 함수
  */
 const confirmSelection = async () => {
   closeConfirmModal()
   try {
+    console.log('userNo: ', userNo.value)
+    console.log('seatStatusNo: ', seatNo.value)
+
     const response = await api.post(`/seat/available-seats/${seatOffice.value}/select/${seatNo.value}/${userNo.value}`)
+
     if (response.data && response.data.status === 'success') {
-      selected.value.push(seatNo.value)
-      seatStore.selectSeat(userNo.value, seatNo.value)
-      showAlert(`좌석 ${seatNo.value}이(가) 성공적으로 선택되었습니다.`)
+      selected.value.push(seatLocation.value)
+      seatStore.selectSeat(userNo.value, seatLocation.value)
+      showAlert(`좌석 ${seatLocation.value}이(가) 성공적으로 선택되었습니다.`)
       fetchSeatData()
     } else {
       showAlert(response.data.message)
@@ -285,10 +257,11 @@ const cancelSelection = async () => {
   closeCancelModal()
   try {
     const response = await api.post(`/seat/available-seats/${seatOffice.value}/cancel/${seatNo.value}/${userNo.value}`)
+
     if (response.data && response.data.status === 'success') {
-      selected.value = selected.value.filter(seat => seat !== seatNo.value)
+      selected.value = selected.value.filter(seat => seat !== seatLocation.value)
       seatStore.cancelSeat(userNo.value)
-      showAlert(`좌석 ${seatNo.value}이(가) 성공적으로 취소되었습니다.`)
+      showAlert(`좌석 ${seatLocation.value}이(가) 성공적으로 취소되었습니다.`)
       fetchSeatData()
     } else {
       showAlert(response.data.message)
@@ -305,43 +278,71 @@ const cancelSelection = async () => {
  * @returns {Array} - 정리된 좌석 배열
  */
 const getRowLayout = layout => {
-  const maxRow = Math.max(...layout.map(seat => seat.seatRow))
-  const maxColumn = Math.max(...layout.map(seat => seat.seatColumn))
+  const maxRow = Math.max(...layout.map((_, index) => Math.floor(index / 7)))
+  const maxColumn = 6
   const rowLayout = Array.from({ length: maxRow + 1 }, () => Array(maxColumn + 1).fill(null))
-  layout.forEach(seat => {
-    rowLayout[seat.seatRow][seat.seatColumn] = seat
+  layout.forEach((seat, index) => {
+    const row = Math.floor(index / 7)
+    const column = index % 7
+    rowLayout[row][column] = seat
   })
   return rowLayout
 }
 
 /**
  * 사원 정보를 모달로 보여주는 함수
- * @param {Number} seatNo - 좌석 번호
+ * @param {String} seatLocation - 좌석 위치
  */
-const showEmployeeInfo = async seatNo => {
+const fetchUserInfo = async seatLocation => {
   try {
-    const response = await api.get(`/seat/user/info/${seatNo}`)
-    if (response.data.data) {
-      employeeInfo.value = response.data.data
-      showEmployeeModal.value = true
+    const response = await api.get(`/seat/user/info/${seatLocation}`)
+    console.log('User info response:', response.data.data) // 응답 확인용 콘솔 출력
+
+    if (response.data && response.data.status === 'success') {
+      return response.data.data
+    } else {
+      console.error('Error fetching user info:', response.data.message)
+      return null
     }
   } catch (error) {
-    console.error('Error fetching employee info:', error)
+    console.error('Error fetching user info:', error)
+    return null
   }
 }
 
 // API 호출 함수
 
 /**
- * 사용 가능한 좌석 데이터를 가져오는 함수
+ * 모든 좌석 데이터를 가져오는 함수
  */
 const fetchSeatData = async () => {
   try {
-    const response = await api.get(`/seat/available-seats/${seatOffice.value}`)
+    const convertedFloor = convertFloor(floor.value)
+    const response = await api.get(`/seat/office/${seatOffice.value}/${convertedFloor}`)
     if (response.data && response.data.status === 'success') {
-      checked.value = response.data.data.filter(seat => seat.seatStatusYn).map(seat => seat.seatNo)
+      const seatData = response.data.data
+      checked.value = seatData.filter(seat => seat.seatStatusYn).map(seat => seat.seatLocation)
+      seatUserInfo.value = seatData.reduce((acc, seat) => {
+        acc[seat.seatLocation] = seat.userInfo
+        return acc
+      }, {})
+      seatLayouts.value = {
+        ...seatLayouts.value,
+        [seatOffice.value]: {
+          ...seatLayouts.value[seatOffice.value],
+          [convertedFloor]: seatData,
+        },
+      }
     } else {
       checked.value = []
+      seatUserInfo.value = {}
+      seatLayouts.value = {
+        ...seatLayouts.value,
+        [seatOffice.value]: {
+          ...seatLayouts.value[seatOffice.value],
+          [convertedFloor]: [],
+        },
+      }
     }
   } catch (error) {
     console.error('Error fetching seat data:', error)
@@ -401,6 +402,7 @@ onMounted(() => {
   if (selectedSeat) {
     selected.value = [selectedSeat]
   }
+  console.log('Mounted - Checked seats:', checked.value)
 })
 
 // 좌석 오피스가 변경될 때마다 좌석 데이터 갱신
@@ -458,6 +460,7 @@ watch(selectedOfficeName, newName => {
 
 .seat.selected {
   background-color: green;
+  cursor: pointer;
 }
 
 .seat.none {
