@@ -23,7 +23,7 @@
                 }"
                 @click="handleSeatClick(seat)"
               >
-                {{ seat.seatNum }}
+                {{ removeLeadingZeros(seat.seatNum) }}
               </button>
             </div>
           </div>
@@ -92,7 +92,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="confirmSelection">확인</v-btn>
+          <v-btn color="primary" @click="fetchConfirmSelection">확인</v-btn>
           <v-spacer></v-spacer>
         </v-card-actions>
       </v-card>
@@ -112,7 +112,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="cancelSelection">확인</v-btn>
+          <v-btn color="primary" @click="fetchCancelSelection">확인</v-btn>
           <v-spacer></v-spacer>
         </v-card-actions>
       </v-card>
@@ -152,7 +152,7 @@ const seatStore = useSeatStore()
 const userNo = ref(authStore.userNo)
 const selected = ref([])
 const seatOffice = ref('OJS01') // 기본 오피스를 잠실오피스로 설정
-const floor = ref('1F') // 기본 층을 1F로 설정
+const floor = ref('LOBBY') // 기본 층을 LOBBY 로 설정
 const offices = ref(['OJS01', 'OMP02', 'OSB03'])
 const officeNames = computed(() => offices.value.map(office => codeStore.getCodeName(office)))
 const selectedOfficeName = ref(codeStore.getCodeName(seatOffice.value))
@@ -172,8 +172,8 @@ const cancelMessage = ref('')
 const confirmAction = ref(null)
 const alertMessage = ref('')
 const seatLocation = ref(null)
-
-const seatNo = ref([])
+const seatNo = ref(null)
+const seatNum = ref(null) // 추가
 
 // 변환 함수
 const convertFloor = floor => {
@@ -201,7 +201,14 @@ const convertFloor = floor => {
 const isSeatSelectionDisabled = seatLocation => {
   return checked.value.includes(seatLocation)
 }
-
+/**
+ * 주어진 좌석 번호에서 앞의 0을 제거하는 함수
+ * @param {String} seatNum - 좌석 번호
+ * @returns {String} - 앞의 0이 제거된 좌석 번호
+ */
+const removeLeadingZeros = seatNum => {
+  return seatNum.replace(/^0+/, '')
+}
 /**
  * 좌석 클릭 시 호출되는 함수
  * @param {Object} seat - 클릭한 좌석 객체
@@ -209,6 +216,9 @@ const isSeatSelectionDisabled = seatLocation => {
 const handleSeatClick = async seat => {
   seatLocation.value = seat.seatLocation
   seatNo.value = seat.seatStatusNo
+  seatNum.value = seat.seatNum // 추가
+
+  // 다른 사람이 사용 중인 좌석인 경우 사용자 정보 보여주기
   if (checked.value.includes(seatLocation.value) && !selected.value.includes(seatLocation.value)) {
     const userInfo = await fetchUserInfo(seatLocation.value)
     if (userInfo) {
@@ -217,29 +227,39 @@ const handleSeatClick = async seat => {
     } else {
       showAlert('직원 정보를 가져올 수 없습니다.')
     }
-  } else if (selected.value.includes(seatLocation.value)) {
-    cancelMessage.value = `좌석 ${seatLocation.value}을(를) 취소하시겠습니까?`
-    showCancelModal.value = true
-  } else {
-    confirmMessage.value = `좌석 ${seatLocation.value}을(를) 선택하시겠습니까?`
-    showConfirmModal.value = true
+    return
   }
+
+  // 사용자가 이미 다른 좌석을 선택한 경우 알림 모달 표시
+  if (selected.value.length > 0 && !selected.value.includes(seatLocation.value)) {
+    showAlert('이미 다른 좌석을 선택하셨습니다. 선택된 좌석을 먼저 취소해주세요.')
+    return
+  }
+
+  // 사용자가 자신의 좌석을 클릭한 경우 선택 취소 모달 보여주기
+  if (selected.value.includes(seatLocation.value)) {
+    cancelMessage.value = `좌석 ${removeLeadingZeros(seatNum.value)}번을 취소하시겠습니까?`
+    showCancelModal.value = true
+    return
+  }
+
+  // 새로운 좌석을 선택하는 경우 확인 모달 보여주기
+  confirmMessage.value = `좌석 ${removeLeadingZeros(seatNum.value)}번을 선택하시겠습니까?`
+  showConfirmModal.value = true
 }
+
 /**
  * 좌석 선택을 확인하는 함수
  */
-const confirmSelection = async () => {
+const fetchConfirmSelection = async () => {
   closeConfirmModal()
   try {
-    console.log('userNo: ', userNo.value)
-    console.log('seatStatusNo: ', seatNo.value)
-
     const response = await api.post(`/seat/available-seats/${seatOffice.value}/select/${seatNo.value}/${userNo.value}`)
 
     if (response.data && response.data.status === 'success') {
       selected.value.push(seatLocation.value)
       seatStore.selectSeat(userNo.value, seatLocation.value)
-      showAlert(`좌석 ${seatLocation.value}이(가) 성공적으로 선택되었습니다.`)
+      showAlert(`좌석 ${removeLeadingZeros(seatNum.value)}번이 성공적으로 선택되었습니다.`) // 여기 수정
       fetchSeatData()
     } else {
       showAlert(response.data.message)
@@ -249,11 +269,10 @@ const confirmSelection = async () => {
     showAlert('좌석 선택 중 오류가 발생했습니다. 다시 시도해주세요.')
   }
 }
-
 /**
  * 좌석 선택 취소를 확인하는 함수
  */
-const cancelSelection = async () => {
+const fetchCancelSelection = async () => {
   closeCancelModal()
   try {
     const response = await api.post(`/seat/available-seats/${seatOffice.value}/cancel/${seatNo.value}/${userNo.value}`)
@@ -261,7 +280,7 @@ const cancelSelection = async () => {
     if (response.data && response.data.status === 'success') {
       selected.value = selected.value.filter(seat => seat !== seatLocation.value)
       seatStore.cancelSeat(userNo.value)
-      showAlert(`좌석 ${seatLocation.value}이(가) 성공적으로 취소되었습니다.`)
+      showAlert(`좌석 ${removeLeadingZeros(seatNum.value)}번이 성공적으로 취소되었습니다.`) // 여기 수정
       fetchSeatData()
     } else {
       showAlert(response.data.message)
@@ -299,7 +318,10 @@ const fetchUserInfo = async seatLocation => {
     console.log('User info response:', response.data.data) // 응답 확인용 콘솔 출력
 
     if (response.data && response.data.status === 'success') {
-      return response.data.data
+      const userData = response.data.data
+      userData.userTeam = codeStore.getCodeName(userData.userTeam) // 부서 이름 변환
+      userData.userPosition = codeStore.getCodeName(userData.userPosition) // 직책 이름 변환
+      return userData
     } else {
       console.error('Error fetching user info:', response.data.message)
       return null
@@ -432,14 +454,13 @@ watch(selectedOfficeName, newName => {
   font-size: 2em;
   margin-bottom: 20px;
 }
-
 .row {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 20px; /* 좌석 사이의 간격을 조절하는 값 */
+  margin-bottom: 20px; /* 행 사이의 간격을 조절하는 값 */
 }
 
 .seat {
