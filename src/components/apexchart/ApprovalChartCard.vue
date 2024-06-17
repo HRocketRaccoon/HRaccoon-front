@@ -23,8 +23,9 @@
 import ApexChart from '@/components/apexchart/ApexChart.vue'
 import axios from '@/api/axios'
 import { onMounted, ref, watch } from 'vue'
+import { useAuthStore } from '@/stores/useAuthStore'
 
-const userNo = ref(1)
+const userNo = ref(useAuthStore().userNo || '')
 
 const params = ref({
   text: '총 근무 시간',
