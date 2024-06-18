@@ -1,36 +1,33 @@
 <template>
-  <VCard class="d-flex flex-column mx-auto py-8" elevation="10">
-    <div class="d-flex justify-center mt-auto text-h5 mb-15">잔여 좌석 확인</div>
+  <VCard elevation="10">
+    <VCardTitle>잔여 좌석 확인</VCardTitle>
+    <VCardText>
+      <VRow class="mt-2 mb-2">
+        <VCol>
+          <VCombobox
+            v-model="seatOffice"
+            :items="['잠실오피스', '마포오피스', '성북오피스']"
+            class="ml-auto"
+            label="조회할 오피스를 고르세요."
+          />
+        </VCol>
+      </VRow>
+      <VList bg-color="transparent" class="d-flex flex-column-reverse" density="compact">
+        <VListItem v-for="(floor, index) in floors" :key="index" class="mb-7">
+          <VProgressLinear :model-value="calculatePercentage(floor.cntNum, floor.totalNum)" class="mx-n5" height="25" />
 
-    <div class="d-flex flex-column mr-1 py-8">
-      <VCombobox
-        v-model="seatOffice"
-        :items="['잠실오피스', '마포오피스', '성북오피스']"
-        label="조회할 오피스를 고르세요."
-        variant="outlined"
-        width="280px"
-      ></VCombobox>
-    </div>
+          <template v-slot:prepend>
+            <span class="mr-10" style="width: 20px">{{ floor.floor }}</span>
+          </template>
 
-    <VList bg-color="transparent" class="d-flex flex-column-reverse" density="compact">
-      <v-list-item v-for="(floor, index) in floors" :key="index" class="mb-7">
-        <v-progress-linear
-          :model-value="calculatePercentage(floor.cntNum, floor.totalNum)"
-          class="mx-n5"
-          height="25"
-        ></v-progress-linear>
-
-        <template v-slot:prepend>
-          <span class="mr-10" style="width: 20px">{{ floor.floor }}</span>
-        </template>
-
-        <template v-slot:append>
-          <div class="rating-values">
-            <span class="d-flex justify-end"> {{ floor.cntNum }} </span>
-          </div>
-        </template>
-      </v-list-item>
-    </VList>
+          <template v-slot:append>
+            <div class="rating-values">
+              <span class="d-flex justify-end"> {{ floor.cntNum }} </span>
+            </div>
+          </template>
+        </VListItem>
+      </VList>
+    </VCardText>
   </VCard>
 </template>
 
@@ -38,7 +35,7 @@
 import { onMounted, ref, watch } from 'vue'
 import axios from '@/api/axios'
 
-const seatOffice = ref('잠실오피스') // remainSeat 가져올 때 .. id
+const seatOffice = ref('잠실오피스')
 const remainSeat = ref([])
 const floors = ref([
   {
@@ -79,11 +76,7 @@ const countSeatNumber = () => {
   }
 }
 
-onMounted(() => {
-  getRemainSeat()
-})
-
-const getRemainSeat = async () => {
+const fetchRemainSeat = async () => {
   try {
     const response = await axios.get(`/seat/office/${setToOfficeRegion()}`)
     console.log('get remainSeat success ! ', response)
@@ -96,15 +89,18 @@ const getRemainSeat = async () => {
 
 const calculatePercentage = (value, total) => {
   if (total === 0) return 0
-
   return 100 - (value / total) * 100
 }
 
 const setToOfficeRegion = () => {
-  const officePrefix = seatOffice.value.substring(0, 2)
-  return officePrefix
+  return seatOffice.value.substring(0, 2)
 }
-watch(seatOffice, getRemainSeat)
-</script>
 
-<style></style>
+onMounted(() => {
+  fetchRemainSeat()
+})
+
+watch(seatOffice, () => {
+  fetchRemainSeat()
+})
+</script>

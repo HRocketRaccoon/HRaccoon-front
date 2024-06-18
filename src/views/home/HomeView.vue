@@ -1,20 +1,20 @@
 <template>
   <h1 class="mb-2">| 대시보드</h1>
   <VRow>
-    <VCol cols="12" md="7">
+    <VCol cols="12" md="4">
       <VRow>
         <VCol cols="12">
-          <ApprovalChartCard class="mb-5" />
+          <ApprovalChartCard />
         </VCol>
         <VCol cols="12">
-          <RemainSeat style="padding: 32px 50px" />
+          <RemainSeat />
         </VCol>
       </VRow>
     </VCol>
-    <VCol cols="12" md="5">
+    <VCol cols="12" md="8">
       <VRow>
         <VCol cols="12">
-          <CalendarCard class="mb-5" />
+          <CalendarCard />
         </VCol>
       </VRow>
     </VCol>
