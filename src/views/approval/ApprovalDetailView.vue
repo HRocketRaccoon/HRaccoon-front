@@ -48,15 +48,7 @@
 
       <!-- 내용 -->
       <VCol cols="12">
-        <VTextarea
-          v-model="params.approvalDetailContent"
-          auto-grow
-          label="내용"
-          min-h-full="true"
-          multi-line
-          readonly
-          rows="10"
-        />
+        <CKEditor v-model:editorData="params.approvalDetailContent" is-disabled="true" />
       </VCol>
 
       <VCol v-if="getKeyByValue(APPROVAL_STATUS, params.approvalStatus) === 'REJECTED'" cols="12">
@@ -130,6 +122,7 @@ import { formatDate, getKeyByValue } from '@/util/util.js'
 
 // constants
 import { APPROVAL_STATUS, APPROVAL_TITLE, APPROVAL_TYPE } from '@/util/constants/approvalConstant.js'
+import CKEditor from '@/components/ckeditor/CKEditor.vue'
 
 const props = defineProps({
   approvalNo: String,

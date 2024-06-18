@@ -26,6 +26,7 @@
       <VCard>
         <VCardText>
           <h2>CKEditor</h2>
+          <VSpacer />
           <CKEditor v-model:editorData="editorData" @update:editor-data="updateEditorData" />
         </VCardText>
       </VCard>
@@ -37,10 +38,10 @@ import { ref, watch } from 'vue'
 import { useToast } from 'vue-toastification'
 
 // components
+import CKEditor from '@/components/ckeditor/CKEditor.vue'
+import InputDialog from '@/components/dialog/InputDialog.vue'
 import OneButtonDialog from '@/components/dialog/OneButtonDialog.vue'
 import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
-import InputDialog from '@/components/dialog/InputDialog.vue'
-import CKEditor from '@/components/ckeditor/CKEditor.vue'
 
 const toast = useToast()
 

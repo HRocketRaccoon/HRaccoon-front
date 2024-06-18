@@ -54,14 +54,7 @@
 
       <!-- 내용 -->
       <VCol cols="12">
-        <VTextarea
-          v-model="params.approvalDetailContent"
-          auto-grow
-          label="내용"
-          min-h-full="true"
-          multi-line
-          rows="10"
-        />
+        <CKEditor v-model:editorData="params.approvalDetailContent" @update:editor-data="updateEditorData" />
       </VCol>
 
       <VCol class="d-flex gap-4">
@@ -99,6 +92,7 @@ import { formatLocalDateTime, getKeyByValue } from '@/util/util.js'
 
 // constants
 import { APPROVAL_TITLE, APPROVAL_TYPE } from '@/util/constants/approvalConstant.js'
+import CKEditor from '@/components/ckeditor/CKEditor.vue'
 
 const toast = useToast()
 const router = useRouter()
@@ -186,6 +180,10 @@ const mappedApprovers = computed(() =>
     value: approver.userId,
   })),
 )
+
+const updateEditorData = newData => {
+  params.value.approvalDetailContent = newData
+}
 
 watch(
   () => params.value.approvalType,
