@@ -31,6 +31,9 @@ export default defineConfig({
   },
 
   build: {
+    commonjsOptions: {
+      exclude: ['ckeditor5-custom-build'],
+    },
     sourcemap: false, // 소스 맵 비활성화
     minify: 'terser', // 코드 최소화
     rollupOptions: {
@@ -43,6 +46,7 @@ export default defineConfig({
   },
 
   optimizeDeps: {
+    include: ['ckeditor5-custom-build'],
     extensions: ['.scss', '.sass'],
     entries: ['./src/**/*.vue'],
     exclude: ['vuetify'],
@@ -50,7 +54,9 @@ export default defineConfig({
       plugins: [
         (await import('esbuild-sass-plugin')).sassPlugin({
           type: 'style',
-          logger: { warn() {} },
+          logger: {
+            warn() {},
+          },
         }),
       ],
     },

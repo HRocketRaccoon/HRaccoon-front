@@ -76,8 +76,8 @@ const chartParams = ref({
 const userNo = ref(authStore.userNo || null)
 
 // logic variables
-const selectedDate = ref(new Date())
-const yesterday = ref(new Date())
+const selectedDate = ref(new Date(new Date().setDate(new Date().getDate() - 1)))
+const yesterday = ref(new Date(new Date().setDate(new Date().getDate() - 1)))
 
 const fetchAttendanceChartData = async () => {
   try {
@@ -136,9 +136,6 @@ watch(selectedDate, newDate => {
 })
 
 onMounted(() => {
-  selectedDate.value.setDate(selectedDate.value.getDate() - 1)
-  yesterday.value.setDate(yesterday.value.getDate() - 1)
-
   fetchDailyAttendanceData(formatDate(selectedDate.value))
 })
 </script>
