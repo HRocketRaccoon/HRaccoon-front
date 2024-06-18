@@ -31,6 +31,9 @@
         </VCardText>
       </VCard>
     </VRow>
+    <h2 class="mt-10">ProgressBar</h2>
+    <VSpacer />
+    <VProgressLinear :model-value="50" class="mx-n5 progress-custom" color="primary" height="25" />
   </div>
 </template>
 <script setup>
@@ -66,3 +69,8 @@ watch(editorData, newValue => {
   console.log('Editor Data changed:', newValue)
 })
 </script>
+<style lang="scss" scoped>
+.progress-custom {
+  background-color: var(--v-theme-primary);
+}
+</style>

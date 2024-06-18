@@ -13,13 +13,17 @@
         </VCol>
       </VRow>
       <VList bg-color="transparent" class="d-flex flex-column-reverse" density="compact">
-        <VListItem v-for="(floor, index) in floors" :key="index" class="mb-7">
-          <VProgressLinear :model-value="calculatePercentage(floor.cntNum, floor.totalNum)" class="mx-n5" height="25" />
-
+        <VListItem v-for="(floor, index) in floors" :key="index">
+          <VProgressLinear
+            :class="`floor-${index}`"
+            :color="colors[index]"
+            :model-value="calculatePercentage(floor.cntNum, floor.totalNum)"
+            class="mx-n5"
+            height="20"
+          />
           <template v-slot:prepend>
             <span class="mr-10" style="width: 20px">{{ floor.floor }}</span>
           </template>
-
           <template v-slot:append>
             <div class="rating-values">
               <span class="d-flex justify-end"> {{ floor.cntNum }} </span>
@@ -38,29 +42,14 @@ import axios from '@/api/axios'
 const seatOffice = ref('잠실오피스')
 const remainSeat = ref([])
 const floors = ref([
-  {
-    floor: 'L',
-    totalNum: 27,
-    cntNum: 0,
-  },
-  {
-    floor: '1F',
-    totalNum: 29,
-    cntNum: 0,
-  },
-  {
-    floor: '2F',
-    totalNum: 28,
-    cntNum: 0,
-  },
-  {
-    floor: '3F',
-    totalNum: 26,
-    cntNum: 0,
-  },
+  { floor: 'L', totalNum: 27, cntNum: 0 },
+  { floor: '1F', totalNum: 29, cntNum: 0 },
+  { floor: '2F', totalNum: 28, cntNum: 0 },
+  { floor: '3F', totalNum: 26, cntNum: 0 },
 ])
+const colors = ['primary', 'success', 'info', 'warning', 'error']
+
 const countSeatNumber = () => {
-  // 초기화
   floors.value.forEach(floor => (floor.cntNum = 0))
 
   for (const seat of remainSeat.value) {
@@ -79,11 +68,12 @@ const countSeatNumber = () => {
 const fetchRemainSeat = async () => {
   try {
     const response = await axios.get(`/seat/office/${setToOfficeRegion()}`)
-    console.log('get remainSeat success ! ', response)
+    console.log('[SUCCESS] fetchRemainSeat response:', response.data.data)
+
     remainSeat.value = response.data.data
     countSeatNumber()
   } catch (error) {
-    console.log('Error get remainSeat:', error)
+    console.log('[FAIL] fetchRemainSeat error:', error.response.data.message)
   }
 }
 
@@ -104,3 +94,4 @@ watch(seatOffice, () => {
   fetchRemainSeat()
 })
 </script>
+<style lang="scss" scoped></style>
