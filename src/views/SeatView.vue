@@ -1,161 +1,117 @@
 <template>
-  <v-container>
-    <h2 class="office-title">| 좌석 배치도</h2>
-    <v-row>
-      <!-- 좌석 배치도 -->
-      <v-col class="left-align" cols="6">
-        <v-container v-if="seatLayouts[seatOffice] && seatLayouts[seatOffice][convertFloor(floor)]">
-          <v-row
-            v-for="(row, rowIndex) in getRowLayout(seatLayouts[seatOffice][convertFloor(floor)])"
-            :key="`${seatOffice}_${convertFloor(floor)}_row_${rowIndex}`"
+  <h1 class="office-title">| 좌석 배치도</h1>
+  <v-row>
+    <!-- 좌석 배치도 -->
+    <v-col cols="8">
+      <v-col v-if="seatLayouts[seatOffice] && seatLayouts[seatOffice][convertFloor(floor)]">
+        <v-row
+          v-for="(row, rowIndex) in getRowLayout(seatLayouts[seatOffice][convertFloor(floor)])"
+          :key="`${seatOffice}_${convertFloor(floor)}_row_${rowIndex}`"
+        >
+          <v-col
+            v-for="(seat, colIndex) in row"
+            :key="`${seatOffice}_${convertFloor(floor)}_seat_${rowIndex}_${colIndex}`"
           >
-            <v-col
-              v-for="(seat, colIndex) in row"
-              :key="`${seatOffice}_${convertFloor(floor)}_seat_${rowIndex}_${colIndex}`"
+            <v-card
+              v-if="seat"
+              class="seat"
+              :class="{
+                checked: checked.includes(seat.seatLocation),
+                selected: selected.includes(seat.seatLocation),
+              }"
+              @click="handleSeatClick(seat)"
+              outlined
+              flat
             >
-              <v-btn
-                v-if="seat"
-                class="seat"
-                :class="{
-                  checked: checked.includes(seat.seatLocation),
-                  selected: selected.includes(seat.seatLocation),
-                }"
-                @click="handleSeatClick(seat)"
-                color="transparent"
-              >
+              <v-card-text class="seat-text">
                 {{ removeLeadingZeros(seat.seatNum) }}
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-container>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-col>
+    </v-col>
 
-      <!-- 오피스 선택 및 층 선택 -->
-      <v-col>
-        <v-select v-model="selectedOfficeName" :items="officeNames" label="오피스를 선택해주세요"></v-select>
-        <v-btn-toggle v-model="floor" mandatory class="mt-4">
-          <v-btn value="LOBBY">Lobby</v-btn>
-          <v-btn value="1F">1F</v-btn>
-          <v-btn value="2F">2F</v-btn>
-          <v-btn value="3F">3F</v-btn>
-        </v-btn-toggle>
-        <div class="legend mt-4">
-          <div class="tips" v-show="showTips">
-            <div><span class="checked seat seatTip"></span> : 사용 중인 좌석</div>
-            <div><span class="selected seat seatTip"></span> : 본인이 사용 중인 좌석</div>
-            <div><span class="available seat seatTip"></span> : 사용 가능한 좌석</div>
-          </div>
+    <!-- 오피스 선택 및 층 선택 -->
+    <v-col>
+      <v-select v-model="selectedOfficeName" :items="officeNames" label="오피스를 선택해주세요"></v-select>
+      <v-btn-toggle v-model="floor" mandatory class="mt-4">
+        <v-btn value="LOBBY">Lobby</v-btn>
+        <v-btn value="1F">1F</v-btn>
+        <v-btn value="2F">2F</v-btn>
+        <v-btn value="3F">3F</v-btn>
+      </v-btn-toggle>
+      <div class="legend mt-4">
+        <div class="tips" v-show="showTips">
+          <div><span class="checked seat seatTip"></span> : 사용 중인 좌석</div>
+          <div><span class="selected seat seatTip"></span> : 본인이 사용 중인 좌석</div>
+          <div><span class="available seat seatTip"></span> : 사용 가능한 좌석</div>
         </div>
-      </v-col>
-    </v-row>
+      </div>
+    </v-col>
+  </v-row>
 
-    <!-- 사원 정보 모달 -->
-    <v-dialog v-model="showEmployeeModal" max-width="600px">
-      <v-card>
-        <v-card-title class="d-flex justify-space-between align-center">
-          <span class="headline">사원 정보</span>
-          <v-btn icon @click="closeModal">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col cols="4">
-                <v-img src="src/assets/employee.jpg" class="custom-avatar" alt="Avatar"></v-img>
-              </v-col>
-              <v-col cols="8">
-                <p>이름: {{ employeeInfo.userName }}</p>
-                <p>사번: {{ employeeInfo.userId }}</p>
-                <p>부서: {{ employeeInfo.userTeam }}</p>
-                <p>직책: {{ employeeInfo.userPosition }}</p>
-                <div v-if="checked.length > 0" class="used-seats">
-                  <p>이미 사용 중인 좌석입니다</p>
-                </div>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+  <!-- 사원 정보 모달 -->
+  <v-dialog v-model="showEmployeeModal" width="800px">
+    <v-card max-width="600" prepend-icon="mdi-account" title="사원 정보">
+      <v-card-text>
+        <v-row>
+          <v-col cols="4">
+            <v-img src="src/assets/employee.jpg" class="custom-avatar" alt="Avatar"></v-img>
+          </v-col>
+          <v-col cols="8">
+            <p>이름: {{ employeeInfo.userName }}</p>
+            <p>사번: {{ employeeInfo.userId }}</p>
+            <p>부서: {{ employeeInfo.userTeam }}</p>
+            <p>직책: {{ employeeInfo.userPosition }}</p>
+          </v-col>
+        </v-row>
+      </v-card-text>
+      <template v-slot:actions>
+        <v-btn class="ms-auto" text="확인" @click="closeModal" />
+      </template>
+    </v-card>
+  </v-dialog>
 
-    <!-- 좌석 선택 확인 모달 -->
-    <v-dialog v-model="showConfirmModal" max-width="400px">
-      <v-card>
-        <v-card-title class="d-flex justify-space-between align-center">
-          <span class="headline">좌석 선택</span>
-          <v-btn icon @click="closeConfirmModal">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <p>{{ confirmMessage }}</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" @click="fetchConfirmSelection">확인</v-btn>
-          <v-spacer></v-spacer>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+  <!-- 좌석 선택 확인 모달 -->
+  <v-dialog v-model="showConfirmModal" width="400px">
+    <v-card max-width="400" prepend-icon="mdi-check" title="좌석 선택">
+      <v-card-text class="text-center">{{ confirmMessage }}</v-card-text>
+      <template v-slot:actions>
+        <v-btn class="ms-auto" text="확인" @click="fetchConfirmSelection" />
+      </template>
+    </v-card>
+  </v-dialog>
 
-    <!-- 좌석 취소 확인 모달 -->
-    <v-dialog v-model="showCancelModal" max-width="400px">
-      <v-card>
-        <v-card-title class="d-flex justify-space-between align-center">
-          <span class="headline">좌석 취소</span>
-          <v-btn icon @click="closeCancelModal">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <p>{{ cancelMessage }}</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" @click="fetchCancelSelection">확인</v-btn>
-          <v-spacer></v-spacer>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+  <!-- 좌석 취소 확인 모달 -->
+  <v-dialog v-model="showCancelModal" width="400px">
+    <v-card max-width="400" prepend-icon="mdi-close" title="좌석 취소">
+      <v-card-text class="text-center">{{ cancelMessage }}</v-card-text>
+      <template v-slot:actions>
+        <v-btn class="ms-auto" text="확인" @click="fetchCancelSelection" />
+      </template>
+    </v-card>
+  </v-dialog>
 
-    <!-- 알림 모달 -->
-    <v-dialog v-model="showAlertModal" max-width="400px">
-      <v-card>
-        <v-card-title class="d-flex justify-space-between align-center">
-          <span class="headline">좌석 선택</span>
-        </v-card-title>
-        <v-card-text>
-          <p>{{ alertMessage }}</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" @click="closeAlertModal">확인</v-btn>
-          <v-spacer></v-spacer>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+  <!-- 알림 모달 -->
+  <v-dialog v-model="showAlertModal" width="400px">
+    <v-card max-width="400" prepend-icon="mdi-alert" title="좌석 선택">
+      <v-card-text class="text-center">{{ alertMessage }}</v-card-text>
+      <template v-slot:actions>
+        <v-btn class="ms-auto" text="확인" @click="closeAlertModal" />
+      </template>
+    </v-card>
+  </v-dialog>
 
-    <!-- 좌석 선택 중복 경고 모달 -->
-    <v-dialog v-model="showDuplicateSelectionModal" max-width="400px">
-      <v-card>
-        <v-card-title class="d-flex justify-space-between align-center">
-          <span class="headline">좌석 선택 중복 경고</span>
-          <v-btn icon @click="closeDuplicateSelectionModal">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <p>이미 선택중인 좌석이 있습니다. 취소 후 새로운 좌석을 선택해주세요.</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" @click="closeDuplicateSelectionModal">확인</v-btn>
-          <v-spacer></v-spacer>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-container>
+  <!-- 좌석 선택 중복 경고 모달 -->
+  <v-dialog v-model="showDuplicateSelectionModal" width="400px">
+    <v-card max-width="400" prepend-icon="mdi-alert" title="좌석 선택 중복 경고">
+      <v-card-text class="text-center">이미 선택중인 좌석이 있습니다. 취소 후 새로운 좌석을 선택해주세요.</v-card-text>
+      <template v-slot:actions>
+        <v-btn class="ms-auto" text="확인" @click="closeDuplicateSelectionModal" />
+      </template>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -376,14 +332,40 @@ const fetchSeatData = async () => {
 }
 
 const getRowLayout = layout => {
-  const maxRow = Math.max(...layout.map((_, index) => Math.floor(index / 7)))
-  const maxColumn = 6
-  const rowLayout = Array.from({ length: maxRow + 1 }, () => Array(maxColumn + 1).fill(null))
+  const rowLayout = []
+  let currentRow = []
+
   layout.forEach((seat, index) => {
-    const row = Math.floor(index / 7)
-    const column = index % 7
-    rowLayout[row][column] = seat
+    // 6자리를 한 줄로
+    if (index % 10 < 6) {
+      currentRow.push(seat)
+      if (currentRow.length === 6) {
+        rowLayout.push(currentRow)
+        currentRow = []
+      }
+    }
+    // 2자리씩 마주보게
+    else if (index % 10 >= 6 && index % 10 < 8) {
+      currentRow.push(seat)
+      if (currentRow.length === 2) {
+        rowLayout.push(currentRow)
+        currentRow = []
+      }
+    }
+    // 4자리 묶음
+    else if (index % 10 >= 8 && index % 10 < 10) {
+      currentRow.push(seat)
+      if (currentRow.length === 4) {
+        rowLayout.push(currentRow)
+        currentRow = []
+      }
+    }
   })
+
+  if (currentRow.length > 0) {
+    rowLayout.push(currentRow)
+  }
+
   return rowLayout
 }
 
@@ -436,11 +418,6 @@ watch(selectedOfficeName, newName => {
 </script>
 
 <style scoped>
-.office-title {
-  font-size: 2em;
-  margin-bottom: 20px;
-}
-
 .seat {
   cursor: pointer;
   width: 60px;
@@ -450,6 +427,7 @@ watch(selectedOfficeName, newName => {
   align-items: center;
   justify-content: center;
   font-size: 1em;
+  margin: 5px;
 }
 
 .seat.checked {
@@ -462,10 +440,10 @@ watch(selectedOfficeName, newName => {
   cursor: pointer;
 }
 
-.seat.none {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
+.seat-text {
+  text-align: center;
+  font-size: 1.2em;
+  color: #000;
 }
 
 .seatTip {
