@@ -54,9 +54,9 @@ const onHandlePage = page => {
 }
 
 watch(
-  userNo,
-  async newUserNo => {
-    if (newUserNo) {
+  userId,
+  async newUserId => {
+    if (newUserId) {
       await fetchApprovalRequestList()
     }
   },
