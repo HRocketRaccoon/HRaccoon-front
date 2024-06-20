@@ -1,10 +1,11 @@
 import { EventSourcePolyfill } from 'event-source-polyfill'
 import { useAuthStore } from '@/stores/useAuthStore.js'
 import { useSSEStore } from '@/stores/useSSEStore.js'
+import api from '@/api/axios.js'
 
 let eventSource = null
 
-export const connectSSE = () => {
+export const connectSSE = async () => {
   const authStore = useAuthStore()
   const sseStore = useSSEStore()
 
@@ -22,11 +23,17 @@ export const connectSSE = () => {
   }
 
   try {
+    const response = await api.get('/notification/unread', {
+      params: { userId },
+    })
+
+    sseStore.setNotifications(response.data.data)
+
     eventSource = new EventSourcePolyfill(`${import.meta.env.VITE_API_BASE_URL}/notification/connect`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-      heartbeatTimeout: 86400000, //sse 연결 시간 (토큰 유지 24시간)
+      heartbeatTimeout: 86400000,
       withCredentials: true,
     })
 
@@ -51,9 +58,15 @@ export const connectSSE = () => {
 
     try {
       const parsedData = JSON.parse(event.data)
-      console.log('::::::::::SSEResponse::::::::::', parsedData)
 
-      sseStore.addNotification(parsedData)
+      const existingNotification = sseStore.notifications.find(
+        notification => notification.webNotificationNo === parsedData.webNotificationNo,
+      )
+
+      if (!existingNotification) {
+        sseStore.addNotification(parsedData)
+        sseStore.setNotifications([...sseStore.notifications]) // 상태 업데이트 감지
+      }
     } catch (error) {
       console.error('[ERROR] Failed to parse event data:', error)
     }
