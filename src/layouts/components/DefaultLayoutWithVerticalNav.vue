@@ -1,22 +1,30 @@
 <script setup>
 import { useRouter } from 'vue-router'
+import { onMounted, watch } from 'vue'
 import { useToast } from 'vue-toastification'
-import VerticalNavSectionTitle from '@/@layouts/components/VerticalNavSectionTitle.vue'
 
+// Components
+import VerticalNavSectionTitle from '@/@layouts/components/VerticalNavSectionTitle.vue'
 import VerticalNavLayout from '@layouts/components/VerticalNavLayout.vue'
 import VerticalNavLink from '@layouts/components/VerticalNavLink.vue'
 
-// Components
 import Footer from '@/layouts/components/GlobalFooter.vue'
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
 import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
+import TodoDialog from '@/components/todo/TodoDialog.vue'
+import NotificationButton from '@/layouts/components/NotificationButton.vue'
 
 // store
 import { useAuthStore } from '@/stores/useAuthStore.js'
-import TodoDialog from '@/components/todo/TodoDialog.vue'
+import { useSSEStore } from '@/stores/useSSEStore.js'
+
+// util
+import { connectSSE } from '@/plugins/sse/sseService.js'
 
 const { fetchSignOut } = useAuthStore()
+const sseStore = useSSEStore()
+
 const router = useRouter()
 const toast = useToast()
 
@@ -30,6 +38,30 @@ const onHandleDialogButton = async () => {
     toast.error('로그아웃에 실패했습니다.')
   }
 }
+
+onMounted(() => {
+  connectSSE()
+})
+
+watch(
+  () => sseStore.isConnected,
+  (newVal, oldVal) => {
+    if (newVal) {
+      console.log('SSE 연결되었습니다.')
+    } else {
+      console.log('SSE 연결이 끊어졌습니다.')
+    }
+  },
+)
+
+watch(
+  () => sseStore.lastError,
+  (newVal, oldVal) => {
+    if (newVal) {
+      toast.error(`SSE Error: ${newVal}`)
+    }
+  },
+)
 </script>
 
 <template>
@@ -46,9 +78,7 @@ const onHandleDialogButton = async () => {
 
         <TodoDialog class="me-2" />
 
-        <IconBtn class="me-2">
-          <VIcon icon="bx-bell" />
-        </IconBtn>
+        <NotificationButton class="me-3" />
 
         <NavbarThemeSwitcher class="me-2" />
 

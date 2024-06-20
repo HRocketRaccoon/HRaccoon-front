@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import api from '@/api/axios'
 import { jwtDecode } from 'jwt-decode'
+import { disconnectSSE } from '@/plugins/sse/sseService.js'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -77,6 +78,7 @@ export const useAuthStore = defineStore('auth', {
           },
         )
         this.clearAuthData()
+        disconnectSSE()
         return true
       } catch (error) {
         console.error('Sign out error:', error)

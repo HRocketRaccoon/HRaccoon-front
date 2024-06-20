@@ -62,6 +62,8 @@ import { useToast } from 'vue-toastification'
 // constants
 import { loginConstant } from '@/util/constants/loginConstant.js'
 
+// service
+
 const { fetchSignIn, fetchUserName } = useAuthStore()
 const router = useRouter()
 const toast = useToast()
