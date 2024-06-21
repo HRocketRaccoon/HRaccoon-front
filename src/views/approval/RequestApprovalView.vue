@@ -130,12 +130,12 @@ const fetchApprovalInfo = async () => {
     approvalDetailContent: params.value.approvalDetailContent,
   }
 
-  console.log(approvalInfo)
-
   try {
     const response = await api.post(`/approval/submit/${userNo.value}`, approvalInfo)
     console.log('[SUCCESS] fetchApprovalInfo response: ', response.data)
     toast.success(response.data.message)
+
+    fetchApprovalEmail(approvalInfo)
   } catch (error) {
     console.error('[ERROR] fetchApprovalInfo error: ', error)
     toast.error(error.response.data.message)
@@ -151,6 +151,16 @@ const fetchApprovalAuthority = async () => {
   } catch (error) {
     console.error('[ERROR] fetchApprovalAuthority error: ', error)
     toast(error.response.data.message)
+  }
+}
+
+const fetchApprovalEmail = async approvalInfo => {
+  try {
+    const response = await api.post(`/notification/email/send/${userId.value}`, approvalInfo)
+    console.log('[SUCCESS] fetchApprovalEmail response: ', response.data)
+  } catch (error) {
+    console.error('[ERROR] fetchApprovalEmail error: ', error)
+    toast.error(error.response.data.message)
   }
 }
 
