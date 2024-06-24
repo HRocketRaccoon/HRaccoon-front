@@ -1,5 +1,5 @@
 <template>
-  <VCol cols="12" md="6">
+  <VCol cols="12">
     <VCard>
       <VTabs v-model="navigationTab" align-tabs="center">
         <VTab v-for="item in tabItems" :key="item" :value="item">
@@ -41,8 +41,12 @@ const props = defineProps({
 const navigationTab = ref('나의 출근시간')
 const tabItems = ['나의 출근시간', '나의 퇴근시간']
 const tabContent = computed(() => ({
-  '나의 출근시간': '나의 출근시간은 ' + formatKoreanTime(props.startTime) + ' 입니다.',
-  '나의 퇴근시간': '나의 퇴근시간은 ' + formatKoreanTime(props.endTime) + ' 입니다.',
+  '나의 출근시간': props.startTime
+    ? '나의 출근시간은 ' + formatKoreanTime(props.startTime) + ' 입니다.'
+    : '출근하지 않았습니다.',
+  '나의 퇴근시간': props.endTime
+    ? '나의 퇴근시간은 ' + formatKoreanTime(props.endTime) + ' 입니다.'
+    : '퇴근 시간이 설정되지 않았습니다.',
 }))
 
 const getTabContent = tab => {

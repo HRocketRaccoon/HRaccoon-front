@@ -22,11 +22,11 @@ const params = ref([])
 const currentPage = ref(1)
 const totalPage = ref(1)
 
-const userNo = ref(useAuthStore().userNo || '')
+const userId = ref(useAuthStore().userId || '')
 
 const fetchApprovalRequestList = async () => {
   try {
-    const response = await api.get(`/approval/requested-approval-list/${userNo.value}`, {
+    const response = await api.get(`/approval/requested-approval-list/${userId.value}`, {
       params: {
         pageNumber: currentPage.value,
       },
@@ -54,9 +54,9 @@ const onHandlePage = page => {
 }
 
 watch(
-  userNo,
-  async newUserNo => {
-    if (newUserNo) {
+  userId,
+  async newUserId => {
+    if (newUserId) {
       await fetchApprovalRequestList()
     }
   },

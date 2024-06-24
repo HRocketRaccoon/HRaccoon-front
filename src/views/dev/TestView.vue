@@ -21,15 +21,34 @@
         <InputDialog />
       </VCol>
     </VRow>
+
+    <VRow>
+      <VCard>
+        <VCardText>
+          <h2>CKEditor</h2>
+          <VSpacer />
+          <CKEditor v-model:editorData="editorData" @update:editor-data="updateEditorData" />
+        </VCardText>
+      </VCard>
+    </VRow>
+    <h2 class="mt-10">ProgressBar</h2>
+    <VSpacer />
+    <VProgressLinear :model-value="50" class="mx-n5 progress-custom" color="primary" height="25" />
   </div>
 </template>
 <script setup>
+import { ref, watch } from 'vue'
 import { useToast } from 'vue-toastification'
+
+// components
+import CKEditor from '@/components/ckeditor/CKEditor.vue'
+import InputDialog from '@/components/dialog/InputDialog.vue'
 import OneButtonDialog from '@/components/dialog/OneButtonDialog.vue'
 import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
-import InputDialog from '@/components/dialog/InputDialog.vue'
 
 const toast = useToast()
+
+const editorData = ref('<p>여기에 값을 입력하세요.🎉</p>')
 
 const toastError = () => {
   toast.error('My toast content', {
@@ -40,4 +59,18 @@ const toastError = () => {
 const onHandleDialog = () => {
   console.log('두번째 모달 버튼 클릭')
 }
+
+const updateEditorData = newData => {
+  editorData.value = newData
+}
+
+// -- CKEditor Data 감지
+watch(editorData, newValue => {
+  console.log('Editor Data changed:', newValue)
+})
 </script>
+<style lang="scss" scoped>
+.progress-custom {
+  background-color: var(--v-theme-primary);
+}
+</style>

@@ -48,15 +48,7 @@
 
       <!-- 내용 -->
       <VCol cols="12">
-        <VTextarea
-          v-model="params.approvalDetailContent"
-          auto-grow
-          label="내용"
-          min-h-full="true"
-          multi-line
-          readonly
-          rows="10"
-        />
+        <CKEditor v-model:editorData="params.approvalDetailContent" is-disabled="true" />
       </VCol>
 
       <VCol v-if="getKeyByValue(APPROVAL_STATUS, params.approvalStatus) === 'REJECTED'" cols="12">
@@ -130,6 +122,7 @@ import { formatDate, getKeyByValue } from '@/util/util.js'
 
 // constants
 import { APPROVAL_STATUS, APPROVAL_TITLE, APPROVAL_TYPE } from '@/util/constants/approvalConstant.js'
+import CKEditor from '@/components/ckeditor/CKEditor.vue'
 
 const props = defineProps({
   approvalNo: String,
@@ -141,6 +134,7 @@ const toast = useToast()
 
 const params = ref({})
 const userNo = ref(useAuthStore().userNo || '')
+const userId = ref(useAuthStore().userId || '')
 
 const fetchApprovalRequestDetail = async () => {
   try {
@@ -205,6 +199,7 @@ const fetchApprovalReject = async content => {
     console.log('[SUCCESS] fetchApprovalReject response:', response)
 
     toast.success('결재 반려가 완료되었습니다.')
+    fetchApprovalSendEmail()
     await fetchApprovalRequestDetail()
   } catch (error) {
     console.error('[ERROR] fetchApprovalReject error:', error)
@@ -223,6 +218,7 @@ const fetchApprovalSuccess = async () => {
     console.log('[SUCCESS] fetchApprovalSuccess response:', response)
 
     toast.success('결재 승인이 완료되었습니다.')
+    fetchApprovalSendEmail()
     await fetchApprovalRequestDetail()
   } catch (error) {
     console.error('[ERROR] fetchApprovalSuccess error:', error)
@@ -246,6 +242,17 @@ const fetchApprovalCancel = async () => {
     console.error('[ERROR] fetchApprovalCancel error:', error)
 
     toast.error(error.response.data.message)
+  }
+}
+
+const fetchApprovalSendEmail = async () => {
+  try {
+    const response = await api.post(`/notification/email/send/result/${userId.value}/${props.approvalNo}`)
+    console.log('[SUCCESS] fetchApprovalSendEmail response:', response)
+
+    toast.success(response.data.message)
+  } catch (error) {
+    console.error('[ERROR] fetchApprovalSendEmail error:', error)
   }
 }
 

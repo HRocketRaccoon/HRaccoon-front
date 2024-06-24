@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 // components
 import WorkTime from '@/components/attendance/WorkTime.vue'
@@ -62,6 +62,7 @@ const weekendParams = ref([
   { name: '금', status: '8시간' },
 ])
 const dailyParams = ref({
+  /* 형식 확인 */
   selectedAttendanceDate: '2024-01-01',
   startTime: '2024-06-03T00:45:04',
   endTime: '2024-06-03T12:45:01',
@@ -75,10 +76,8 @@ const chartParams = ref({
 const userNo = ref(authStore.userNo || null)
 
 // logic variables
-const selectedDate = ref(new Date())
-const yesterday = ref(new Date())
-selectedDate.value.setDate(selectedDate.value.getDate() - 1)
-yesterday.value.setDate(yesterday.value.getDate() - 1)
+const selectedDate = ref(new Date(new Date().setDate(new Date().getDate() - 1)))
+const yesterday = ref(new Date(new Date().setDate(new Date().getDate() - 1)))
 
 const fetchAttendanceChartData = async () => {
   try {
@@ -101,6 +100,10 @@ const fetchDailyAttendanceData = async paramDate => {
       dailyParams.value.selectedAttendanceDate = response.data.data.attendanceDate
       dailyParams.value.startTime = response.data.data.attendanceStartTime
       dailyParams.value.endTime = response.data.data.attendanceEndTime
+    } else {
+      dailyParams.value.selectedAttendanceDate = paramDate
+      dailyParams.value.startTime = ''
+      dailyParams.value.endTime = ''
     }
   } catch (error) {
     console.error('[ERROR] fetchDailyAttendanceData error:', error)
@@ -130,6 +133,10 @@ watch(
 
 watch(selectedDate, newDate => {
   fetchDailyAttendanceData(formatDate(newDate))
+})
+
+onMounted(() => {
+  fetchDailyAttendanceData(formatDate(selectedDate.value))
 })
 </script>
 <style scoped>

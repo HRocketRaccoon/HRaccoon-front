@@ -117,7 +117,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 
 // api
@@ -128,11 +128,12 @@ import { useCodeStore } from '@/stores/useCodeStore'
 import { useAuthStore } from '@/stores/useAuthStore.js'
 
 const router = useRouter()
+const route = useRoute()
 const store = useCodeStore()
 const authStore = useAuthStore()
 
 const params = ref({})
-const userId = ref(authStore.userId)
+const userId = ref(route.params.userId)
 const userAbilities = ref([])
 
 const tab = ref('tab-1')
