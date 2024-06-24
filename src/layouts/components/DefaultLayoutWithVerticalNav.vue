@@ -1,69 +1,3 @@
-<script setup>
-import { useRouter } from 'vue-router'
-import { onMounted, watch } from 'vue'
-import { useToast } from 'vue-toastification'
-
-// Components
-import VerticalNavSectionTitle from '@/@layouts/components/VerticalNavSectionTitle.vue'
-import VerticalNavLayout from '@layouts/components/VerticalNavLayout.vue'
-import VerticalNavLink from '@layouts/components/VerticalNavLink.vue'
-
-import Footer from '@/layouts/components/GlobalFooter.vue'
-import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
-import UserProfile from '@/layouts/components/UserProfile.vue'
-import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
-import TodoDialog from '@/components/todo/TodoDialog.vue'
-import NotificationButton from '@/layouts/components/NotificationButton.vue'
-
-// store
-import { useAuthStore } from '@/stores/useAuthStore.js'
-import { useSSEStore } from '@/stores/useSSEStore.js'
-
-// util
-import { connectSSE } from '@/plugins/sse/sseService.js'
-
-const { fetchSignOut } = useAuthStore()
-const sseStore = useSSEStore()
-
-const router = useRouter()
-const toast = useToast()
-
-const onHandleDialogButton = async () => {
-  const res = await fetchSignOut()
-
-  if (res) {
-    await router.push('/login')
-    toast.success('로그아웃 되었습니다.')
-  } else {
-    toast.error('로그아웃에 실패했습니다.')
-  }
-}
-
-onMounted(() => {
-  connectSSE()
-})
-
-watch(
-  () => sseStore.isConnected,
-  (newVal, oldVal) => {
-    if (newVal) {
-      console.log('SSE 연결되었습니다.')
-    } else {
-      console.log('SSE 연결이 끊어졌습니다.')
-    }
-  },
-)
-
-watch(
-  () => sseStore.lastError,
-  (newVal, oldVal) => {
-    if (newVal) {
-      toast.error(`SSE Error: ${newVal}`)
-    }
-  },
-)
-</script>
-
 <template>
   <VerticalNavLayout>
     <!-- 👉 horizontal Navbar -->
@@ -117,6 +51,30 @@ watch(
         }"
       />
 
+      <!-- 👉 관리자 -->
+      <VerticalNavSectionTitle
+        :item="{
+          heading: '관리자',
+        }"
+        :v-if="authority === 'ADMIN'"
+      />
+      <VerticalNavLink
+        :item="{
+          title: '직원 정보 조회',
+          icon: 'bx-user-check',
+          to: '/admin/employee/list',
+        }"
+        :v-if="authority === 'ADMIN'"
+      />
+      <VerticalNavLink
+        :item="{
+          title: '직원 등록',
+          icon: 'bx-user-plus',
+          to: '/admin/employee/register',
+        }"
+        :v-if="authority === 'ADMIN'"
+      />
+
       <!-- 👉 근태 -->
       <VerticalNavSectionTitle
         :item="{
@@ -154,7 +112,7 @@ watch(
       <VerticalNavLink
         :item="{
           title: '결재 현황 관리',
-          icon: 'bx-user-plus',
+          icon: 'bx-bar-chart-alt-2',
           to: '/approval/status/list',
         }"
       />
@@ -218,7 +176,71 @@ watch(
     </template>
   </VerticalNavLayout>
 </template>
+<script setup>
+import { useRouter } from 'vue-router'
+import { onMounted, watch } from 'vue'
+import { useToast } from 'vue-toastification'
 
+// Components
+import VerticalNavSectionTitle from '@/@layouts/components/VerticalNavSectionTitle.vue'
+import VerticalNavLayout from '@layouts/components/VerticalNavLayout.vue'
+import VerticalNavLink from '@layouts/components/VerticalNavLink.vue'
+
+import Footer from '@/layouts/components/GlobalFooter.vue'
+import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
+import UserProfile from '@/layouts/components/UserProfile.vue'
+import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
+import TodoDialog from '@/components/todo/TodoDialog.vue'
+import NotificationButton from '@/layouts/components/NotificationButton.vue'
+
+// store
+import { useAuthStore } from '@/stores/useAuthStore.js'
+import { useSSEStore } from '@/stores/useSSEStore.js'
+
+// util
+import { connectSSE } from '@/plugins/sse/sseService.js'
+
+const { fetchSignOut, authority } = useAuthStore()
+const sseStore = useSSEStore()
+
+const router = useRouter()
+const toast = useToast()
+
+const onHandleDialogButton = async () => {
+  const res = await fetchSignOut()
+
+  if (res) {
+    await router.push('/login')
+    toast.success('로그아웃 되었습니다.')
+  } else {
+    toast.error('로그아웃에 실패했습니다.')
+  }
+}
+
+onMounted(() => {
+  connectSSE()
+})
+
+watch(
+  () => sseStore.isConnected,
+  (newVal, oldVal) => {
+    if (newVal) {
+      console.log('SSE 연결되었습니다.')
+    } else {
+      console.log('SSE 연결이 끊어졌습니다.')
+    }
+  },
+)
+
+watch(
+  () => sseStore.lastError,
+  (newVal, oldVal) => {
+    if (newVal) {
+      toast.error(`SSE Error: ${newVal}`)
+    }
+  },
+)
+</script>
 <style lang="scss" scoped>
 .meta-key {
   border: thin solid rgba(var(--v-border-color), var(--v-border-opacity));

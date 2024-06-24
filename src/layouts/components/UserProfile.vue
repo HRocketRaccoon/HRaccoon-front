@@ -40,15 +40,6 @@
 
             <VListItemTitle>Settings</VListItemTitle>
           </VListItem>
-
-          <!-- 👉 FAQ -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon class="me-2" icon="bx-help-circle" size="22" />
-            </template>
-
-            <VListItemTitle>FAQ</VListItemTitle>
-          </VListItem>
         </VList>
       </VMenu>
     </VAvatar>

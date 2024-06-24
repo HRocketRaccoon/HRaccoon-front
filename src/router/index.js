@@ -15,6 +15,7 @@ const router = createRouter({
         },
         {
           path: '/:pathMatch(.*)*',
+          name: 'NotFound',
           component: () => import('@/views/exception/ErrorView.vue'),
         },
       ],
@@ -29,6 +30,17 @@ const router = createRouter({
           component: () => import('@/views/home/HomeView.vue'),
         },
         {
+          path: 'mypage',
+          name: 'MyPage',
+          component: () => import('@/views/user/MypageView.vue'),
+        },
+        /* 👉 근태 */
+        {
+          path: 'attendance',
+          component: () => import('@/views/attendance/AttendanceView.vue'),
+        },
+        /* 👉 결재 */
+        {
           path: 'approval/request',
           component: () => import('@/views/approval/RequestApprovalView.vue'),
         },
@@ -42,13 +54,10 @@ const router = createRouter({
           props: route => ({ approvalNo: route.params.approvalNo, type: route.query.type }),
         },
         {
-          path: 'attendance',
-          component: () => import('@/views/attendance/AttendanceView.vue'),
-        },
-        {
           path: 'approval/status/list',
           component: () => import('@/views/approval/ApprovalStatusListView.vue'),
         },
+        /* 👉 직원 조회 */
         {
           path: 'search',
           component: () => import('@/views/search/EmployeeSearch.vue'),
@@ -58,18 +67,25 @@ const router = createRouter({
           component: () => import('@/components/search/EmployeeView.vue'),
           props: route => ({ userId: route.params.userId, type: route.query.type }),
         },
-        {
-          path: 'test',
-          component: () => import('@/views/dev/TestView.vue'),
-        },
+        /* 👉 좌석 */
         {
           path: 'seat',
           component: () => import('@/views/SeatView.vue'),
         },
         {
-          path: 'mypage',
-          name: 'MyPage',
-          component: () => import('@/views/user/MypageView.vue'),
+          path: 'test',
+          component: () => import('@/views/dev/TestView.vue'),
+        },
+        /* 👉 관리자 */
+        {
+          path: '/admin/employee/list',
+        },
+        {
+          path: '/admin/employee/register',
+          component: () => import('@/views/admin/EmployeeRegisterView.vue'),
+        },
+        {
+          path: '/admin/employee/edit/:userId',
         },
       ],
     },
@@ -84,6 +100,16 @@ router.beforeEach((to, from, next) => {
     next({ name: 'SignIn' })
   } else {
     next()
+  }
+
+  if (
+    (authStore.authority === 'ADMIN' && to.path === '/admin/employee/list') ||
+    to.path === '/admin/employee/register' ||
+    to.path === '/admin/employee/edit/:userId'
+  ) {
+    next()
+  } else {
+    next({ name: 'NotFound' })
   }
 })
 
