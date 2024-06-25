@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watchEffect } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/useAuthStore'
 import axios from '@/api/axios'
 
@@ -137,9 +137,7 @@ onMounted(() => {
   fetchTodoList()
 })
 
-watchEffect(() => {
-  fetchTodoList()
-})
+watch(todoChangeTrigger, fetchTodoList)
 </script>
 
 <style lang="scss">
