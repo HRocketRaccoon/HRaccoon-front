@@ -1,1 +1,67 @@
-// write your override here
+//SeatView style
+.seat {
+  width: 60px;
+  height: 60px;
+  border: 2px solid #a19c9c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1em;
+  margin: 5px;
+
+  &.checked {
+    background-color: red;
+  }
+
+  &.selected {
+    background-color: green;
+  }
+
+  .seat-text {
+    text-align: center;
+    font-size: 1.2em;
+    color: #000;
+  }
+}
+
+.notice-card {
+  padding: 16px;
+
+  .v-card-title {
+    font-weight: bold;
+    font-size: 1.4em;
+  }
+
+  .v-card-text {
+    padding: 16px;
+  }
+
+  .v-list-item {
+    margin-bottom: 12px;
+
+    .v-list-item-title {
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+
+    .v-list-item-subtitle {
+      color: #757575;
+      font-size: 0.9em;
+    }
+  }
+}
+
+.user-info-panel {
+  padding: 16px;
+
+  .v-card-title {
+    font-weight: bold;
+    font-size: 1.4em;
+  }
+}
+
+.seatTip {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}

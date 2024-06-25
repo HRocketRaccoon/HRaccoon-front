@@ -77,9 +77,9 @@ export const useCodeStore = defineStore('code', {
       TM009: '외주관리팀',
       TM010: '인사지원팀',
       TM011: '총무팀',
-      OJS01: '잠실',
-      OMP02: '마포',
-      OSB03: '성북',
+      OJS01: '잠실오피스',
+      OMP02: '마포오피스',
+      OSB03: '성북오피스',
     },
   }),
   actions: {
