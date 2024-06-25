@@ -46,9 +46,13 @@
       </v-btn-toggle>
       <div class="legend mt-4">
         <div class="tips" v-show="showTips">
-          <div><span class="checked seat seatTip"></span> : 사용 중인 좌석</div>
+          <div><span class="checked seat seatTip"></span> : 다른 사원이 사용 중인 좌석</div>
           <div><span class="selected seat seatTip"></span> : 본인이 사용 중인 좌석</div>
           <div><span class="available seat seatTip"></span> : 사용 가능한 좌석</div>
+          <!-- 새로고침 버튼 -->
+          <v-btn icon @click="fetchSeatData">
+            <v-icon>mdi-refresh</v-icon>
+          </v-btn>
         </div>
       </div>
 
@@ -56,9 +60,6 @@
       <v-card class="notice-card mt-6" outlined elevation="1">
         <v-card-title class="d-flex justify-space-between">
           <span>공지사항</span>
-          <v-btn icon>
-            <v-icon>mdi-bell</v-icon>
-          </v-btn>
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text>
