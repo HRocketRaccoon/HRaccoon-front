@@ -9,10 +9,15 @@ on:
       - main
 
 jobs:
-  cicd:
+  ci-cd:
     runs-on: ubuntu-latest
+    # 가장 최신의 Ubuntu 러너를 사용합니다.
+    
     steps:
+      - name: Checkout Repository
       - uses: actions/checkout@v3
+
+      - name: Setup Node
       - uses: actions/setup-node@v3
         with:
           node-version: 20.10.0
@@ -22,7 +27,8 @@ jobs:
       - name: Set Environment Variables
         run: |
           echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> $GITHUB_ENV
-          
+
+      - name: build    
       - run: npm run build
 
       - name: deploy to s3
