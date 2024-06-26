@@ -1,11 +1,13 @@
 <template>
-  <div class="main-layout">
-    <router-view />
-  </div>
+  <DefaultLayoutWithVerticalNav>
+    <RouterView />
+  </DefaultLayoutWithVerticalNav>
 </template>
-<script setup></script>
-<style scoped>
-.main-layout {
-  padding: 1rem;
-}
+
+<script setup>
+import DefaultLayoutWithVerticalNav from '@/layouts/components/DefaultLayoutWithVerticalNav.vue'
+</script>
+
+<style lang="scss">
+@use '@layouts/styles/default-layout';
 </style>
