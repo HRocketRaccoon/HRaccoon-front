@@ -14,7 +14,7 @@
 
       <VCardText class="pt-2 d-flex flex-column align-center justify-center">
         <h5 class="text-h5 mb-1">Welcome to HRaccoon! 👋🏻</h5>
-        <p class="mb-0">안녕하세요 HRaccoon입니다. 로그인을 진행해주세요</p>
+        <p class="mb-0">안녕하세요 HRaccoon입니다. 로그인을 진행해주세요.</p>
       </VCardText>
 
       <VCardText>
