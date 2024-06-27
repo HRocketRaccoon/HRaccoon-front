@@ -29,7 +29,7 @@ export const connectSSE = async () => {
 
     sseStore.setNotifications(response.data.data)
 
-    eventSource = new EventSourcePolyfill(`${import.meta.env.VITE_API_BASE_URL}/notification/connect`, {
+    eventSource = new EventSourcePolyfill(`http://43.200.15.0:8080/api/v1/notification/connect`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
