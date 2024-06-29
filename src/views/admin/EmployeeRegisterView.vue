@@ -1,109 +1,228 @@
 <template>
-  <h1>| 직원 등록</h1>
-  <VCard class="mb-4 h-100">
-    <VCardText>
-      <VRow>
-        <VCol cols="12" md="4"></VCol>
-        <VCol cols="12" md="8">
-          <VRow>
-            <VCol cols="12" md="6">
-              <VTextField v-model="params.userId" label="아이디(사번)" outlined readonly />
-            </VCol>
-            <VCol cols="12" md="6">
-              <VTextField v-model="params.userName" label="이름" outlined />
-            </VCol>
-          </VRow>
-          <VRow>
-            <VCol cols="12" md="6">
-              <VTextField v-model="params.userMobile" label="전화번호" outlined />
-            </VCol>
-            <VCol cols="12" md="6">
-              <VTextField v-model="params.userEmail" label="이메일" outlined />
-            </VCol>
-          </VRow>
-          <VRow>
-            <VCol cols="12" md="6">
-              <VTextField v-model="params.userGender" label="성별" outlined />
-            </VCol>
-            <VCol cols="12" md="6">
-              <VTextField v-model="params.userBirth" label="생년월일" outlined />
-            </VCol>
-          </VRow>
-          <VRow>
-            <VCol cols="12" md="6">
-              <VTextField v-model="params.userDepartment" label="부서" outlined />
-            </VCol>
-            <VCol cols="12" md="6">
-              <VTextField v-model="params.userPosition" label="직급" outlined />
-            </VCol>
-          </VRow>
-          <VRow>
-            <VCol cols="12">
-              <VTextField v-model="params.userTeam" label="팀" outlined />
-            </VCol>
-          </VRow>
-        </VCol>
-      </VRow>
-      <VRow>
-        <VCol cols="12">
-          <VTextField v-model="params.userAddress" label="주소" outlined />
-        </VCol>
-      </VRow>
-      <VRow>
-        <VCol cols="12" md="8" />
-        <VCol cols="12" md="4">
-          <VRow>
-            <VSpacer />
-            <VBtn color="secondary" size="large">초기화</VBtn>
-            <TwoButtonDialog
-              button-name="등록하기"
-              button-size="large"
-              class="ml-4"
-              content="정말로 직원 등록을 진행하시겠습니까?"
-              icon="mdi-user-register"
-              right-btn-name="등록"
-              title="직원 등록 확인"
-            />
-          </VRow>
-        </VCol>
-      </VRow>
-    </VCardText>
-  </VCard>
+  <div>
+    <h1>| 직원 등록</h1>
+    <VCard class="mb-4 h-100">
+      <VCardText>
+        <VRow>
+          <VCol cols="12" md="4"></VCol>
+          <VCol cols="12" md="8">
+            <VRow>
+              <VCol cols="12" md="6">
+                <VTextField v-model="params.userId" label="아이디(사번)" outlined />
+              </VCol>
+              <VCol cols="12" md="6">
+                <VTextField v-model="params.userPassword" label="비밀번호" outlined />
+              </VCol>
+            </VRow>
+            <VRow>
+              <VCol cols="12" md="6">
+                <VTextField v-model="params.userName" label="이름" outlined />
+              </VCol>
+              <VCol cols="12" md="6">
+                <VDateInput v-model="params.userBirth" label="생년월일" prepend-icon="" variant="outlined"></VDateInput>
+              </VCol>
+            </VRow>
+            <VRow>
+              <VCol cols="12" md="6">
+                <VCombobox v-model="params.userGender" :items="genderList" label="성별" variant="outlined"></VCombobox>
+              </VCol>
+              <VCol cols="12" md="6">
+                <VTextField v-model="params.userAddress" label="주소" outlined />
+              </VCol>
+            </VRow>
+            <VRow>
+              <VCol cols="12" md="6">
+                <VTextField v-model="params.userMobile" label="전화번호" outlined />
+              </VCol>
+              <VCol cols="12" md="6">
+                <VTextField v-model="params.userEmail" label="이메일" outlined />
+              </VCol>
+            </VRow>
+            <VRow>
+              <VCol cols="12" md="6">
+                <VCombobox
+                  v-model="params.userDepartment"
+                  :items="departmentList"
+                  label="소속 부서"
+                  variant="outlined"
+                ></VCombobox>
+              </VCol>
+              <VCol cols="12" md="6">
+                <VCombobox v-model="params.userTeam" :items="teamList" label="소속 팀" variant="outlined"></VCombobox>
+              </VCol>
+            </VRow>
+            <VRow>
+              <VCol cols="12" md="6">
+                <VCombobox v-model="params.userRank" :items="rankList" label="직위" variant="outlined"></VCombobox>
+              </VCol>
+              <VCol cols="12" md="6">
+                <VCombobox
+                  v-model="params.userPosition"
+                  :items="positionList"
+                  label="직책"
+                  variant="outlined"
+                ></VCombobox>
+              </VCol>
+            </VRow>
+          </VCol>
+        </VRow>
+        <VRow>
+          <VCol cols="12" md="8" />
+          <VCol cols="12" md="4">
+            <VRow>
+              <VSpacer />
+              <VBtn color="secondary" size="large" @click="onReset">초기화</VBtn>
+              <TwoButtonDialog
+                :rightBtnAction="onHandleSubmit"
+                button-name="등록하기"
+                button-size="large"
+                class="ml-4"
+                content="정말로 직원 등록을 진행하시겠습니까?"
+                icon="mdi-user-register"
+                rightBtnName="등록"
+                title="직원 등록 확인"
+              />
+            </VRow>
+          </VCol>
+        </VRow>
+      </VCardText>
+    </VCard>
+  </div>
 </template>
 <script setup>
 import { ref } from 'vue'
 import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
+import { useToast } from 'vue-toastification'
+import { VDateInput } from 'vuetify/labs/components'
+
+// api
+import api from '@/api/axios.js'
+import dayjs from 'dayjs'
+
+// util
+import {
+  TEAM_LIST,
+  DEPATMENT_LIST,
+  RANK_LIST,
+  POSITION_LIST,
+  GENDER,
+  userConstant,
+} from '@/util/constants/userConstant'
+import { loginConstant } from '@/util/constants/loginConstant'
+import { formatDate, getKeyByValue, validatePhoneNumber, validateEmail, validatePassword } from '@/util/util'
+
+const toast = useToast()
+
+const { NOT_VALID_PHONE, NOT_VALID_EMAIL, NOT_VALID_ADDRESS } = userConstant
+
+const { AUTH_PASSWORD_REGEX } = loginConstant
+
+const departmentList = DEPATMENT_LIST
+const teamList = TEAM_LIST
+const rankList = RANK_LIST
+const positionList = POSITION_LIST
+const genderList = ['남자', '여자']
 
 const params = ref({
-  userId: '',
-  userPassword: '',
-  userName: '',
-  userMobile: '',
-  userAddress: '',
-  userBirth: '',
+  userId: 'A000301',
+  userPassword: 'Password301!',
+  userName: '정광수',
+  userMobile: '01044686191',
+  userAddress: '경기도 고양시 덕양구 삼원로 102',
+  userBirth: null,
   userGender: '',
-  userEmail: '',
+  userEmail: 'glgl246@naver.com',
   userDepartment: '',
   userPosition: '',
   userTeam: '',
   userRank: '',
-  userRole: '',
-  userJoinDate: '',
 })
-// {
-//   "userId": "00914125",
-//   "userPassword": "ehfkdlgi981",
-//   "userName": "test",
-//   "userMobile": "01012344562",
-//   "userAddress": "서울특별시 광진구 뚝섬로 123 101-1232",
-//   "userBirth": "981031",
-//   "userGender": "MALE",
-//   "userEmail": "asdfasdf@gmail.com",
-//   "userDepartment": "DP001",
-//   "userPosition": "PS000",
-//   "userTeam": "TM001",
-//   "userRank": "RK001",
-//   "userRole": "USER",
-//   "userJoinDate": "2024-05-28T14:30:00"
-// }
+
+const fetchUserInfo = async () => {
+  const userInfo = {
+    userId: params.value.userId,
+    userPassword: params.value.userPassword,
+    userName: params.value.userName,
+    userMobile: params.value.userMobile,
+    userAddress: params.value.userAddress,
+    userBirth: formatDate(params.value.userBirth),
+    userGender: getKeyByValue(GENDER, params.value.userGender),
+    userEmail: params.value.userEmail,
+    userDepartment: params.value.userDepartment,
+    userPosition: params.value.userPosition,
+    userTeam: params.value.userTeam,
+    userRank: params.value.userRank,
+    userRole: setUserRole(params.value.userTeam),
+    userJoinDate: dayjs(new Date()).format('YYYY-MM-DDTHH:mm:ss').toString(),
+  }
+
+  try {
+    const response = await api.post(`/admin/create`, userInfo)
+    console.log('[SUCCESS] fetchUserInfo response: ', response.data)
+
+    toast.success(response.data.message)
+    onReset()
+  } catch (error) {
+    console.error('[ERROR] fetchUserInfo error: ', error)
+    toast.error(error.response.data.message)
+  }
+}
+
+const validateUserInfo = () => {
+  if (!validatePhoneNumber(params.value.userMobile)) {
+    return NOT_VALID_PHONE
+  }
+
+  if (!validateEmail(params.value.userEmail)) {
+    return NOT_VALID_EMAIL
+  }
+
+  if (!validatePassword(params.value.userPassword)) {
+    return AUTH_PASSWORD_REGEX
+  }
+
+  if (params.value.userAddress.length < 1) {
+    return NOT_VALID_ADDRESS
+  }
+}
+
+const onHandleSubmit = async () => {
+  const values = Object.values(params.value)
+  const hasNull = values.some(value => value === null || value === '')
+
+  if (hasNull) {
+    toast.error('모든 항목을 입력해주세요.')
+    return
+  }
+
+  if (validateUserInfo()) {
+    toast.error(validateUserInfo())
+    return
+  }
+
+  await fetchUserInfo()
+}
+
+const setUserRole = team => {
+  if (team === '인사지원팀') {
+    return 'ADMIN'
+  } else {
+    return 'USER'
+  }
+}
+
+const onReset = () => {
+  params.value.userId = ''
+  params.value.userPassword = ''
+  params.value.userName = ''
+  params.value.userMobile = ''
+  params.value.userAddress = ''
+  params.value.userBirth = null
+  params.value.userGender = ''
+  params.value.userEmail = ''
+  params.value.userDepartment = ''
+  params.value.userPosition = ''
+  params.value.userTeam = ''
+  params.value.userRank = ''
+}
 </script>

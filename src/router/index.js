@@ -79,6 +79,7 @@ const router = createRouter({
         /* 👉 관리자 */
         {
           path: '/admin/employee/list',
+          component: () => import('@/views/admin/AdminEmployeeSearch.vue'),
         },
         {
           path: '/admin/employee/register',
@@ -86,6 +87,7 @@ const router = createRouter({
         },
         {
           path: '/admin/employee/edit/:userId',
+          component: () => import('@/components/admin/AdminEmployeeView.vue'),
         },
       ],
     },
