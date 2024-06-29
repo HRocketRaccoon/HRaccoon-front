@@ -53,26 +53,26 @@
 
       <!-- 👉 관리자 -->
       <VerticalNavSectionTitle
+        v-if="authority === 'ADMIN'"
         :item="{
           heading: '관리자',
         }"
-        :v-if="authority === 'ADMIN'"
       />
       <VerticalNavLink
+        v-if="authority === 'ADMIN'"
         :item="{
           title: '직원 정보 조회',
           icon: 'bx-user-check',
           to: '/admin/employee/list',
         }"
-        :v-if="authority === 'ADMIN'"
       />
       <VerticalNavLink
+        v-if="authority === 'ADMIN'"
         :item="{
           title: '직원 등록',
           icon: 'bx-user-plus',
           to: '/admin/employee/register',
         }"
-        :v-if="authority === 'ADMIN'"
       />
 
       <!-- 👉 근태 -->
@@ -219,6 +219,7 @@ const onHandleDialogButton = async () => {
 
 onMounted(() => {
   connectSSE()
+  console.log(authority)
 })
 
 watch(
