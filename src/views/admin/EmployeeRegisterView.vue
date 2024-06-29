@@ -124,14 +124,14 @@ const positionList = POSITION_LIST
 const genderList = ['남자', '여자']
 
 const params = ref({
-  userId: 'A000301',
-  userPassword: 'Password301!',
-  userName: '정광수',
-  userMobile: '01044686191',
-  userAddress: '경기도 고양시 덕양구 삼원로 102',
+  userId: '',
+  userPassword: '',
+  userName: '',
+  userMobile: '',
+  userAddress: '',
   userBirth: null,
   userGender: '',
-  userEmail: 'glgl246@naver.com',
+  userEmail: '',
   userDepartment: '',
   userPosition: '',
   userTeam: '',
