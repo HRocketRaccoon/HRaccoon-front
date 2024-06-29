@@ -66,61 +66,11 @@ import axios from '@/api/axios'
 // store
 import { useCodeStore } from '@/stores/useCodeStore'
 
-const store = useCodeStore()
+import { DEPATMENT_LIST, ABILITY_LIST } from '@/util/constants/userConstant'
 
-// TODO: 변경 예정
-const departmentList = ['IT 사업부', 'IOT사업부', '경영기획부', '인사총무지원부']
-const abilityList = [
-  'Python',
-  'Java',
-  'C',
-  'C++',
-  'C#',
-  'JavaScript',
-  'TypeScript',
-  'Ruby',
-  'PHP',
-  'Swift',
-  'Kotlin',
-  'R',
-  'Go',
-  'Rust',
-  'Scala',
-  'Perl',
-  'Haskell',
-  'Objective-C',
-  'MATLAB',
-  'SQL',
-  'English',
-  'Japanese',
-  'Chinese (Mandarin)',
-  'Spanish',
-  'French',
-  'German',
-  'Russian',
-  'Italian',
-  'Portuguese',
-  'Arabic',
-  'Hindi',
-  'Data Analysis',
-  'Machine Learning',
-  'Deep Learning',
-  'DevOps',
-  'Cloud Computing (AWS)',
-  'Cloud Computing (Azure)',
-  'Cloud Computing (Google Cloud)',
-  'Cybersecurity',
-  'Network Administration',
-  'Database Management (MySQL)',
-  'Database Management (PostgreSQL)',
-  'Database Management (MongoDB)',
-  'Project Management',
-  'Agile Methodologies',
-  'UI/UX Design',
-  'Software Testing',
-  'Technical Writing',
-  'Business Analysis',
-]
+const store = useCodeStore()
+const departmentList = DEPATMENT_LIST
+const abilityList = ABILITY_LIST
 
 const loaded = ref(false)
 const loading = ref(false)
