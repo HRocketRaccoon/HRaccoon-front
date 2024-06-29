@@ -72,5 +72,7 @@ const bottomContent = ref('')
 const handleRightBtnClick = () => {
   props.rightBtnAction(topContent.value, bottomContent.value)
   dialog.value = false
+  topContent.value = ''
+  bottomContent.value = ''
 }
 </script>
