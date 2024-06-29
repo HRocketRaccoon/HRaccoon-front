@@ -45,7 +45,7 @@
             <VRow>
               <VCol cols="12" md="6">
                 <VTextField
-                  v-model="params.userPositionName"
+                  v-model="params.userRankName"
                   class="custom-text-field"
                   label="직위"
                   :readonly="!isEditable"
@@ -53,7 +53,7 @@
               </VCol>
               <VCol cols="12" md="6">
                 <VTextField
-                  v-model="params.userRankName"
+                  v-model="params.userPositionName"
                   class="custom-text-field"
                   label="직책"
                   :readonly="!isEditable"
@@ -248,11 +248,14 @@ const fetchUserAbilities = async () => {
 }
 
 const fetchUserDelete = async content => {
+  if (!content) {
+    toast.error('퇴사사유를 입력해주세요.')
+    return
+  }
   const deleteInfo = {
     userId: userId.value,
     userDeleteReason: content,
   }
-
   try {
     const response = await api.post(`/admin/delete`, deleteInfo)
     console.log('[SUCCESS] fetchUserDelete response:', response.data)
