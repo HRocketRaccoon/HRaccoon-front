@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="mb-2">| 직원 정보 조회</h1>
+    <h1 class="mb-2">| 직원 정보 조회 (관리자)</h1>
     <VCard class="mb-4">
       <VCardText class="pa-10">
         <VRow>
@@ -37,6 +37,17 @@
           </VCol>
         </VRow>
         <VRow>
+          <VCol cols="12" md="4">
+            <VCombobox
+              v-model="selectedDeleteYn"
+              :items="deleteYnList"
+              label="퇴사여부"
+              variant="outlined"
+              @keydown.enter="onSubmit"
+            ></VCombobox>
+          </VCol>
+        </VRow>
+        <VRow>
           <VBtn class="ml-auto" size="large" variant="tonal" @click="onReset">초기화</VBtn>
           <VBtn class="ml-3" size="large" @click="onSubmit">검색</VBtn>
         </VRow>
@@ -58,7 +69,7 @@
 </template>
 <script setup>
 import { onMounted, ref } from 'vue'
-import EmployeeTable from '@/components/search/EmployeeTable.vue'
+import EmployeeTable from '@/components/admin/AdminEmployeeTable.vue'
 
 // api
 import axios from '@/api/axios'
@@ -71,6 +82,7 @@ import { DEPATMENT_LIST, ABILITY_LIST } from '@/util/constants/userConstant'
 const store = useCodeStore()
 const departmentList = DEPATMENT_LIST
 const abilityList = ABILITY_LIST
+const deleteYnList = ['재직', '퇴사']
 
 const loaded = ref(false)
 const loading = ref(false)
@@ -78,6 +90,7 @@ const loading = ref(false)
 const searchQuery = ref('')
 const selectedAbility = ref('')
 const selectedDepartment = ref('')
+const selectedDeleteYn = ref('')
 
 const params = ref([])
 const totalPage = ref(1)
@@ -95,12 +108,13 @@ const fetchEmployeeAbility = async (userId, index) => {
 
 const fetchEmployeeList = async () => {
   try {
-    const response = await axios.get(`/user/search`, {
+    const response = await axios.get(`/admin/search`, {
       params: {
         keyword: searchQuery.value,
         ability: selectedAbility.value,
         department: selectedDepartment.value,
         pageNumber: currentPage.value,
+        deleteYn: selectedDeleteYn.value,
       },
     })
 
@@ -147,6 +161,7 @@ const onReset = () => {
   selectedAbility.value = ''
   selectedDepartment.value = ''
   searchQuery.value = ''
+  selectedDeleteYn.value = ''
 }
 
 onMounted(() => {
