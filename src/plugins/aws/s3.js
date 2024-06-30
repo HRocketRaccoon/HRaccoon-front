@@ -21,7 +21,7 @@ export const S3uploadImage = async file => {
   try {
     const command = new PutObjectCommand(params)
     await s3Client.send(command)
-    const imageUrl = `https://${params.Bucket}.s3.${s3Client.config.region}.amazonaws.com/${params.Key}`
+    const imageUrl = `https://${params.Bucket}.s3.ap-northeast-2.amazonaws.com/${params.Key}`
     console.log('[SUCCESS] ImageUpload Success', imageUrl)
     return imageUrl
   } catch (err) {

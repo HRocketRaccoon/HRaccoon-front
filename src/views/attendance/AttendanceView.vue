@@ -53,8 +53,8 @@
 import { onMounted, ref, watch } from 'vue'
 
 // components
-import WorkTime from '@/components/attendance/WorkTime.vue'
-import CardNavigation from '@/components/attendance/CardNavigation.vue'
+import WorkTime from '@/components/WorkTime.vue'
+import CardNavigation from '@/components/CardNavigation.vue'
 import AttendanceApexChart from '@/components/apexchart/AttendanceApexChart.vue'
 
 // api

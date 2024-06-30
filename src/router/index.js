@@ -87,7 +87,7 @@ const router = createRouter({
         },
         {
           path: '/admin/employee/edit/:userId',
-          component: () => import('@/components/admin/AdminEmployeeView.vue'),
+          component: () => import('@/views/admin/AdminEmployeeView.vue'),
         },
       ],
     },
