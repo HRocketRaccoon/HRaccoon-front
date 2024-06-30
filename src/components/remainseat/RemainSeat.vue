@@ -1,8 +1,8 @@
 <template>
   <VCard elevation="10">
-    <VCardTitle>잔여 좌석 확인</VCardTitle>
+    <VCardTitle class="mt-5">잔여 좌석 확인</VCardTitle>
     <VCardText>
-      <VRow class="mt-2 mb-2">
+      <VRow class="mt-5 mb-5">
         <VCol>
           <VCombobox
             v-model="seatOffice"
@@ -12,8 +12,8 @@
           />
         </VCol>
       </VRow>
-      <VList bg-color="transparent" class="d-flex flex-column-reverse" density="compact">
-        <VListItem v-for="(floor, index) in floors" :key="index">
+      <VList bg-color="transparent" class="d-flex flex-column-reverse mb-5" density="compact">
+        <VListItem v-for="(floor, index) in floors" :key="index" class="mb-5">
           <VProgressLinear
             :class="`floor-${index}`"
             :color="colors[index]"
@@ -22,7 +22,7 @@
             height="20"
           />
           <template v-slot:prepend>
-            <span class="mr-10" style="width: 20px">{{ floor.floor }}</span>
+            <span class="mr-5" style="width: 20px">{{ floor.floor }}</span>
           </template>
           <template v-slot:append>
             <div class="rating-values">
