@@ -22,18 +22,29 @@
         :start-time="dailyParams.startTime"
       />
     </VCol>
-  </VRow>
-  <VRow>
-    <VCol cols="12" md="6">
-      <WorkTime :work-hours="weekendParams" />
-    </VCol>
-    <VCol cols="12" md="6">
+    <VCol>
       <VCard class="card-container">
         <h2>총 근무시간</h2>
         <VCardText>
           <AttendanceApexChart :params="chartParams" />
         </VCardText>
       </VCard>
+    </VCol>
+  </VRow>
+  <VRow>
+    <VCol cols="12" md="6">
+      <VCard>
+        <VCardText>
+          <h2 class="mb-4">금주 근무 시간</h2>
+          <VSpacer />
+          <VRow>
+            <GraphBar />
+          </VRow>
+        </VCardText>
+      </VCard>
+    </VCol>
+    <VCol cols="12" md="6">
+      <WorkTime :work-hours="weekendParams" />
     </VCol>
   </VRow>
 </template>
@@ -52,6 +63,7 @@ import { useAuthStore } from '@/stores/useAuthStore.js'
 
 // util
 import { formatDate, removeDecimal } from '@/util/util.js'
+import GraphBar from '@/components/GraphBar.vue'
 
 const authStore = useAuthStore()
 const weekendParams = ref([
@@ -137,6 +149,7 @@ watch(selectedDate, newDate => {
 
 onMounted(() => {
   fetchDailyAttendanceData(formatDate(selectedDate.value))
+  fetchWeekendWorkTime()
 })
 </script>
 <style scoped>

@@ -34,6 +34,16 @@
     <h2 class="mt-10">ProgressBar</h2>
     <VSpacer />
     <VProgressLinear :model-value="50" class="mx-n5 progress-custom" color="primary" height="25" />
+    <VSpacer />
+    <VCard>
+      <VCardText>
+        <h2>CKEditor</h2>
+        <VSpacer />
+        <VRow>
+          <GraphBar :labels="labels" :values="votes" />
+        </VRow>
+      </VCardText>
+    </VCard>
   </div>
 </template>
 <script setup>
@@ -45,10 +55,13 @@ import CKEditor from '@/components/ckeditor/CKEditor.vue'
 import InputDialog from '@/components/dialog/InputDialog.vue'
 import OneButtonDialog from '@/components/dialog/OneButtonDialog.vue'
 import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
+import GraphBar from '@/components/GraphBar.vue'
 
 const toast = useToast()
 
 const editorData = ref('<p>여기에 값을 입력하세요.🎉</p>')
+const labels = ref(['test1', 'test2', 'test3', 'test4', 'test5'])
+const votes = ref([12, 19, 3, 5, 2])
 
 const toastError = () => {
   toast.error('My toast content', {
