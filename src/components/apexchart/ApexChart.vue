@@ -177,7 +177,11 @@ const chartOptions = computed(() => {
       },
       responsive: [
         {
-          breakpoint: 900,
+          breakpoint: 1400,
+          options: { chart: { height: 250 } },
+        },
+        {
+          breakpoint: 960,
           options: { chart: { height: 350 } },
         },
         {
