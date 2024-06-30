@@ -5,12 +5,12 @@
       <VCardText>
         <VRow>
           <VCol cols="12" md="4">
-            <VImg :src="'src/assets/employee.jpg'" aspect-ratio="1.0" class="photo" />
+            <VImg :src="'src/assets/images/employee.jpg'" aspect-ratio="1.0" class="photo" />
           </VCol>
           <VCol cols="12" md="8">
             <v-row>
               <VCol cols="12" md="6">
-                <VTextField v-model="params.userName" class="custom-text-field" label="이름" :readonly="!isEditable" />
+                <VTextField v-model="params.userName" :readonly="!isEditable" class="custom-text-field" label="이름" />
               </VCol>
               <VCol cols="12" md="6">
                 <VTextField v-model="params.userId" class="custom-text-field" label="사번" readonly />
@@ -28,35 +28,35 @@
               <VCol cols="12" md="6">
                 <VTextField
                   v-model="params.userDepartmentName"
+                  :readonly="!isEditable"
                   class="custom-text-field"
                   label="소속 부서"
-                  :readonly="!isEditable"
                 />
               </VCol>
               <VCol cols="12" md="6">
                 <v-text-field
                   v-model="params.userTeamName"
+                  :readonly="!isEditable"
                   class="custom-text-field"
                   label="소속 팀"
-                  :readonly="!isEditable"
                 />
               </VCol>
             </v-row>
             <VRow>
               <VCol cols="12" md="6">
                 <VTextField
-                  v-model="params.userPositionName"
+                  v-model="params.userRankName"
+                  :readonly="!isEditable"
                   class="custom-text-field"
                   label="직위"
-                  :readonly="!isEditable"
                 />
               </VCol>
               <VCol cols="12" md="6">
                 <VTextField
-                  v-model="params.userRankName"
+                  v-model="params.userPositionName"
+                  :readonly="!isEditable"
                   class="custom-text-field"
                   label="직책"
-                  :readonly="!isEditable"
                 />
               </VCol>
             </VRow>
@@ -64,17 +64,17 @@
               <VCol cols="12" md="6">
                 <VTextField
                   v-model="params.userMobile"
+                  :readonly="!isEditable"
                   class="custom-text-field"
                   label="연락처"
-                  :readonly="!isEditable"
                 />
               </VCol>
               <VCol cols="12" md="6">
                 <VTextField
                   v-model="params.userEmail"
+                  :readonly="!isEditable"
                   class="custom-text-field"
                   label="이메일"
-                  :readonly="!isEditable"
                 />
               </VCol>
             </VRow>
@@ -90,7 +90,7 @@
         </VRow>
         <VRow>
           <VCol cols="12" md="8">
-            <VTextField v-model="params.userAddress" class="custom-text-field" label="주소" :readonly="!isEditable" />
+            <VTextField v-model="params.userAddress" :readonly="!isEditable" class="custom-text-field" label="주소" />
           </VCol>
           <VCol cols="12" md="4">
             <VTextField v-model="params.userRole" class="custom-text-field" label="권한" readonly />
@@ -116,18 +116,18 @@
             v-if="!params.userDeleteYn"
             :rightBtnAction="fetchUserDelete"
             button-name="삭제하기"
+            description="*작성 시, 직원 퇴사 사유에 반영됩니다."
+            inputLabel="퇴사 사유"
             right-btn-name="삭제"
             title="직원 퇴사 확인"
-            inputLabel="퇴사 사유"
-            description="*작성 시, 직원 퇴사 사유에 반영됩니다."
           />
         </VRow>
 
         <VRow>
           <TwoInputDialog
-            class="ml-auto mt-3"
             :rightBtnAction="onHandleUserPasswordBtn"
             button-name="비밀번호 수정하기"
+            class="ml-auto mt-3"
             right-btn-name="수정"
             title="직원 비밀번호 수정"
           />
@@ -178,18 +178,17 @@ import { VCardTitle } from 'vuetify/lib/components/index.mjs'
 import { useToast } from 'vue-toastification'
 
 // api
-import api from '@/api/axios'
+import api from '@/api/axios.js'
 
 // store
-import { useCodeStore } from '@/stores/useCodeStore'
-import { useAuthStore } from '@/stores/useAuthStore.js'
+import { useCodeStore } from '@/stores/useCodeStore.js'
 
 //constants
-import { TEAM_LIST, DEPATMENT_LIST, RANK_LIST, POSITION_LIST, userConstant } from '@/util/constants/userConstant'
-import { loginConstant } from '@/util/constants/loginConstant'
+import { DEPATMENT_LIST, POSITION_LIST, RANK_LIST, TEAM_LIST, userConstant } from '@/util/constants/userConstant.js'
+import { loginConstant } from '@/util/constants/loginConstant.js'
 
 // util
-import { validateEmail, validatePhoneNumber, validatePassword } from '@/util/util.js'
+import { validateEmail, validatePassword, validatePhoneNumber } from '@/util/util.js'
 
 const toast = useToast()
 
@@ -248,11 +247,14 @@ const fetchUserAbilities = async () => {
 }
 
 const fetchUserDelete = async content => {
+  if (!content) {
+    toast.error('퇴사사유를 입력해주세요.')
+    return
+  }
   const deleteInfo = {
     userId: userId.value,
     userDeleteReason: content,
   }
-
   try {
     const response = await api.post(`/admin/delete`, deleteInfo)
     console.log('[SUCCESS] fetchUserDelete response:', response.data)

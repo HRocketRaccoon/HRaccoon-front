@@ -55,8 +55,9 @@ const handleNavScroll = evt => {
     <!-- 👉 Header -->
     <div class="nav-header">
       <slot name="nav-header">
-        <RouterLink class="app-logo d-flex align-center gap-x-3 app-title-wrapper" to="/">
-          <h1 class="leading-normal">HRaccoon</h1>
+        <RouterLink class="app-logo d-flex align-center gap-x-3 app-title-wrapper" to="/home">
+          <h1 class="leading-normal nav-title d-flex">HRaccoon</h1>
+          <VImg :src="'src/assets/images/hraccoon_primary.png'" style="width: 60px; height: 60px" />
         </RouterLink>
       </slot>
     </div>
@@ -101,6 +102,10 @@ const handleNavScroll = evt => {
   .nav-header {
     display: flex;
     align-items: center;
+
+    .nav-title {
+      color: rgb(var(--v-theme-primary));
+    }
 
     .header-action {
       cursor: pointer;

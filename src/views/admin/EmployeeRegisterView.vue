@@ -4,7 +4,9 @@
     <VCard class="mb-4 h-100">
       <VCardText>
         <VRow>
-          <VCol cols="12" md="4"></VCol>
+          <VCol cols="12" md="4">
+            <VImg :src="params.userImageUrl" alt="직원 사진" />
+          </VCol>
           <VCol cols="12" md="8">
             <VRow>
               <VCol cols="12" md="6">
@@ -67,6 +69,26 @@
           </VCol>
         </VRow>
         <VRow>
+          <VCol>
+            <VFileInput
+              v-model="tempImg"
+              :show-size="1000"
+              color="primary"
+              counter
+              label="직원 사진"
+              placeholder="직원 사진을 등록해주세요."
+              prepend-icon="mdi-paperclip"
+              variant="outlined"
+            >
+              <template v-slot:selection="{ file }">
+                <VChip v-if="tempImgName.name" class="me-2" color="primary" label size="small">
+                  {{ tempImgName.name }}
+                </VChip>
+              </template>
+            </VFileInput>
+          </VCol>
+        </VRow>
+        <VRow>
           <VCol cols="12" md="8" />
           <VCol cols="12" md="4">
             <VRow>
@@ -90,7 +112,7 @@
   </div>
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
 import { useToast } from 'vue-toastification'
 import { VDateInput } from 'vuetify/labs/components'
@@ -101,15 +123,16 @@ import dayjs from 'dayjs'
 
 // util
 import {
-  TEAM_LIST,
   DEPATMENT_LIST,
-  RANK_LIST,
-  POSITION_LIST,
   GENDER,
+  POSITION_LIST,
+  RANK_LIST,
+  TEAM_LIST,
   userConstant,
 } from '@/util/constants/userConstant'
 import { loginConstant } from '@/util/constants/loginConstant'
-import { formatDate, getKeyByValue, validatePhoneNumber, validateEmail, validatePassword } from '@/util/util'
+import { formatDate, getKeyByValue, validateEmail, validatePassword, validatePhoneNumber } from '@/util/util'
+import { S3uploadImage } from '@/plugins/aws/s3.js'
 
 const toast = useToast()
 
@@ -136,6 +159,11 @@ const params = ref({
   userPosition: '',
   userTeam: '',
   userRank: '',
+  userImageUrl: '',
+})
+const tempImg = ref(null)
+const tempImgName = ref({
+  name: '',
 })
 
 const fetchUserInfo = async () => {
@@ -225,4 +253,21 @@ const onReset = () => {
   params.value.userTeam = ''
   params.value.userRank = ''
 }
+
+watch(
+  () => tempImg.value,
+  async newImageUrl => {
+    if (newImageUrl) {
+      params.value.userImageUrl = await S3uploadImage(newImageUrl)
+      tempImgName.value.name = newImageUrl.name
+    }
+  },
+)
+
+watch(
+  () => params.value.userImageUrl,
+  newImageUrl => {
+    console.log('newImageUrl:', newImageUrl)
+  },
+)
 </script>
