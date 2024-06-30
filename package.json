@@ -20,6 +20,7 @@
     "@vuepic/vue-datepicker": "^8.7.0",
     "@vueuse/core": "^10.9.0",
     "apexcharts": "^3.49.1",
+    "aws-sdk": "^2.1651.0",
     "axios": "^1.7.2",
     "chart.js": "^4.4.3",
     "ckeditor5-custom-build": "file:ckeditor5",
