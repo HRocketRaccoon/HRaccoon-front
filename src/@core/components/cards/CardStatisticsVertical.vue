@@ -35,7 +35,7 @@ const isPercentage = () => {
 </script>
 
 <template>
-  <VCard>
+  <VCard class="card-container">
     <VCardText class="d-flex align-center pb-4">
       <img :src="props.image" alt="image" width="42" />
 
@@ -58,3 +58,9 @@ const isPercentage = () => {
     </VCardText>
   </VCard>
 </template>
+
+<style lang="scss" scoped>
+.card-container {
+  height: 206px;
+}
+</style>

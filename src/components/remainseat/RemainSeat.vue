@@ -12,8 +12,8 @@
           />
         </VCol>
       </VRow>
-      <VList bg-color="transparent" class="d-flex flex-column-reverse mb-5" density="compact">
-        <VListItem v-for="(floor, index) in floors" :key="index" class="mb-5">
+      <VList bg-color="transparent" class="d-flex flex-column-reverse mb-4" density="compact">
+        <VListItem v-for="(floor, index) in floors" :key="index" class="mb-2">
           <VProgressLinear
             :class="`floor-${index}`"
             :color="colors[index]"
