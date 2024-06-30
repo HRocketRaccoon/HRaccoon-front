@@ -144,27 +144,6 @@
           to: '/search',
         }"
       />
-
-      <!-- 👉 에러 페이지 -->
-      <VerticalNavSectionTitle
-        :item="{
-          heading: '개발 페이지',
-        }"
-      />
-      <VerticalNavLink
-        :item="{
-          title: 'Error',
-          icon: 'bx-x',
-          to: '/no-existence',
-        }"
-      />
-      <VerticalNavLink
-        :item="{
-          title: '테스트 페이지',
-          icon: 'bx-x',
-          to: '/test',
-        }"
-      />
     </template>
 
     <!-- 👉 Pages -->
