@@ -1,26 +1,66 @@
 <template>
-  <VCard class="d-flex flex-column">
+  <VCard class="pa-5">
     <VCardTitle>Team Calendar</VCardTitle>
-
-    <div class="d-flex flex-column ml-auto py-8 pr-10">
-      <VCombobox
-        v-model="userTeam"
-        :items="teamList"
-        label="조회할 팀을 고르세요."
-        variant="outlined"
-        width="280px"
-      ></VCombobox>
-    </div>
-
-    <VueDatePickerComponent :markers="markers" @handleSelectCurrentDate="selectCurrentDate"></VueDatePickerComponent>
-
-    <div v-if="isDateSelected(selectDate)" class="tooltip">
-      <VDivider class="mb-2"></VDivider>
-      <div v-for="text in getDataBySelectDate(selectDate)" :key="text.id">
-        <p>{{ text }}</p>
-        <VDivider class="mb-2"></VDivider>
+    <VRow class="isMobile">
+      <div class="py-8">
+        <VCombobox
+          v-model="userTeam"
+          :items="teamList"
+          label="조회할 팀을 고르세요."
+          variant="outlined"
+          width="280px"
+        ></VCombobox>
       </div>
-    </div>
+    </VRow>
+    <VRow>
+      <VCol cols="12" md="7">
+        <div class="mb-5">
+          <VueDatePickerComponent
+            :markers="markers"
+            @handleSelectCurrentDate="selectCurrentDate"
+          ></VueDatePickerComponent>
+          <!-- <VDatePicker
+            v-model="selectDate"
+            :min="new Date('2010-01-01')"
+            placeholder="날짜를 선택하세요."
+            :allowed-dates="markers"
+            width="100%"
+          /> -->
+          <div v-if="isDateSelected(selectDate)" class="tooltip">
+            <VDivider class="mb-2"></VDivider>
+            <div v-for="text in getDataBySelectDate(selectDate)" :key="text.id">
+              <p>{{ text }}</p>
+              <VDivider class="mb-2"></VDivider>
+            </div>
+          </div>
+        </div>
+      </VCol>
+      <VCol cols="12" md="5" class="calcontent">
+        <VCombobox
+          class="isWeb"
+          v-model="userTeam"
+          :items="teamList"
+          label="조회할 팀을 고르세요."
+          variant="outlined"
+        ></VCombobox>
+        <v-card variant="outlined" class="mx-auto" color="#8592A3">
+          <div class="tips" v-show="showTips">
+            <div>
+              <div class="seat vacation"></div>
+              휴가
+            </div>
+            <div>
+              <div class="seat businesstrip"></div>
+              출장
+            </div>
+            <div>
+              <div class="seat outonbusiness"></div>
+              외근
+            </div>
+          </div>
+        </v-card>
+      </VCol>
+    </VRow>
   </VCard>
 </template>
 
@@ -45,7 +85,12 @@ const teamList = ref([
 const userTeam = ref('IT영업팀')
 const selectDate = ref(new Date())
 
+const markers = ref([])
+const tooltip = ref([])
+
 const teamApprovalInfo = ref([])
+
+const showTips = ref(true)
 
 const getTeamApprovalInfo = async () => {
   try {
@@ -58,9 +103,6 @@ const getTeamApprovalInfo = async () => {
     console.log('Error get userTeam:', error)
   }
 }
-
-const markers = ref([])
-const tooltip = ref([])
 
 const resetMarkersAndTooltips = () => {
   markers.value = []
@@ -78,7 +120,7 @@ const addMarkers = () => {
 
     // startDate부터 endDate까지의 모든 날짜를 포함
     while (currentDate <= endDate) {
-      const dateKey = dateStr(currentDate) // 날짜 문자열로 변환 (YYYY-MM-DD 형식)
+      const dateKey = dateStr(currentDate)
 
       if (!dateMap[dateKey]) {
         dateMap[dateKey] = []
@@ -87,7 +129,8 @@ const addMarkers = () => {
       dateMap[dateKey].push({
         userName: user.userName,
         approvalType: user.approvalType,
-        color: user.approvalType === 'BUSINESS_TRIP' ? 'blue' : user.approvalType === 'VACATION' ? 'green' : 'red',
+        color:
+          user.approvalType === 'BUSINESS_TRIP' ? '#FF3E1D' : user.approvalType === 'VACATION' ? '#71DD37' : '#FFAB00',
         startDate: dateStr(startDate),
         endDate: dateStr(endDate),
       })
@@ -103,6 +146,7 @@ const addMarkers = () => {
       type: 'dot',
       color: users[0].color,
     })
+    // markers.value.push(new Date(dateKey))
     users.map(user =>
       tooltip.value.push({
         date: new Date(dateKey),
@@ -130,7 +174,10 @@ const isDateSelected = date => {
 }
 
 const dateStr = date => {
-  return date.toISOString().replace(/T.*$/, '') // YYYY-MM-DD
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 
 const selectCurrentDate = date => {
@@ -155,7 +202,31 @@ watch(userTeam, getTeamApprovalInfo)
 .tooltip {
   display: flex;
   flex-direction: column;
-  padding-bottom: 35px;
   text-align: center;
+  margin-top: 10px;
+}
+.tips {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  padding: 1.5rem 0;
+}
+.isWeb {
+  margin-top: 20px;
+  margin-bottom: 50px;
+}
+.isMobile {
+  display: none;
+}
+@media (max-width: 960px) {
+  .isMobile {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 8px;
+  }
+  .isWeb {
+    display: none;
+  }
 }
 </style>
