@@ -14,6 +14,10 @@ const router = createRouter({
           component: () => import('@/views/auth/LoginView.vue'),
         },
         {
+          path: 'test',
+          component: () => import('@/views/dev/TestView.vue'),
+        },
+        {
           path: '/:pathMatch(.*)*',
           name: 'NotFound',
           component: () => import('@/views/exception/ErrorView.vue'),
@@ -72,10 +76,7 @@ const router = createRouter({
           path: 'seat',
           component: () => import('@/views/SeatView.vue'),
         },
-        {
-          path: 'test',
-          component: () => import('@/views/dev/TestView.vue'),
-        },
+
         /* 👉 관리자 */
         {
           path: '/admin/employee/list',
@@ -99,6 +100,9 @@ router.beforeEach((to, from, next) => {
   const isLoggedIn = !!sessionStorage.getItem('accessToken')
 
   if (!isLoggedIn && to.name !== 'SignIn') {
+    if (to.name === 'NotFound' || to.path === '/test') {
+      next()
+    }
     next({ name: 'SignIn' })
   } else {
     next()
