@@ -10,12 +10,28 @@
         <VCardText>
           <VRow>
             <VCol>
-              <VTextField v-model="topContent" :label="topInputLabel" auto-grow multi-line></VTextField>
+              <VTextField
+                v-model="topContent"
+                :append-inner-icon="isNewPasswordVisible ? 'bx-hide' : 'bx-show'"
+                :type="isNewPasswordVisible ? 'text' : 'password'"
+                :label="topInputLabel"
+                @click:append-inner="isNewPasswordVisible = !isNewPasswordVisible"
+                auto-grow
+                multi-line
+              ></VTextField>
             </VCol>
           </VRow>
           <VRow>
             <VCol>
-              <VTextField v-model="bottomContent" :label="bottomInputLabel" auto-grow multi-line></VTextField>
+              <VTextField
+                v-model="bottomContent"
+                :append-inner-icon="isConfirmPasswordVisible ? 'bx-hide' : 'bx-show'"
+                :type="isConfirmPasswordVisible ? 'text' : 'password'"
+                :label="bottomInputLabel"
+                @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
+                auto-grow
+                multi-line
+              ></VTextField>
             </VCol>
           </VRow>
           <small class="text-caption text-medium-emphasis">{{ description }}</small>
@@ -64,6 +80,9 @@ const props = defineProps({
     default: '*작성 시, 비밀번호 수정에 반영됩니다.',
   },
 })
+
+const isNewPasswordVisible = ref(false)
+const isConfirmPasswordVisible = ref(false)
 
 const dialog = ref(false)
 const topContent = ref('')
