@@ -38,7 +38,7 @@
           <h2 class="mb-4">금주 근무 시간</h2>
           <VSpacer />
           <VRow>
-            <GraphBar />
+            <GraphBar :labels="defaultGraphLabels" :values="weekendGraphValues" />
           </VRow>
         </VCardText>
       </VCard>
@@ -68,7 +68,7 @@ import GraphBar from '@/components/GraphBar.vue'
 const authStore = useAuthStore()
 const weekendParams = ref([
   { name: '월', status: '8시간' },
-  { name: '화', status: '8시간' },
+  { name: '화', status: '7시간' },
   { name: '수', status: '8시간' },
   { name: '목', status: '8시간' },
   { name: '금', status: '8시간' },
@@ -81,11 +81,13 @@ const dailyParams = ref({
 })
 const chartParams = ref({
   text: '총 근무 시간',
-  percent: 50,
+  percent: 99,
   totalTime: 40,
-  currentTime: 20,
+  currentTime: 39,
 })
 const userNo = ref(authStore.userNo || null)
+const weekendGraphValues = ref([8, 7, 8, 8, 8])
+const defaultGraphLabels = ref([' 월요일', '화요일', '수요일', '목요일', '금요일'])
 
 // logic variables
 const selectedDate = ref(new Date(new Date().setDate(new Date().getDate() - 1)))
@@ -137,7 +139,7 @@ watch(
   userNo,
   async newUserNo => {
     if (newUserNo) {
-      await fetchAttendanceChartData()
+      /* await fetchAttendanceChartData() */
     }
   },
   { immediate: true },
@@ -149,7 +151,7 @@ watch(selectedDate, newDate => {
 
 onMounted(() => {
   fetchDailyAttendanceData(formatDate(selectedDate.value))
-  fetchWeekendWorkTime()
+  /*fetchWeekendWorkTime()*/
 })
 </script>
 <style scoped>
