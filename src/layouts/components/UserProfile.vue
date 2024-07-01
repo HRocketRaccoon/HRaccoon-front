@@ -2,7 +2,7 @@
   <VBadge bordered color="success" dot location="bottom right" offset-x="3" offset-y="3">
     <VAvatar class="cursor-pointer" color="primary" variant="tonal">
       <!--      VIMg-->
-
+      <v-img cover src="https://hraccoon-image-bucket.s3.ap-northeast-2.amazonaws.com/apple-icon-72x72.png" />
       <!-- SECTION Menu -->
       <VMenu activator="parent" location="bottom end" offset="14px" width="230">
         <VList>
@@ -12,7 +12,10 @@
               <VListItemAction start>
                 <VBadge color="success" dot location="bottom right" offset-x="3" offset-y="3">
                   <VAvatar color="primary" variant="tonal">
-                    <!-- Vimg -->
+                    <v-img
+                      cover
+                      src="https://hraccoon-image-bucket.s3.ap-northeast-2.amazonaws.com/apple-icon-72x72.png"
+                    />
                   </VAvatar>
                 </VBadge>
               </VListItemAction>

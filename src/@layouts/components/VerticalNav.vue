@@ -57,7 +57,6 @@ const handleNavScroll = evt => {
       <slot name="nav-header">
         <RouterLink class="app-logo d-flex align-center gap-x-3 app-title-wrapper" to="/home">
           <h1 class="leading-normal nav-title d-flex">HRaccoon</h1>
-          <VImg :src="'src/assets/images/hraccoon_primary.png'" style="width: 60px; height: 60px" />
         </RouterLink>
       </slot>
     </div>
