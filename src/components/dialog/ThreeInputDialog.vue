@@ -15,6 +15,11 @@
           </VRow>
           <VRow>
             <VCol>
+              <VTextField v-model="centerContent" :label="centerInputLabel" auto-grow multi-line></VTextField>
+            </VCol>
+          </VRow>
+          <VRow>
+            <VCol>
               <VTextField v-model="bottomContent" :label="bottomInputLabel" auto-grow multi-line></VTextField>
             </VCol>
           </VRow>
@@ -53,6 +58,10 @@ const props = defineProps({
   },
   topInputLabel: {
     type: String,
+    default: '기존 비밀번호',
+  },
+  centerInputLabel: {
+    type: String,
     default: '새 비밀번호',
   },
   bottomInputLabel: {
@@ -67,12 +76,14 @@ const props = defineProps({
 
 const dialog = ref(false)
 const topContent = ref('')
+const centerContent = ref('')
 const bottomContent = ref('')
 
 const handleRightBtnClick = () => {
-  props.rightBtnAction(topContent.value, bottomContent.value)
+  props.rightBtnAction(topContent.value, centerContent.value, bottomContent.value)
   dialog.value = false
   topContent.value = ''
+  centerContent.value = ''
   bottomContent.value = ''
 }
 </script>

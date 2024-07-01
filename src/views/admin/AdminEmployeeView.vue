@@ -314,6 +314,7 @@ const fetchUpdateUserInfo = async () => {
     }
 
     toast.success('해당 직원의 정보가 수정되었습니다.')
+    await fetchUserInfo()
   } catch (error) {
     console.error('[ERROR] fetchUpdateUserInfo error:', error.response)
     toast.error(error.response.data.message)
