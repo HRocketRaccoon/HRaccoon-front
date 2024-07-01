@@ -57,61 +57,62 @@
       <VTab text="근무 좌석 정보" value="tab-1"></VTab>
       <VTab text="개인 역량" value="tab-2"></VTab>
     </VTabs>
-
-    <VCardText>
-      <VRow>
-        <VTabsWindow v-model="tab">
-          <VTabsWindowItem v-for="i in 2" :key="i" :value="'tab-' + i">
-            <VCol>
-              <div v-if="i === 1">
-                <VForm v-if="userSeat.seatOffice">
-                  <VRow>
-                    <VCol cols="12" md="6">
-                      <VTextField
-                        v-model="userSeat.seatOffice"
-                        class="custom-text-field"
-                        label="현 근무장소"
-                        readonly
-                      />
-                    </VCol>
-                    <VCol cols="12" md="6">
-                      <VTextField v-model="seatCustomLocation" class="custom-text-field" label="좌석" readonly />
-                    </VCol>
-                  </VRow>
-                </VForm>
-                <VForm v-else>자리에 없습니다.</VForm>
-              </div>
-              <div v-if="i === 2">
-                <VForm>
-                  <VRow>
-                    <VCol cols="12">
-                      <VChipGroup>
-                        <VChip v-for="(ability, index) in userAbilities" :key="index">
-                          {{ ability }}
-                        </VChip>
-                      </VChipGroup>
-                    </VCol>
-                  </VRow>
-                </VForm>
-              </div>
-            </VCol>
-          </VTabsWindowItem>
-        </VTabsWindow>
-      </VRow>
-      <VRow>
-        <VBtn
-          class="ml-auto"
-          size="large"
-          variant="tonal"
-          @click="
-            () => {
-              router.go(-1)
-            }
-          "
-          >뒤로 가기
-        </VBtn>
-      </VRow>
-    </VCardText>
+    <VTabsWindow v-model="tab">
+      <VTabsWindowItem v-for="i in 2" :key="i" :value="'tab-' + i">
+        <VCardText>
+          <div v-if="i === 1">
+            <VRow v-if="userSeat.seatOffice">
+              <VCol cols="12" md="6">
+                <VTextField v-model="userSeat.seatOffice" label="현 근무장소" readonly />
+              </VCol>
+              <VCol cols="12" md="6">
+                <VTextField v-model="seatCustomLocation" label="좌석" readonly />
+              </VCol>
+            </VRow>
+            <VRow v-else>자리에 없습니다.</VRow>
+            <VRow>
+              <VBtn
+                class="ml-auto"
+                size="large"
+                variant="tonal"
+                @click="
+                  () => {
+                    router.go(-1)
+                  }
+                "
+                >뒤로 가기
+              </VBtn>
+            </VRow>
+          </div>
+          <div v-if="i === 2">
+            <VForm>
+              <VRow>
+                <VCol cols="12">
+                  <VChipGroup>
+                    <VChip v-for="(ability, index) in userAbilities" :key="index">
+                      {{ ability }}
+                    </VChip>
+                  </VChipGroup>
+                </VCol>
+              </VRow>
+              <VRow>
+                <VBtn
+                  class="ml-auto"
+                  size="large"
+                  variant="tonal"
+                  @click="
+                    () => {
+                      router.go(-1)
+                    }
+                  "
+                  >뒤로 가기
+                </VBtn>
+              </VRow>
+            </VForm>
+          </div>
+        </VCardText>
+      </VTabsWindowItem>
+    </VTabsWindow>
   </VCard>
 </template>
 
