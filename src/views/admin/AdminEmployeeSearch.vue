@@ -69,7 +69,7 @@
 </template>
 <script setup>
 import { onMounted, ref } from 'vue'
-import EmployeeTable from '@/components/admin/AdminEmployeeTable.vue'
+import EmployeeTable from '@/components/table/AdminEmployeeTable.vue'
 
 // api
 import axios from '@/api/axios'
@@ -77,7 +77,7 @@ import axios from '@/api/axios'
 // store
 import { useCodeStore } from '@/stores/useCodeStore'
 
-import { DEPATMENT_LIST, ABILITY_LIST } from '@/util/constants/userConstant'
+import { ABILITY_LIST, DEPATMENT_LIST } from '@/util/constants/userConstant'
 
 const store = useCodeStore()
 const departmentList = DEPATMENT_LIST
