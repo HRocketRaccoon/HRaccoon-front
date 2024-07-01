@@ -4,7 +4,7 @@
     <VCardText>
       <VRow>
         <VCol cols="12" md="4">
-          <VImg aspect-ratio="1.0" class="photo" src="https://cdn.vuetifyjs.com/images/parallax/material.jpg"></VImg>
+          <VImg :src="params.userImageUrl" style="max-width: 420px" />
         </VCol>
         <VCol cols="12" md="8">
           <VRow>
