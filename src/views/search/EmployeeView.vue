@@ -4,7 +4,7 @@
     <VCardText>
       <VRow>
         <VCol cols="12" md="4">
-          <VImg :src="'src/assets/employee.jpg'" aspect-ratio="1.0" class="photo" />
+          <VImg :src="params.userImageUrl" style="max-height: 420px" />
         </VCol>
         <VCol cols="12" md="8">
           <v-row>
@@ -57,33 +57,22 @@
       <VTab text="근무 좌석 정보" value="tab-1"></VTab>
       <VTab text="개인 역량" value="tab-2"></VTab>
     </VTabs>
+
     <VTabsWindow v-model="tab">
       <VTabsWindowItem v-for="i in 2" :key="i" :value="'tab-' + i">
         <VCardText>
-          <div v-if="i === 1">
+          <div v-if="i === 1" class="w-100">
             <VRow v-if="userSeat.seatOffice">
               <VCol cols="12" md="6">
-                <VTextField v-model="userSeat.seatOffice" label="현 근무장소" readonly />
+                <VTextField v-model="userSeat.seatOffice" class="custom-text-field" label="현 근무장소" readonly />
               </VCol>
               <VCol cols="12" md="6">
-                <VTextField v-model="seatCustomLocation" label="좌석" readonly />
+                <VTextField v-model="seatCustomLocation" class="custom-text-field" label="좌석" readonly />
               </VCol>
             </VRow>
             <VRow v-else>자리에 없습니다.</VRow>
-            <VRow>
-              <VBtn
-                class="ml-auto"
-                size="large"
-                variant="tonal"
-                @click="
-                  () => {
-                    router.go(-1)
-                  }
-                "
-                >뒤로 가기
-              </VBtn>
-            </VRow>
           </div>
+
           <div v-if="i === 2">
             <VForm>
               <VRow>
@@ -95,21 +84,21 @@
                   </VChipGroup>
                 </VCol>
               </VRow>
-              <VRow>
-                <VBtn
-                  class="ml-auto"
-                  size="large"
-                  variant="tonal"
-                  @click="
-                    () => {
-                      router.go(-1)
-                    }
-                  "
-                  >뒤로 가기
-                </VBtn>
-              </VRow>
             </VForm>
           </div>
+          <VRow class="mt-4">
+            <VBtn
+              class="ml-auto"
+              size="large"
+              variant="tonal"
+              @click="
+                () => {
+                  router.go(-1)
+                }
+              "
+              >뒤로 가기
+            </VBtn>
+          </VRow>
         </VCardText>
       </VTabsWindowItem>
     </VTabsWindow>
@@ -122,10 +111,10 @@ import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 
 // api
-import api from '@/api/axios'
+import api from '@/api/axios.js'
 
 // store
-import { useCodeStore } from '@/stores/useCodeStore'
+import { useCodeStore } from '@/stores/useCodeStore.js'
 import { useAuthStore } from '@/stores/useAuthStore.js'
 
 const router = useRouter()
