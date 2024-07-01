@@ -33,10 +33,10 @@
           </v-row>
           <VRow>
             <VCol cols="12" md="6">
-              <VTextField v-model="params.userPositionName" class="custom-text-field" label="직위" readonly />
+              <VTextField v-model="params.userRankName" class="custom-text-field" label="직위" readonly />
             </VCol>
             <VCol cols="12" md="6">
-              <VTextField v-model="params.userRankName" class="custom-text-field" label="직책" readonly />
+              <VTextField v-model="params.userPositionName" class="custom-text-field" label="직책" readonly />
             </VCol>
           </VRow>
           <VRow>
