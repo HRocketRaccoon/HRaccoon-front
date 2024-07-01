@@ -4,7 +4,7 @@
     <VCardText>
       <VRow>
         <VCol cols="12" md="4">
-          <VImg :src="params.userImageUrl" style="max-width: 420px" />
+          <VImg :src="params.userImageUrl" style="max-height: 420px" />
         </VCol>
         <VCol cols="12" md="8">
           <VRow>
@@ -33,10 +33,10 @@
           </VRow>
           <VRow>
             <VCol cols="12" md="6">
-              <VTextField v-model="params.userPositionName" class="custom-text-field" label="직위" readonly />
+              <VTextField v-model="params.userPositionName" class="custom-text-field" label="직책" readonly />
             </VCol>
             <VCol cols="12" md="6">
-              <VTextField v-model="params.userRankName" class="custom-text-field" label="직책" readonly />
+              <VTextField v-model="params.userRankName" class="custom-text-field" label="직위" readonly />
             </VCol>
           </VRow>
           <VRow>

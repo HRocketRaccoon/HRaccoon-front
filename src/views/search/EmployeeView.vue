@@ -4,7 +4,7 @@
     <VCardText>
       <VRow>
         <VCol cols="12" md="4">
-          <VImg :src="'src/assets/employee.jpg'" aspect-ratio="1.0" class="photo" />
+          <VImg :src="params.userImageUrl" style="max-height: 420px" />
         </VCol>
         <VCol cols="12" md="8">
           <v-row>
@@ -33,10 +33,10 @@
           </v-row>
           <VRow>
             <VCol cols="12" md="6">
-              <VTextField v-model="params.userPositionName" class="custom-text-field" label="직위" readonly />
+              <VTextField v-model="params.userRankName" class="custom-text-field" label="직위" readonly />
             </VCol>
             <VCol cols="12" md="6">
-              <VTextField v-model="params.userRankName" class="custom-text-field" label="직책" readonly />
+              <VTextField v-model="params.userPositionName" class="custom-text-field" label="직책" readonly />
             </VCol>
           </VRow>
           <VRow>
@@ -121,10 +121,10 @@ import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 
 // api
-import api from '@/api/axios'
+import api from '@/api/axios.js'
 
 // store
-import { useCodeStore } from '@/stores/useCodeStore'
+import { useCodeStore } from '@/stores/useCodeStore.js'
 import { useAuthStore } from '@/stores/useAuthStore.js'
 
 const router = useRouter()

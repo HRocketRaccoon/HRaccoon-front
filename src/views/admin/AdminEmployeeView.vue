@@ -5,7 +5,7 @@
       <VCardText>
         <VRow>
           <VCol cols="12" md="4">
-            <VImg :src="'src/assets/images/employee.jpg'" aspect-ratio="1.0" class="photo" />
+            <VImg :src="params.userImageUrl" style="max-height: 420px" />
           </VCol>
           <VCol cols="12" md="8">
             <v-row>
