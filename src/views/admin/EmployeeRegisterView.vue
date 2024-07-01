@@ -134,7 +134,10 @@ import { loginConstant } from '@/util/constants/loginConstant'
 import { formatDate, getKeyByValue, validateEmail, validatePassword, validatePhoneNumber } from '@/util/util'
 import { S3uploadImage } from '@/plugins/aws/s3.js'
 
+import { useRouter } from 'vue-router'
+
 const toast = useToast()
+const router = useRouter()
 
 const { NOT_VALID_PHONE, NOT_VALID_EMAIL, NOT_VALID_ADDRESS } = userConstant
 
@@ -190,6 +193,7 @@ const fetchUserInfo = async () => {
 
     toast.success(response.data.message)
     onReset()
+    router.push(`/admin/employee/edit/${userInfo.userId}`)
   } catch (error) {
     console.error('[ERROR] fetchUserInfo error: ', error)
     toast.error(error.response.data.message)

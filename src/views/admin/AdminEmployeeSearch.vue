@@ -70,6 +70,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import EmployeeTable from '@/components/table/AdminEmployeeTable.vue'
+import { useToast } from 'vue-toastification'
 
 // api
 import axios from '@/api/axios'
@@ -78,6 +79,8 @@ import axios from '@/api/axios'
 import { useCodeStore } from '@/stores/useCodeStore'
 
 import { ABILITY_LIST, DEPATMENT_LIST } from '@/util/constants/userConstant'
+
+const toast = useToast()
 
 const store = useCodeStore()
 const departmentList = DEPATMENT_LIST
@@ -125,6 +128,7 @@ const fetchEmployeeList = async () => {
     await setEmployeeAbility(params.value)
   } catch (error) {
     console.log('Error get Employee:', error)
+    toast.error(error.response.data.message)
   }
 }
 
