@@ -117,7 +117,7 @@
                     v-for="(ability, index) in modifiedAbilities"
                     :key="index"
                     :closable="isEditableAbilities"
-                    @click="isEditableAbilities && removeAbility(index)"
+                    @click:close="isEditableAbilities && removeAbility(index)"
                   >
                     {{ ability.abilityName }}
                   </VChip>
@@ -175,7 +175,7 @@ import { useCodeStore } from '/src/stores/useCodeStore.js'
 import { useAuthStore } from '@/stores/useAuthStore.js'
 
 // util
-import { validateEmail, validatePhoneNumber, validatePassword } from '@/util/util.js'
+import { validateEmail, validatePassword, validatePhoneNumber } from '@/util/util.js'
 
 //constant
 import { userConstant } from '@/util/constants/userConstant.js'
@@ -358,8 +358,11 @@ const onHandleAbilityBtn = () => {
 }
 
 const removeAbility = index => {
+  console.log('::::::::testese::::::::::::::')
   if (modifiedAbilities.value.length > 1) {
     modifiedAbilities.value.splice(index, 1)
+
+    console.log('::::::::::::', modifiedAbilities.value)
   } else {
     toast.error(ABILITY_REMAIN)
   }
@@ -396,7 +399,19 @@ const formatPhoneNumber = event => {
   params.value.userMobile = phoneNumber
 }
 
-watch(modifiedAbilities, newVal => {}, { deep: true })
+watch(
+  modifiedAbilities.value,
+  newVal => {
+    console.log('modifiedAbilities:', newVal)
+  },
+  { deep: true },
+)
+watch(
+  () => isEditableAbilities.value,
+  newVal => {
+    console.log('isEditableAbilities:', newVal)
+  },
+)
 
 onMounted(() => {
   fetchUserInfo()
