@@ -15,6 +15,7 @@ const router = createRouter({
         },
         {
           path: 'test',
+          name: 'Test',
           component: () => import('@/views/dev/TestView.vue'),
         },
         {
@@ -100,10 +101,11 @@ router.beforeEach((to, from, next) => {
   const isLoggedIn = !!sessionStorage.getItem('accessToken')
 
   if (!isLoggedIn && to.name !== 'SignIn') {
-    if (to.name === 'NotFound' || to.path === '/test') {
+    if (to.name === 'Test') {
       next()
+    } else {
+      next({ name: 'SignIn' })
     }
-    next({ name: 'SignIn' })
   } else {
     next()
   }
