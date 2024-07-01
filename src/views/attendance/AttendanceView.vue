@@ -94,6 +94,7 @@ const fetchAttendanceChartData = async () => {
     monthlyChartParams.value.percent = removeDecimal(response.data.data.formattedPercent)
     monthlyChartParams.value.currentTime = response.data.data.totalWorkHours
     monthlyChartParams.value.totalTime = response.data.data.totalHours
+    monthlyChartParams.value.text = '월별 근무시간 달성률'
   } catch (error) {
     console.error('[ERROR] fetchAttendanceChartData error:', error)
   }
