@@ -50,7 +50,13 @@
         </VCol>
       </VRow>
       <VRow>
-        <VBtn class="ml-auto" color="primary" size="large">비밀번호 수정하기</VBtn>
+        <ThreeInputDialog
+          :rightBtnAction="onHandleUserPasswordBtn"
+          button-name="비밀번호 수정하기"
+          class="ml-auto mt-3"
+          right-btn-name="수정"
+          title="직원 비밀번호 수정"
+        />
       </VRow>
     </VCardText>
   </VCard>
@@ -159,6 +165,7 @@
 import { onMounted, ref, watch } from 'vue'
 import dayjs from 'dayjs'
 import { useToast } from 'vue-toastification'
+import ThreeInputDialog from '@/components/dialog/ThreeInputDialog.vue'
 
 // api
 import api from '/src/api/axios.js'
@@ -168,10 +175,11 @@ import { useCodeStore } from '/src/stores/useCodeStore.js'
 import { useAuthStore } from '@/stores/useAuthStore.js'
 
 // util
-import { validateEmail, validatePhoneNumber } from '@/util/util.js'
+import { validateEmail, validatePhoneNumber, validatePassword } from '@/util/util.js'
 
 //constant
 import { userConstant } from '@/util/constants/userConstant.js'
+import { loginConstant } from '@/util/constants/loginConstant.js'
 
 const useAuth = useAuthStore()
 const store = useCodeStore()
@@ -265,6 +273,23 @@ const fetchUpdateUserInfo = async () => {
   }
 }
 
+const fetchUpdateUserPassword = async (topContent, centerContent, bottomContent) => {
+  try {
+    const response = await api.post(`/user/${userId.value}/change-password`, {
+      userId: userId.value,
+      originPassword: topContent,
+      newPassword: centerContent,
+      confirmPassword: bottomContent,
+    })
+    console.log('[SUCCESS] fetchUpdateUserPassword response:', response.data)
+
+    toast.success('해당 직원의 비밀번호가 수정되었습니다.')
+  } catch (error) {
+    console.error('[ERROR] fetchUpdateUserPassword error:', error.response)
+    toast.error(error.response.data.message)
+  }
+}
+
 const fetchUpdateUserAbilities = async () => {
   try {
     const response = await api.post(
@@ -309,6 +334,18 @@ const onHandleUserBtn = () => {
     fetchUpdateUserInfo()
   } else {
     isEditable.value = true
+  }
+}
+
+const onHandleUserPasswordBtn = (topContent, centerContent, bottomContent) => {
+  if (!validatePassword(centerContent)) {
+    toast.error(loginConstant.AUTH_PASSWORD_REGEX)
+    return
+  }
+  if (centerContent === bottomContent) {
+    fetchUpdateUserPassword(topContent, centerContent, bottomContent)
+  } else {
+    toast.error('비밀번호가 일치하지 않습니다.')
   }
 }
 
