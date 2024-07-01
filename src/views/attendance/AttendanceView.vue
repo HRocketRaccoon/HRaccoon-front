@@ -151,7 +151,7 @@ watch(selectedDate, newDate => {
 
 onMounted(() => {
   fetchDailyAttendanceData(formatDate(selectedDate.value))
-  /*fetchWeekendWorkTime()*/
+  fetchWeekendWorkTime()
 })
 </script>
 <style scoped>

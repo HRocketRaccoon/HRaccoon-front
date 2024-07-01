@@ -96,6 +96,26 @@
             <VTextField v-model="params.userRole" class="custom-text-field" label="권한" readonly />
           </VCol>
         </VRow>
+        <VRow v-if="isEditable">
+          <VCol>
+            <VFileInput
+              v-model="tempImg"
+              :show-size="1000"
+              color="primary"
+              counter
+              label="수정할 직원 사진"
+              placeholder="수정할 직원 사진을 등록해주세요."
+              prepend-icon="mdi-paperclip"
+              variant="outlined"
+            >
+              <template v-slot:selection="{ file }">
+                <VChip v-if="tempImgName.name" class="me-2" color="primary" label size="small">
+                  {{ tempImgName.name }}
+                </VChip>
+              </template>
+            </VFileInput>
+          </VCol>
+        </VRow>
 
         <VRow>
           <VBtn v-if="!isEditable" class="ml-auto mr-5" color="primary" size="large" @click="onHandleUserBtn">
@@ -168,7 +188,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import TwoButtonDialog from '@/components/dialog/TwoButtonDialog.vue'
@@ -189,6 +209,7 @@ import { loginConstant } from '@/util/constants/loginConstant.js'
 
 // util
 import { validateEmail, validatePassword, validatePhoneNumber } from '@/util/util.js'
+import { S3uploadImage } from '@/plugins/aws/s3.js'
 
 const toast = useToast()
 
@@ -206,7 +227,12 @@ const store = useCodeStore()
 const params = ref({})
 const userId = ref(route.params.userId)
 const userAbilities = ref([])
-const userDeleteReason = ref('')
+
+const tempImg = ref(null)
+const tempImgName = ref({
+  name: '',
+})
+
 const isEditable = ref(false)
 
 const fetchUserInfo = async () => {
@@ -279,6 +305,7 @@ const fetchUpdateUserInfo = async () => {
       userTeam: params.value.userTeamName,
       userRank: params.value.userRankName,
       userRole: setUserRole(params.value.userTeamName),
+      userImageUrl: params.value.userImageUrl,
     })
     console.log('[SUCCESS] fetchUpdateUserInfo response:', response.data)
 
@@ -376,6 +403,16 @@ const setUserRole = team => {
     return 'USER'
   }
 }
+
+watch(
+  () => tempImg.value,
+  async newImageUrl => {
+    if (newImageUrl) {
+      params.value.userImageUrl = await S3uploadImage(newImageUrl)
+      tempImgName.value.name = newImageUrl.name
+    }
+  },
+)
 
 onMounted(() => {
   fetchUserInfo()
