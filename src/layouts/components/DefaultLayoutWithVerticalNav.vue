@@ -16,7 +16,7 @@
 
         <NavbarThemeSwitcher class="me-2" />
 
-        <UserProfile class="me-4" />
+        <UserPr경ofile class="me-4" />
 
         <TwoButtonDialog
           :right-btn-action="onHandleDialogButton"

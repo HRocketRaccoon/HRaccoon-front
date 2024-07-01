@@ -1,22 +1,20 @@
 <template>
-  <VCol cols="12">
-    <VCard>
-      <VTabs v-model="navigationTab" align-tabs="center">
-        <VTab v-for="item in tabItems" :key="item" :value="item">
-          {{ item }}
-        </VTab>
-      </VTabs>
-      <VDivider />
-      <VWindow v-model="navigationTab">
-        <VWindowItem v-for="item in tabItems" :key="item" :value="item" class="text-center">
-          <VCardItem>
-            <VCardTitle>{{ formatKoreanDate(selectedAttendanceDate) }}</VCardTitle>
-          </VCardItem>
-          <VCardText>{{ getTabContent(item) }}</VCardText>
-        </VWindowItem>
-      </VWindow>
-    </VCard>
-  </VCol>
+  <VCard>
+    <VTabs v-model="navigationTab" align-tabs="center">
+      <VTab v-for="item in tabItems" :key="item" :value="item">
+        {{ item }}
+      </VTab>
+    </VTabs>
+    <VDivider />
+    <VWindow v-model="navigationTab">
+      <VWindowItem v-for="item in tabItems" :key="item" :value="item" class="text-center">
+        <VCardItem>
+          <VCardTitle>{{ formatKoreanDate(selectedAttendanceDate) }}</VCardTitle>
+        </VCardItem>
+        <VCardText>{{ getTabContent(item) }}</VCardText>
+      </VWindowItem>
+    </VWindow>
+  </VCard>
 </template>
 
 <script setup>

@@ -358,7 +358,7 @@ const onHandleAbilityBtn = () => {
 }
 
 const removeAbility = index => {
-  console.log('::::::::testese::::::::::::::')
+  console.log(':::::::::: testese ::::::::::::')
   if (modifiedAbilities.value.length > 1) {
     modifiedAbilities.value.splice(index, 1)
 

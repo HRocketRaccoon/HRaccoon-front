@@ -82,3 +82,16 @@ export const validatePhoneNumber = phoneNumber => {
   const regex = /^\d{3}-\d{4}-\d{4}$/
   return regex.test(phoneNumber)
 }
+
+/**
+ * @description 시간의 반올림을 구하는 함수.
+ * @param timeString
+ * @returns {number}
+ */
+export const roundHour = timeString => {
+  const [hours, minutes, seconds] = timeString.split(':').map(Number)
+  const totalSeconds = hours * 3600 + minutes * 60 + seconds
+  const totalHours = totalSeconds / 3600
+
+  return Math.round(totalHours)
+}

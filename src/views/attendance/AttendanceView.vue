@@ -2,7 +2,7 @@
   <h1 class="mb-2">| 근태 관리</h1>
   <VRow>
     <VCol>
-      <VCard class="date-picker-card">
+      <VCard class="date-picker-card h-100">
         <VDatePicker
           v-model="selectedDate"
           :max="yesterday"
@@ -20,31 +20,28 @@
         :end-time="dailyParams.endTime"
         :selected-attendance-date="dailyParams.selectedAttendanceDate"
         :start-time="dailyParams.startTime"
+        class="mb-4"
       />
-    </VCol>
-    <VCol>
-      <VCard class="card-container">
-        <h2>총 근무시간</h2>
+      <VCard>
         <VCardText>
-          <AttendanceApexChart :params="chartParams" />
+          <AttendanceApexChart :params="monthlyChartParams" />
         </VCardText>
       </VCard>
     </VCol>
   </VRow>
   <VRow>
     <VCol cols="12" md="6">
-      <VCard>
+      <VCard class="h-100">
         <VCardText>
           <h2 class="mb-4">금주 근무 시간</h2>
-          <VSpacer />
           <VRow>
-            <GraphBar :labels="defaultGraphLabels" :values="weekendGraphValues" />
+            <GraphBar :labels="defaultGraphLabels" :values="weekendGraphValues" style="width: auto; height: auto" />
           </VRow>
         </VCardText>
       </VCard>
     </VCol>
     <VCol cols="12" md="6">
-      <WorkTime :work-hours="weekendParams" />
+      <WorkTimeListCard :datas="weekendParams" />
     </VCol>
   </VRow>
 </template>
@@ -53,7 +50,7 @@
 import { onMounted, ref, watch } from 'vue'
 
 // components
-import WorkTime from '@/components/WorkTime.vue'
+import WorkTimeListCard from '@/components/WorkTimeListCard.vue'
 import CardNavigation from '@/components/CardNavigation.vue'
 import AttendanceApexChart from '@/components/apexchart/AttendanceApexChart.vue'
 
@@ -62,16 +59,16 @@ import api from '@/api/axios.js'
 import { useAuthStore } from '@/stores/useAuthStore.js'
 
 // util
-import { formatDate, removeDecimal } from '@/util/util.js'
+import { formatDate, removeDecimal, roundHour } from '@/util/util.js'
 import GraphBar from '@/components/GraphBar.vue'
 
 const authStore = useAuthStore()
 const weekendParams = ref([
-  { name: '월', status: '8시간' },
-  { name: '화', status: '7시간' },
-  { name: '수', status: '8시간' },
-  { name: '목', status: '8시간' },
-  { name: '금', status: '8시간' },
+  { attendanceDay: '월', attendanceTotalTime: '8' },
+  { attendanceDay: '화', attendanceTotalTime: '7' },
+  { attendanceDay: '수', attendanceTotalTime: '8' },
+  { attendanceDay: '목', attendanceTotalTime: '8' },
+  { attendanceDay: '금', attendanceTotalTime: '8' },
 ])
 const dailyParams = ref({
   /* 형식 확인 */
@@ -79,15 +76,11 @@ const dailyParams = ref({
   startTime: '2024-06-03T00:45:04',
   endTime: '2024-06-03T12:45:01',
 })
-const chartParams = ref({
-  text: '총 근무 시간',
-  percent: 99,
-  totalTime: 40,
-  currentTime: 39,
-})
-const userNo = ref(authStore.userNo || null)
-const weekendGraphValues = ref([8, 7, 8, 8, 8])
+const monthlyChartParams = ref({})
+const weekendGraphValues = ref([])
 const defaultGraphLabels = ref([' 월요일', '화요일', '수요일', '목요일', '금요일'])
+
+const userNo = ref(authStore.userNo || null)
 
 // logic variables
 const selectedDate = ref(new Date(new Date().setDate(new Date().getDate() - 1)))
@@ -95,11 +88,12 @@ const yesterday = ref(new Date(new Date().setDate(new Date().getDate() - 1)))
 
 const fetchAttendanceChartData = async () => {
   try {
-    const response = await api.get(`/attendance/weektotalpercent/${userNo.value}`)
+    const response = await api.get(`/attendance/monthtotalpercent/${userNo.value}`)
     console.log('[SUCCESS] fetchAttendanceChartData response:', response)
 
-    chartParams.value.percent = removeDecimal(response.data.data.formattedPercent)
-    chartParams.value.currentTime = response.data.data.totalWorkHours
+    monthlyChartParams.value.percent = removeDecimal(response.data.data.formattedPercent)
+    monthlyChartParams.value.currentTime = response.data.data.totalWorkHours
+    monthlyChartParams.value.totalTime = response.data.data.totalHours
   } catch (error) {
     console.error('[ERROR] fetchAttendanceChartData error:', error)
   }
@@ -129,7 +123,12 @@ const fetchWeekendWorkTime = async () => {
     const response = await api.get(`/attendance/worktimeperdate/${userNo.value}`)
     console.log('[SUCCESS] fetchWeekendWorkTime response:', response)
 
-    weekendParams.value = response.data.data
+    weekendParams.value = response.data.data.slice(0, -2)
+    weekendGraphValues.value = response.data.data
+      .slice(0, -2)
+      .map(data => (data.attendanceTotalTime === null ? 0 : roundHour(data.attendanceTotalTime)))
+
+    console.log(':::::::: ::::', weekendParams.value, weekendGraphValues.value)
   } catch (error) {
     console.error('[ERROR] fetchWeekendWorkTime error:', error)
   }
@@ -139,7 +138,7 @@ watch(
   userNo,
   async newUserNo => {
     if (newUserNo) {
-      /* await fetchAttendanceChartData() */
+      await fetchAttendanceChartData()
     }
   },
   { immediate: true },
@@ -158,9 +157,5 @@ onMounted(() => {
 .date-picker-card {
   min-width: 300px;
   width: 100%;
-}
-
-.card-container {
-  padding: 20px;
 }
 </style>

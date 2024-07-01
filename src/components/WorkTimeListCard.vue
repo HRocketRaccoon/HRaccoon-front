@@ -2,9 +2,9 @@
   <VCard class="card-container">
     <h2 class="mb-2">근무 시간</h2>
     <VCardText>
-      <VCol v-for="day in workHours" :key="day.name" class="d-flex flex-col justify-space-between col-class">
-        <span>{{ day.name }}</span>
-        <span>{{ day.status }}</span>
+      <VCol v-for="data in datas" :key="data.name" class="d-flex flex-col justify-space-between col-class">
+        <span>{{ data.attendanceDay }}</span>
+        <span>{{ data.attendanceStatus === 'proxy' ? '미출근' : data.attendanceTotalTime }}</span>
       </VCol>
     </VCardText>
   </VCard>
@@ -12,7 +12,7 @@
 
 <script setup>
 const props = defineProps({
-  workHours: {
+  datas: {
     type: Array,
     required: true,
   },
