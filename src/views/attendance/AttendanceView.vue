@@ -124,15 +124,23 @@ const fetchWeekendWorkTime = async () => {
     const response = await api.get(`/attendance/worktimeperdate/${userNo.value}`)
     console.log('[SUCCESS] fetchWeekendWorkTime response:', response)
 
-    weekendParams.value = response.data.data.slice(0, -2)
-    weekendGraphValues.value = response.data.data
-      .slice(0, -2)
-      .map(data => (data.attendanceTotalTime === null ? 0 : roundHour(data.attendanceTotalTime)))
+    const sortedData = sortAttendanceData(response.data.data)
+    const sortedDataExceptWeekend = sortedData.slice(0, -2)
+
+    weekendParams.value = sortedDataExceptWeekend
+    weekendGraphValues.value = sortedDataExceptWeekend.map(data =>
+      data.attendanceTotalTime === null ? 0 : roundHour(data.attendanceTotalTime),
+    )
 
     console.log(':::::::: ::::', weekendParams.value, weekendGraphValues.value)
   } catch (error) {
     console.error('[ERROR] fetchWeekendWorkTime error:', error)
   }
+}
+
+const dayOrder = ['월', '화', '수', '목', '금', '토', '일']
+const sortAttendanceData = data => {
+  return data.sort((a, b) => dayOrder.indexOf(a.attendanceDay) - dayOrder.indexOf(b.attendanceDay))
 }
 
 watch(
