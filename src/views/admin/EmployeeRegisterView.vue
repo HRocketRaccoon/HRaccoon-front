@@ -185,6 +185,7 @@ const fetchUserInfo = async () => {
     userRank: params.value.userRank,
     userRole: setUserRole(params.value.userTeam),
     userJoinDate: dayjs(new Date()).format('YYYY-MM-DDTHH:mm:ss').toString(),
+    userImageUrl: params.value.userImageUrl,
   }
 
   try {
