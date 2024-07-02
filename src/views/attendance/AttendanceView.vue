@@ -153,6 +153,8 @@ watch(
   { immediate: true },
 )
 
+watch(weekendGraphValues, () => {})
+
 watch(selectedDate, newDate => {
   fetchDailyAttendanceData(formatDate(newDate))
 })

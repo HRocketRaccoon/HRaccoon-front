@@ -4,7 +4,13 @@
     <VCardText>
       <VCol v-for="data in datas" :key="data.name" class="d-flex flex-col justify-space-between col-class">
         <span>{{ data.attendanceDay }}</span>
-        <span>{{ data.attendanceStatus === 'proxy' ? '미출근' : data.attendanceTotalTime }}</span>
+        <span>{{
+          data.attendanceStatus === 'proxy'
+            ? '미출근'
+            : data.attendanceStatus !== '퇴근'
+              ? data.attendanceStatus
+              : data.attendanceTotalTime
+        }}</span>
       </VCol>
     </VCardText>
   </VCard>
