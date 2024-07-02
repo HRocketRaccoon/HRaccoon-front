@@ -35,7 +35,12 @@
         <VCardText>
           <h2 class="mb-4">금주 근무 시간</h2>
           <VRow>
-            <GraphBar :labels="defaultGraphLabels" :values="weekendGraphValues" style="width: auto; height: auto" />
+            <GraphBar
+              :key="updateKey"
+              :labels="defaultGraphLabels"
+              :values="weekendGraphValues"
+              style="width: auto; height: auto"
+            />
           </VRow>
         </VCardText>
       </VCard>
@@ -59,7 +64,7 @@ import api from '@/api/axios.js'
 import { useAuthStore } from '@/stores/useAuthStore.js'
 
 // util
-import { formatDate, removeDecimal, roundHour } from '@/util/util.js'
+import { formatDate, removeDecimal } from '@/util/util.js'
 import GraphBar from '@/components/GraphBar.vue'
 
 const authStore = useAuthStore()
@@ -77,8 +82,11 @@ const dailyParams = ref({
   endTime: '2024-06-03T12:45:01',
 })
 const monthlyChartParams = ref({})
+
+/* GraphBar params */
 const weekendGraphValues = ref([])
 const defaultGraphLabels = ref([' 월요일', '화요일', '수요일', '목요일', '금요일'])
+const updateKey = ref(0)
 
 const userNo = ref(authStore.userNo || null)
 
@@ -129,10 +137,9 @@ const fetchWeekendWorkTime = async () => {
 
     weekendParams.value = sortedDataExceptWeekend
     weekendGraphValues.value = sortedDataExceptWeekend.map(data =>
-      data.attendanceTotalTime === null ? 0 : roundHour(data.attendanceTotalTime),
+      data.attendanceTotalTime === null ? 0 : data.attendanceTotalTime,
     )
-
-    console.log(':::::::: ::::', weekendParams.value, weekendGraphValues.value)
+    updateKey.value++
   } catch (error) {
     console.error('[ERROR] fetchWeekendWorkTime error:', error)
   }
@@ -152,8 +159,6 @@ watch(
   },
   { immediate: true },
 )
-
-watch(weekendGraphValues, () => {})
 
 watch(selectedDate, newDate => {
   fetchDailyAttendanceData(formatDate(newDate))

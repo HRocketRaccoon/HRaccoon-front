@@ -1,9 +1,9 @@
 <template>
-  <Bar :data="chartData" :options="chartOptions" />
+  <Bar :ref="chart" :data="chartData" :options="chartOptions" />
 </template>
 
 <script setup>
-import { reactive, watch } from 'vue'
+import { nextTick, onMounted, ref, watch } from 'vue'
 import { Bar } from 'vue-chartjs'
 import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js'
 
@@ -14,7 +14,9 @@ const props = defineProps({
   values: Array,
 })
 
-const chartData = reactive({
+const chart = ref(null)
+
+const chartData = ref({
   labels: props.labels,
   datasets: [
     {
@@ -38,8 +40,9 @@ const chartData = reactive({
   ],
 })
 
-const chartOptions = reactive({
+const chartOptions = ref({
   responsive: true,
+  maintainAspectRatio: false,
   scales: {
     y: {
       beginAtZero: true,
@@ -60,17 +63,31 @@ const chartOptions = reactive({
   },
 })
 
+const updateChart = () => {
+  if (chart.value) {
+    nextTick(() => {
+      chart.value.chartInstance.update()
+    })
+  }
+}
+
 watch(
   () => props.labels,
   newLabels => {
-    chartData.labels = newLabels
+    chartData.value.labels = newLabels
+    updateChart()
   },
 )
 
 watch(
   () => props.values,
   newValues => {
-    chartData.datasets[0].data = newValues
+    chartData.value.datasets[0].data = newValues
+    updateChart()
   },
 )
+
+onMounted(() => {
+  updateChart()
+})
 </script>

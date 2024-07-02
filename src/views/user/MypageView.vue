@@ -358,11 +358,8 @@ const onHandleAbilityBtn = () => {
 }
 
 const removeAbility = index => {
-  console.log(':::::::::: testese ::::::::::::')
   if (modifiedAbilities.value.length > 1) {
     modifiedAbilities.value.splice(index, 1)
-
-    console.log('::::::::::::', modifiedAbilities.value)
   } else {
     toast.error(ABILITY_REMAIN)
   }
