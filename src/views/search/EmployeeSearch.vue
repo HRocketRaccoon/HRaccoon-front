@@ -58,7 +58,7 @@
 </template>
 <script setup>
 import { onMounted, ref } from 'vue'
-import EmployeeTable from '@/components/search/EmployeeTable.vue'
+import EmployeeTable from '@/components/table/EmployeeTable.vue'
 import { useToast } from 'vue-toastification'
 
 // api
@@ -67,7 +67,7 @@ import axios from '@/api/axios'
 // store
 import { useCodeStore } from '@/stores/useCodeStore'
 
-import { DEPATMENT_LIST, ABILITY_LIST } from '@/util/constants/userConstant'
+import { ABILITY_LIST, DEPATMENT_LIST } from '@/util/constants/userConstant'
 
 const toast = useToast()
 

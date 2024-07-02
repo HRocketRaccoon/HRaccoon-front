@@ -5,7 +5,6 @@
       <VCol cols="12" md="4">
         <VRow>
           <VCol cols="12">
-            <!-- <ApprovalChartCard /> -->
             <VCard class="card-container">
               <VCardTitle>이번주 나의 근무시간</VCardTitle>
               <VCardText>
@@ -36,7 +35,7 @@
           </VCol>
         </VRow>
         <VRow>
-          <!-- 👉 vacation -->
+          <!-- 👉 Profit -->
           <VCol cols="12" md="6" sm="6">
             <CardStatisticsVertical
               v-bind="{
@@ -48,7 +47,7 @@
             />
           </VCol>
 
-          <!-- 👉 business trip -->
+          <!-- 👉 Sales -->
           <VCol cols="12" md="6" sm="6">
             <CardStatisticsVertical
               v-bind="{
@@ -61,7 +60,7 @@
           </VCol>
         </VRow>
         <VRow>
-          <!-- 👉 out on business -->
+          <!-- 👉 Profit -->
           <VCol cols="12" md="6" sm="6">
             <CardStatisticsVertical
               v-bind="{
@@ -91,16 +90,13 @@
 
 <script setup>
 import CalendarCard from '@/components/calendar/CalendarCard.vue'
-import ApprovalChartCard from '@/components/apexchart/ApprovalChartCard.vue'
 import AttendanceApexChart from '@/components/apexchart/AttendanceApexChart.vue'
-import RemainSeat from '@/components/remainseat/RemainSeat.vue'
-import AnalyticsCongratulations from '@/components/dashboard/AnalyticsCongratulations.vue'
+import RemainSeat from '@/components/RemainSeat.vue'
 import CardStatisticsVertical from '@/@core/components/cards/CardStatisticsVertical.vue'
 
 // 👉 Images
 import chart1 from '@images/cards/chart-success.png'
 import chart2 from '@images/cards/chart-info.png'
-import card1 from '@images/cards/credit-card-primary.png'
 import wallet from '@images/cards/wallet-primary.png'
 
 import { onMounted, ref, watch } from 'vue'
