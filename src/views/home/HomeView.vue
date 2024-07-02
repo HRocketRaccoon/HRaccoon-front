@@ -36,7 +36,7 @@
           </VCol>
         </VRow>
         <VRow>
-          <!-- 👉 Profit -->
+          <!-- 👉 vacation -->
           <VCol cols="12" md="6" sm="6">
             <CardStatisticsVertical
               v-bind="{
@@ -48,7 +48,7 @@
             />
           </VCol>
 
-          <!-- 👉 Sales -->
+          <!-- 👉 business trip -->
           <VCol cols="12" md="6" sm="6">
             <CardStatisticsVertical
               v-bind="{
@@ -61,7 +61,7 @@
           </VCol>
         </VRow>
         <VRow>
-          <!-- 👉 Profit -->
+          <!-- 👉 out on business -->
           <VCol cols="12" md="6" sm="6">
             <CardStatisticsVertical
               v-bind="{
@@ -79,7 +79,7 @@
               v-bind="{
                 title: '나의 잔여 휴가',
                 image: wallet,
-                stats: 10,
+                stats: remainVacation,
               }"
             />
           </VCol>
@@ -103,7 +103,7 @@ import chart2 from '@images/cards/chart-info.png'
 import card1 from '@images/cards/credit-card-primary.png'
 import wallet from '@images/cards/wallet-primary.png'
 
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 // api
 import api from '@/api/axios.js'
 import { useAuthStore } from '@/stores/useAuthStore.js'
@@ -113,6 +113,7 @@ import { removeDecimal } from '@/util/util.js'
 
 const authStore = useAuthStore()
 const userNo = ref(authStore.userNo || null)
+const userId = ref(authStore.userId || null)
 
 const chartParams = ref({
   text: '총 근무 시간',
@@ -120,6 +121,12 @@ const chartParams = ref({
   totalTime: 40,
   currentTime: 20,
 })
+
+const vacationParams = ref({})
+const businessTripParams = ref({})
+const outOnBusinessParams = ref({})
+
+const remainVacation = ref()
 
 const fetchAttendanceChartData = async () => {
   try {
@@ -133,6 +140,52 @@ const fetchAttendanceChartData = async () => {
   }
 }
 
+const fetchVacationData = async () => {
+  try {
+    const response = await api.get(`/attendance/vacation-percentage`)
+    console.log('[SUCCESS] fetchVacationData response:', response)
+
+    vacationParams.value = {
+      ...response.data.data,
+    }
+  } catch (error) {
+    console.error('[ERROR] fetchVacationData error:', error)
+  }
+}
+
+const fetchBusinessTripData = async () => {
+  try {
+    const response = await api.get(`/attendance/business-trip-percentage`)
+    console.log('[SUCCESS] fetchBusinessTripData response:', response)
+
+    businessTripParams.value = response.data.data
+  } catch (error) {
+    console.error('[ERROR] fetchBusinessTripData error:', error)
+  }
+}
+
+const fetchOutOnBusinessData = async () => {
+  try {
+    const response = await api.get(`/attendance/out-on-business-percentage`)
+    console.log('[SUCCESS] fetchOutOnBusinessData response:', response)
+
+    outOnBusinessParams.value = response.data.data
+  } catch (error) {
+    console.error('[ERROR] fetchOutOnBusinessData error:', error)
+  }
+}
+
+const fetchRemainVacationData = async () => {
+  try {
+    const response = await api.get(`/user/remain-vacation/${userId.value}`)
+    console.log('[SUCCESS] fetchRemainVacationData response:', response)
+
+    remainVacation.value = response.data.data.userRemainVacation
+  } catch (error) {
+    console.error('[ERROR] fetchRemainVacationData error:', error)
+  }
+}
+
 watch(
   userNo,
   async newUserNo => {
@@ -142,6 +195,10 @@ watch(
   },
   { immediate: true },
 )
+
+onMounted(() => {
+  fetchRemainVacationData()
+})
 </script>
 
 <style lang="scss">
