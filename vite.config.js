@@ -1,8 +1,8 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
+import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   server: {
@@ -15,6 +15,69 @@ export default defineConfig({
       autoImport: true,
       styles: {
         configFile: 'src/styles/variables/_vuetify.scss',
+      },
+    }),
+    VitePWA({
+      registerType: 'autoUpdate',
+      devOptions: { enabled: true },
+
+      manifest: {
+        name: 'Hraccoon',
+        short_name: 'raccoon',
+        background_color: '#FFFFFF',
+        theme_color: '#696CFF',
+        description: 'Hraccoon mobile application',
+        icons: [
+          {
+            src: '/pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: '/pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: '/pwa-maskable-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+          {
+            src: '/pwa-maskable-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+        ],
+      },
+      workbox: {
+        runtimeCaching: [
+          {
+            urlPattern: /\.ico$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'ico-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365,
+              },
+            },
+          },
+          {
+            urlPattern: /\.json$/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'json-cache',
+              cacheableResponse: {
+                statuses: [200],
+              },
+            },
+          },
+        ],
       },
     }),
   ],
