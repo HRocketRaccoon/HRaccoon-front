@@ -64,7 +64,7 @@ import api from '@/api/axios.js'
 import { useAuthStore } from '@/stores/useAuthStore.js'
 
 // util
-import { formatDate, removeDecimal } from '@/util/util.js'
+import { formatDate, removeDecimal, roundHour } from '@/util/util.js'
 import GraphBar from '@/components/GraphBar.vue'
 
 const authStore = useAuthStore()
@@ -137,7 +137,7 @@ const fetchWeekendWorkTime = async () => {
 
     weekendParams.value = sortedDataExceptWeekend
     weekendGraphValues.value = sortedDataExceptWeekend.map(data =>
-      data.attendanceTotalTime === null ? 0 : data.attendanceTotalTime,
+      data.attendanceTotalTime === null ? 0 : roundHour(data.attendanceTotalTime),
     )
     updateKey.value++
   } catch (error) {
